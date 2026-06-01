@@ -1,0 +1,109 @@
+import Link from "next/link";
+import HeaderB from "@/components/b/HeaderB";
+import FooterB from "@/components/b/FooterB";
+import PostCard from "@/components/b/PostCard";
+import { getAllPosts } from "@/lib/blog";
+import { getCurrentIssue } from "@/lib/issues";
+
+export const metadata = {
+  title: "Revista de Derecho Comercial y de la Empresa",
+  description:
+    "Análisis jurídico y pensamiento comercial contemporáneo.",
+};
+
+export default function HomeBPage() {
+  const posts = getAllPosts();
+  const currentIssue = getCurrentIssue();
+
+  const [feature, ...rest] = posts;
+  const secondary = rest.slice(0, 2);
+  const recent = posts.slice(0, 4);
+
+  return (
+    <>
+      <HeaderB />
+
+      <main>
+        {/* Asymmetrical feature grid — every.to's signature pattern:
+            secondary stories left, dominant feature center, recent list right.
+            Dashed dividers, not cards. */}
+        <section className="mx-auto max-w-[1280px] px-4 py-12">
+          <div className="grid gap-10 lg:grid-cols-[1fr_2fr_1fr] lg:gap-0">
+            {/* Left: secondary stories */}
+            <div className="flex flex-col gap-10 lg:border-r lg:border-dashed lg:border-line-dark lg:pr-8">
+              {secondary.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
+
+            {/* Center: dominant feature */}
+            <div className="lg:px-8">
+              {feature && <PostCard post={feature} size="feature" />}
+            </div>
+
+            {/* Right: recent essays + current issue */}
+            <div className="lg:border-l lg:border-dashed lg:border-line-dark lg:pl-8">
+              <p className="text-xs uppercase tracking-widest text-ink-muted">
+                Recientes
+              </p>
+              <div className="mt-2 divide-y divide-line">
+                {recent.map((post) => (
+                  <PostCard key={post.slug} post={post} size="compact" />
+                ))}
+              </div>
+
+              {currentIssue && (
+                <div className="mt-10 border-t border-dashed border-line-dark pt-8">
+                  <p className="text-xs uppercase tracking-widest text-ink-muted">
+                    Última edición
+                  </p>
+                  <Link
+                    href={`/b/revista`}
+                    className="group mt-4 block"
+                  >
+                    <div className="aspect-[3/4] w-full bg-paper-cream" />
+                    <p className="mt-4 font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+                      {currentIssue.number} ({currentIssue.year})
+                    </p>
+                    <p className="mt-1 text-xs uppercase tracking-widest text-ink-muted">
+                      Volumen {currentIssue.volume} · N.º {currentIssue.issue}
+                    </p>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Section: all publications — every.to section rhythm:
+            uppercase header + description + arrow, then 4-col grid */}
+        <section className="mx-auto max-w-[1280px] border-t border-line px-4 py-12">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <h2 className="text-xl font-medium uppercase tracking-wide text-ink">
+                Publicaciones
+              </h2>
+              <p className="mt-1 text-base text-ink-muted">
+                Doctrina, jurisprudencia y análisis del derecho comercial.
+              </p>
+            </div>
+            <Link
+              href="/b/publicaciones"
+              className="text-sm text-ink-soft transition-colors hover:text-ink"
+            >
+              Ver todas →
+            </Link>
+          </div>
+
+          <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {posts.map((post) => (
+              <PostCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </section>
+      </main>
+
+      <FooterB />
+    </>
+  );
+}
