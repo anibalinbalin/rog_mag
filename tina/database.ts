@@ -28,8 +28,13 @@ const branch = (process.env.GITHUB_BRANCH ||
 // project so indexes never collide. (Siblings use "elemental" / "diagnostico".)
 const dbName = 'olivera_mag';
 
+// MUST match the --datalayer-port flag in the package.json dev/build scripts.
+// createLocalDatabase connects to the CLI's datalayer server as a TCP client;
+// a mismatch (client on 9000, server on 9001) hangs indexing forever.
+const DATALAYER_PORT = 9001;
+
 export default isLocal || !hasMongo
-  ? createLocalDatabase()
+  ? createLocalDatabase({ port: DATALAYER_PORT })
   : createDatabase({
       // App is at the repo root (Vercel root dir "."), so content commits to
       // content/blog etc. directly — no rootPath needed.
