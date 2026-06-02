@@ -88,9 +88,17 @@ export default function Footer() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-widest text-paper/40">
-                Legal
+                Institucional
               </p>
               <ul className="mt-4 space-y-3">
+                <li>
+                  <Link
+                    href="/nosotros"
+                    className="text-sm text-paper/80 transition-colors hover:text-paper"
+                  >
+                    Nosotros
+                  </Link>
+                </li>
                 <li>
                   <Link
                     href="/legales"

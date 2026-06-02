@@ -10,6 +10,7 @@ const navItems = [
   { href: "/secciones/noticias", label: "Noticias" },
   { href: "/autores", label: "Autores" },
   { href: "/revista", label: "Revista" },
+  { href: "/nosotros", label: "Nosotros" },
 ];
 
 /** every.to-style header: utility bar with actions, oversized centered
