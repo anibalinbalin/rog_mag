@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import IssueCover from "@/components/IssueCover";
+import IssueContents from "@/components/IssueContents";
 import { getAllIssues, getIssueBySlug } from "@/lib/issues";
 
 export function generateStaticParams() {
@@ -21,6 +21,8 @@ export async function generateMetadata({
   };
 }
 
+/** Issue detail — dominant feature treatment from the revista landing,
+    applied to a single archived edition. */
 export default async function IssuePage({
   params,
 }: {
@@ -32,47 +34,30 @@ export default async function IssuePage({
 
   return (
     <>
-      <Header />
+      <Header compact />
 
       <main>
-        <section className="mx-auto max-w-2xl px-6 pb-20 pt-10">
-          <div className="grid gap-10 sm:grid-cols-[1fr_220px]">
+        <section className="mx-auto max-w-[1280px] px-4 py-12">
+          <div className="grid gap-10 lg:grid-cols-[1fr_300px]">
             <div>
-              <h1 className="font-serif text-3xl leading-tight text-ink">
+              <p className="text-xs uppercase tracking-widest text-ink-muted">
+                Vol. {issue.volume} · {issue.number} · {issue.season}
+              </p>
+              <h1 className="mt-4 font-serif text-4xl leading-tight text-ink">
                 {issue.number} ({issue.year}): {issue.title}
               </h1>
 
-              <h2 className="mt-8 font-serif text-xl font-semibold text-ink">
-                Contenido
-              </h2>
-
-              <div className="mt-4">
-                <p className="text-sm text-ink-muted">Doctrina</p>
-                <ul className="mt-2 space-y-1.5">
-                  {issue.doctrina.map((item) => (
-                    <li key={item} className="text-base text-ink-soft">
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {issue.deInteres.length > 0 && (
-                <div className="mt-6">
-                  <p className="text-sm text-ink-muted">De interés</p>
-                  <ul className="mt-2 space-y-1.5">
-                    {issue.deInteres.map((item) => (
-                      <li key={item} className="text-base text-ink-soft">
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <IssueContents issue={issue} />
             </div>
 
-            <div className="self-start">
-              <IssueCover issue={issue} />
+            <div>
+              <div className="aspect-[3/4] w-full bg-paper-cream" />
+              <p className="mt-4 text-xs uppercase tracking-widest text-ink-muted">
+                Volumen {issue.volume}, N.º {issue.issue}
+              </p>
+              <p className="mt-1 text-xs uppercase tracking-widest text-ink-muted">
+                {issue.articleCount} artículos
+              </p>
             </div>
           </div>
         </section>

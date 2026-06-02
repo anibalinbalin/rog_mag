@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import PostListItem from "@/components/PostListItem";
+import PostCard from "@/components/PostCard";
 import { getAllPosts } from "@/lib/blog";
 
 export const metadata = {
@@ -12,15 +12,24 @@ export default function PublicacionesPage() {
 
   return (
     <>
-      <Header />
+      <Header compact />
 
       <main>
-        <section className="mx-auto max-w-2xl px-6 pb-20 pt-10">
-          <h1 className="font-serif text-3xl text-ink">Publicaciones</h1>
+        <section className="mx-auto max-w-[1280px] px-4 py-12">
+          <div className="flex items-baseline justify-between">
+            <div>
+              <h1 className="text-xl font-medium uppercase tracking-wide text-ink">
+                Publicaciones
+              </h1>
+              <p className="mt-1 text-base text-ink-muted">
+                Doctrina, jurisprudencia y análisis del derecho comercial.
+              </p>
+            </div>
+          </div>
 
-          <div className="mt-4 divide-y divide-line">
+          <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             {posts.map((post) => (
-              <PostListItem key={post.slug} post={post} />
+              <PostCard key={post.slug} post={post} />
             ))}
           </div>
         </section>

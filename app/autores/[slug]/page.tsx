@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import HeaderB from "@/components/b/HeaderB";
-import FooterB from "@/components/b/FooterB";
-import PageIdentity from "@/components/b/PageIdentity";
-import PostGrid from "@/components/b/PostGrid";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import PageIdentity from "@/components/PageIdentity";
+import PostGrid from "@/components/PostGrid";
 import { getPostsByAuthor } from "@/lib/blog";
 import { getAllAuthors, getAuthorBySlug } from "@/lib/authors";
 import { getSectionByName } from "@/lib/sections";
@@ -43,14 +43,14 @@ export default async function AuthorPage({
 
   return (
     <>
-      <HeaderB compact />
+      <Header compact />
 
       <main>
         <PageIdentity
           avatar
           pill={primarySection ? `Escribe en ${primarySection.name}` : undefined}
           pillHref={
-            primarySection ? `/b/secciones/${primarySection.slug}` : undefined
+            primarySection ? `/secciones/${primarySection.slug}` : undefined
           }
           title={author.name}
           subtitle={`${author.role} · ${author.institution}`}
@@ -73,7 +73,7 @@ export default async function AuthorPage({
         </section>
       </main>
 
-      <FooterB />
+      <Footer />
     </>
   );
 }

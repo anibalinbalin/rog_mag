@@ -14,7 +14,7 @@ export default function PostCard({
 }) {
   if (size === "compact") {
     return (
-      <Link href={`/b/publicaciones/${post.slug}`} className="group block py-4">
+      <Link href={`/publicaciones/${post.slug}`} className="group block py-4">
         <p className="font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
           {post.title}
         </p>
@@ -29,7 +29,7 @@ export default function PostCard({
 
   return (
     <Link
-      href={`/b/publicaciones/${post.slug}`}
+      href={`/publicaciones/${post.slug}`}
       className={`group block ${isFeature ? "text-center" : ""}`}
     >
       {/* Cover placeholder — cream, like the journal covers */}

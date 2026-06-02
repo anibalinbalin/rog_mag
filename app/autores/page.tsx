@@ -1,6 +1,6 @@
 import Link from "next/link";
-import HeaderB from "@/components/b/HeaderB";
-import FooterB from "@/components/b/FooterB";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 import { getAllAuthors } from "@/lib/authors";
 import { sections } from "@/lib/sections";
 import { getPostsBySection } from "@/lib/blog";
@@ -16,7 +16,7 @@ export default function AutoresPage() {
 
   return (
     <>
-      <HeaderB compact />
+      <Header compact />
 
       <main>
         <section className="mx-auto max-w-[1280px] px-4 pb-20 pt-12">
@@ -30,7 +30,7 @@ export default function AutoresPage() {
             {authors.map((author) => (
               <Link
                 key={author.slug}
-                href={`/b/autores/${author.slug}`}
+                href={`/autores/${author.slug}`}
                 className="group block"
               >
                 {/* Portrait placeholder */}
@@ -61,7 +61,7 @@ export default function AutoresPage() {
                 return (
                   <Link
                     key={section.slug}
-                    href={`/b/secciones/${section.slug}`}
+                    href={`/secciones/${section.slug}`}
                     className="group block"
                   >
                     <p className="font-serif text-2xl font-semibold text-ink transition-colors group-hover:text-ink-soft">
@@ -98,7 +98,7 @@ export default function AutoresPage() {
         </section>
       </main>
 
-      <FooterB />
+      <Footer />
     </>
   );
 }

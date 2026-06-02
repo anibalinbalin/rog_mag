@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
-import HeaderB from "@/components/b/HeaderB";
-import FooterB from "@/components/b/FooterB";
-import PageIdentity from "@/components/b/PageIdentity";
-import PostGrid from "@/components/b/PostGrid";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import PageIdentity from "@/components/PageIdentity";
+import PostGrid from "@/components/PostGrid";
 import { getPostsBySection } from "@/lib/blog";
 import { sections, getSectionBySlug } from "@/lib/sections";
 
@@ -39,7 +39,7 @@ export default async function SectionPage({
 
   return (
     <>
-      <HeaderB compact />
+      <Header compact />
 
       <main>
         <PageIdentity
@@ -59,7 +59,7 @@ export default async function SectionPage({
         </section>
       </main>
 
-      <FooterB />
+      <Footer />
     </>
   );
 }

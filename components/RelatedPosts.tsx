@@ -16,7 +16,7 @@ export default function RelatedPosts({ posts }: { posts: Post[] }) {
         {posts.map((post) => (
           <Link
             key={post.slug}
-            href={`/b/publicaciones/${post.slug}`}
+            href={`/publicaciones/${post.slug}`}
             className="group block py-6"
           >
             <p className="text-xs uppercase tracking-widest text-ink-muted">
