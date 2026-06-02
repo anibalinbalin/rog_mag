@@ -1,74 +1,97 @@
-# olivera_mag — Olivera magazine site (TO BUILD)
+# olivera_mag — Olivera magazine site
 
-This folder is the **Olivera magazine** site — the 3rd of three sister sites that all use the
-same **self-hosted TinaCMS** blog setup. As of 2026-05-29 this folder is **empty / greenfield**:
-the Next.js app + blog still need to be built. **Tina comes AFTER** the site has a blog with a
-content reader — don't wire Tina into an empty app.
+**Revista de Derecho Comercial y de la Empresa** — the 3rd of three sister sites using the same
+self-hosted TinaCMS setup. The site is **built and live**; Tina is **wired** (one env var pending,
+see below).
 
-## The plan for this project
+- **Production:** https://rog-mag.vercel.app (every.to-style layout, sections/authors/issues)
+- **Admin:** https://rog-mag.vercel.app/admin (Clerk Google login, allowed emails only)
+- **GitHub:** `anibalinbalin/rog_mag` — pushes to `main` auto-deploy on Vercel
+- **Vercel:** project `rog-mag`, team scope `anibals-projects-c9882c4c`
+- **Local dir:** `/mnt/data/sites-sync/2026/olivera_mag/` (app at repo root)
+- **Local dev:** `bun run dev` (Tina + Next on port 3003) or `bun run dev:next` (Next only).
+  Tailscale URL: https://claude-code-sec.tailf626.ts.net:3003/
 
-1. **Build the site first** — Next.js (App Router) + Tailwind, a blog that reads markdown posts
-   (e.g. `content/blog/*.md` via `gray-matter`), magazine landing/article pages.
-2. **Then add the self-hosted TinaCMS editor** (`/admin`) so the editors can author posts in a GUI,
-   following the exact playbook the two sibling sites already use (copy from them — see below).
+## Architecture
 
-## Repo
+- Next.js 15 App Router + Tailwind v4 + TypeScript, bun.
+- **Content (markdown, flat frontmatter via gray-matter):**
+  - `content/blog/*.md` → posts (title/category/section/excerpt/author/authorRole/date). URL = `/publicaciones/<filename>`
+  - `content/authors/*.md` → authors (name/role/institution/linkedin/sections + bio body). URL = `/autores/<filename>`
+  - `content/issues/*.md` → journal issues (number/year/volume/issue/season/articleCount/current/doctrina[]/deInteres[]). URL = `/revista/<filename>`
+- **Readers:** `lib/blog.ts`, `lib/authors.ts`, `lib/issues.ts`, `lib/sections.ts` (sections are code, not content)
+- **Design:** Belen owns colors/typography (`--color-*` tokens, Source Serif 4 + Inter) — never change them.
+  Structure follows every.to: sections institutional, authors personal.
 
-- **GitHub:** `anibalinbalin/rog_mag` (https://github.com/anibalinbalin/rog_mag.git)
-- **Local dir:** `/mnt/data/sites-sync/2026/olivera_mag/`
-- App at repo root (no subdir layout).
+## TinaCMS (self-hosted, wired 2026-06-02)
 
-## Editors / access (already decided)
+- **Collections:** `tina/collection/{post,author,issue}.ts` — Spanish labels, map the frontmatter 1:1.
+- **Config:** `tina/config.tsx` (Clerk auth in prod, LocalAuthProvider in dev), `tina/database.ts`
+  (Mongo datalayer + GitHub provider; **falls back to local DB when MONGODB_URI is absent** — the
+  elemental pattern, so deploys never fail on a missing URI), `pages/api/tina/[...routes].ts` (backend).
+- **dbName:** `olivera_mag` on shared Atlas cluster `tina-cms` (host `tina-cms.gxznqty.mongodb.net`,
+  project id `6a18f54236dce0b2d91b996f`).
+- **Dedicated local ports:** Tina server **4002**, datalayer **9001** (baked into package.json scripts) —
+  so olivera_mag's Tina never conflicts with elemental's (which uses defaults 4001/9000). Multiple
+  `tinacms dev` instances CAN run concurrently on this box thanks to this.
+- **Vercel env (Production), all set except MONGODB_URI:** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
+  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`.
+  Stored as plain encrypted (NOT write-only "Sensitive") so `vercel env pull --environment=production` works.
 
-- Allowed editors (`TINA_PUBLIC_ALLOWED_EMAILS`): `rolivera@olivera.com.uy`,
-  `admin@olivera.com.uy`, `anibalin@gmail.com`.
-- Auth = the SAME shared Clerk dev app as the siblings: `app_3ENa7rioipLIOsJsiGl1iaPm0Qj`
-  (publishable key `pk_test_YWNjdXJhdGUtZ2FyZmlzaC0zMC5jbGVyay5hY2NvdW50cy5kZXYk`; the secret key
-  is in the siblings' Vercel env — reuse it / ask Anibal to repaste).
+### ⚠️ Pending: MONGODB_URI (the only missing piece)
 
-## Tina playbook (copy from the working siblings)
+Without it, `/admin` deploys but edits don't persist (local-DB fallback). To finish:
 
-Two live, working references on this machine — copy `tina/` + `pages/api/tina/` from whichever
-matches this project's layout:
-- **App at repo root:** `/mnt/data/sites-sync/2026/stackmd/buena/codex_diag` (the `diaglanding`
-  project) — has its own `CLAUDE.md` documenting the whole setup. Use this if olivera_mag's Next
-  app is at the repo root (no `GitHubProvider rootPath`).
-- **App in a subdir:** `/mnt/data/sites-sync/2026/elemental/landing_wip` — uses
-  `GitHubProvider({ rootPath: '<subdir>' })` so commits land in the subdir Vercel builds from.
-- Origin of the playbook: the `tina-nextjs-starter` repo.
+1. Re-auth Atlas (needs Anibal's device code): `printf '\n\n' | atlas auth login --noBrowser`
+   then enter the code at https://account.mongodb.com/account/connect
+2. Mint the db user:
+   `atlas dbusers create readWriteAnyDatabase --username olivera_mag --password "$(openssl rand -base64 24 | tr -d '/+=')" --projectId 6a18f54236dce0b2d91b996f`
+   (record the password — Atlas can't show it again)
+3. Set the URI (format: `mongodb+srv://olivera_mag:<password>@tina-cms.gxznqty.mongodb.net/?retryWrites=true&w=majority`):
+   `printf '%s' "<uri>" | vercel env add MONGODB_URI production --scope anibals-projects-c9882c4c`
+   Also add it to local `.env`.
+4. Redeploy: `git commit --allow-empty -m "Redeploy with MongoDB" && git push`
 
-What to set up when adding Tina here:
-- `tina/config.tsx` (Clerk auth + LocalAuthProvider for dev, admin SPA → `public/admin`),
-  `tina/database.ts` (Mongo datalayer + GitHub git provider), `tina/collection/post.ts`
-  (schema matching this site's frontmatter), `pages/api/tina/[...routes].ts` (TinaNodeBackend
-  + ClerkBackendAuthentication).
-- **dbName: `olivera_mag`** (unique) on the SHARED Atlas cluster `tina-cms`
-  (host `tina-cms.gxznqty.mongodb.net`, Atlas project id `6a18f54236dce0b2d91b996f`). Mint a new
-  Atlas db user for it (don't reuse another project's — passwords aren't recoverable).
-- Vercel env (Production): `MONGODB_URI`, `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
-  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` + `GITHUB_OWNER/REPO/BRANCH`.
-- Pinned deps (DON'T bump): `tinacms@3.8.3`, `tinacms-clerk@22.0.3`, `@clerk/clerk-js@4`,
-  `@clerk/backend@0.38`, `@tinacms/datalayer@2.0.22`, `tinacms-gitprovider-github`, `mongodb-level`,
-  `@tinacms/cli@2.4.1` (dev).
-- Scripts: dev = `TINA_PUBLIC_IS_LOCAL=true tinacms dev -c "next dev -p <port>"`;
-  build = `tinacms build --partial-reindex && next build`.
+## Editors / access
 
-## Gotchas (learned building the siblings)
+- Allowed editors (`TINA_PUBLIC_ALLOWED_EMAILS`): `rolivera@olivera.com.uy`, `admin@olivera.com.uy`, `anibalin@gmail.com`
+- Auth = shared Clerk dev app `app_3ENa7rioipLIOsJsiGl1iaPm0Qj` (same as siblings).
+  Secret key lives in `/mnt/data/sites-sync/2026/migrate_claude_code/clerk.env` on this box.
 
-- **Run `bunx tsc --noEmit` before every push** — `next build` type-checks (fails the deploy);
-  `next dev` does not, so type errors slip through locally.
-- **bun only** — keep a single `bun.lock`; don't let `package-lock.json`/`pnpm-lock.yaml` coexist
-  (Vercel may pick the wrong installer and miss the Tina deps).
+## Secrets — where to find them on this box
+
+- **Clerk secret (sk_test):** `/mnt/data/sites-sync/2026/migrate_claude_code/clerk.env`
+- **GitHub token:** `gh auth token` (repo scope, account anibalinbalin)
+- **Mongo:** NOT recoverable anywhere — must mint a new Atlas db user (see Pending above)
+- Local `.env` (gitignored) mirrors the Vercel production env for local prod-mode testing
+
+## Gotchas (hard-won)
+
+- **Run `bunx tsc --noEmit` before every push** — `next build` type-checks (fails the deploy); `next dev` does not.
+- **Never run `next build` while `next dev` runs on the same `.next`** — corrupts the dev cache.
+  Kill dev, `rm -rf .next`, build, restart dev.
+- **bun only** — keep a single `bun.lock`.
 - **Tina collection `defaultItem` goes at the collection top level**, not inside `ui`.
-- **Only one `tinacms dev` at a time** per machine (fixed datalayer port 9000).
-- **atlas CLI sessions expire** — re-auth with `printf '\n\n' | atlas auth login --noBrowser`
-  (the newline picks the default UserAccount), then enter the device code at
-  https://account.mongodb.com/account/connect. `atlas auth whoami` can lie ("logged in") while
-  real calls fail — test with `atlas dbusers list --projectId 6a18f54236dce0b2d91b996f`.
-- Keep post frontmatter fields **flat** (the frontend reads them via gray-matter); if the URL is
-  the filename, make the filename equal the `slug`.
+- **Pinned deps (DON'T bump):** `tinacms@3.8.3`, `tinacms-clerk@22.0.3`, `@clerk/clerk-js@4.73.14`,
+  `@clerk/backend@0.38.15`, `@tinacms/datalayer@2.0.22`, `tinacms-gitprovider-github@4.1.9`,
+  `mongodb-level@0.0.4`, `@tinacms/cli@2.4.1` (dev). tinacms-clerk@22 requires Clerk v4 SDKs.
+- **atlas CLI sessions expire** — `atlas auth whoami` can lie; test with
+  `atlas dbusers list --projectId 6a18f54236dce0b2d91b996f`.
+- **Keep post frontmatter flat**; filename === slug === URL.
+- **Dates:** Tina writes ISO datetimes; `lib/blog.ts normalizeDate()` normalizes both ISO and
+  plain `YYYY-MM-DD` to `YYYY-MM-DD`. Don't remove it.
+- **tina-lock.json is committed** (generated by `tinacms dev`); `tina/__generated__/` and
+  `public/admin/{index.html,assets}` are gitignored (regenerated on every build).
 
-## Sister sites (live)
+## Sister sites (live references)
 
-- elemental → https://elemental-beryl.vercel.app/admin (editor: Laura)
-- diagnostico → https://diaglanding.vercel.app/admin (editor: jgualco)
+- elemental → https://elemental-beryl.vercel.app/admin (editor: Laura) — app in subdir `landing_wip`
+- diagnostico → https://diaglanding.vercel.app/admin (editor: jgualco) — app at repo root
+- Origin playbook: `/mnt/data/sites-sync/2026/tina-nextjs-starter`
+
+## Next steps (queue)
+
+1. **MONGODB_URI** (see Pending above) — the only blocker for full production editing
+2. Real images: issue covers, author photos, article covers (cream placeholders now)
+3. Clerk auth for "Iniciar sesión" / "Suscribirme" buttons (non-functional)
+4. About page (editorial letter formula from the every.to spec)

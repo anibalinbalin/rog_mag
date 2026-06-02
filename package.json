@@ -3,26 +3,43 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3003",
-    "build": "next build",
+    "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -p 4002 --datalayer-port 9001 -c \"next dev -p 3003\"",
+    "dev:next": "next dev -p 3003",
+    "build": "tinacms build --partial-reindex -p 4002 --datalayer-port 9001 && next build",
     "start": "next start -p 3003",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@clerk/backend": "0.38.15",
+    "@clerk/clerk-js": "4.73.14",
+    "@tinacms/datalayer": "2.0.22",
     "gray-matter": "^4.0.3",
+    "mongodb-level": "0.0.4",
     "next": "^15.3.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "remark": "^15.0.1",
-    "remark-html": "^16.0.1"
+    "remark-html": "^16.0.1",
+    "tinacms": "3.8.3",
+    "tinacms-clerk": "22.0.3",
+    "tinacms-gitprovider-github": "4.1.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.8",
+    "@tinacms/cli": "2.4.1",
     "@types/node": "^22.15.29",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3"
-  }
+  },
+  "trustedDependencies": [
+    "better-sqlite3",
+    "browser-tabs-lock",
+    "core-js",
+    "esbuild",
+    "protobufjs",
+    "sharp"
+  ]
 }

@@ -22,6 +22,15 @@ export interface PostWithHtml extends Post {
   contentHtml: string;
 }
 
+/** Normalize a frontmatter date to "YYYY-MM-DD".
+    Handles plain strings ("2026-05-15"), ISO datetimes written by the Tina
+    editor ("2026-05-15T00:00:00.000Z"), and Date objects from unquoted YAML. */
+function normalizeDate(value: unknown): string {
+  if (value instanceof Date) return value.toISOString().slice(0, 10);
+  if (typeof value === "string") return value.split("T")[0];
+  return "";
+}
+
 function parsePost(fileName: string): Post {
   const slug = fileName.replace(/\.md$/, "");
   const fullPath = path.join(postsDirectory, fileName);
@@ -36,7 +45,7 @@ function parsePost(fileName: string): Post {
     excerpt: data.excerpt ?? "",
     author: data.author ?? "",
     authorRole: data.authorRole ?? "",
-    date: data.date ?? "",
+    date: normalizeDate(data.date),
     content,
   };
 }
