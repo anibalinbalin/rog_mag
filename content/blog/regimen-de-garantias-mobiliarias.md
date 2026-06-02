@@ -6,7 +6,7 @@ excerpt: "Un análisis del sistema de garantías sobre bienes muebles y su impac
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"
 date: "2026-03-10"
-coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422724/covers/doctrina.jpg"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780423873/covers/garantias.jpg"
 ---
 
 Un análisis del sistema de garantías sobre bienes muebles y su impacto en el acceso al crédito empresarial, con especial referencia a la prenda sin desplazamiento.
