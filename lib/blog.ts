@@ -93,21 +93,6 @@ export function getRelatedPosts(post: Post, limit = 3): Post[] {
   return [...sameSection, ...sameAuthor].slice(0, limit);
 }
 
-export function formatDate(dateString: string): string {
-  const months = [
-    "Enero",
-    "Febrero",
-    "Marzo",
-    "Abril",
-    "Mayo",
-    "Junio",
-    "Julio",
-    "Agosto",
-    "Septiembre",
-    "Octubre",
-    "Noviembre",
-    "Diciembre",
-  ];
-  const date = new Date(dateString + "T00:00:00");
-  return `${months[date.getMonth()]} ${date.getFullYear()}`;
-}
+// Client-safe implementation lives in lib/format.ts; re-exported here so
+// server-side consumers keep importing from "@/lib/blog".
+export { formatDate } from "./format";

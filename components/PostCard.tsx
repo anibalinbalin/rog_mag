@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Post } from "@/lib/blog";
-import { formatDate } from "@/lib/blog";
+import { formatDate } from "@/lib/format";
 
 /** every.to collection-card anatomy: cover, metadata row, serif title,
     serif dek, uppercase author row. No card borders — dividers come from

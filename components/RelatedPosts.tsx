@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Post } from "@/lib/blog";
-import { formatDate } from "@/lib/blog";
+import { formatDate } from "@/lib/format";
 
 /** Related posts as a calm vertical list (every.to under-article pattern) —
     a continuation of reading, not another homepage grid. */
