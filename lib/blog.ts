@@ -15,6 +15,7 @@ export interface Post {
   author: string;
   authorRole: string;
   date: string;
+  coverImage: string;
   content: string;
 }
 
@@ -46,6 +47,7 @@ function parsePost(fileName: string): Post {
     author: data.author ?? "",
     authorRole: data.authorRole ?? "",
     date: normalizeDate(data.date),
+    coverImage: data.coverImage ?? "",
     content,
   };
 }

@@ -38,6 +38,13 @@ const Author: Collection = {
         'Nombre completo con título. Ej: Dr. Ricardo Olivera. Los artículos lo referencian por este nombre exacto.',
     },
     {
+      type: 'image',
+      name: 'photo',
+      label: 'Foto',
+      description:
+        'Foto del autor. Se muestra en su perfil y en el listado de autores. Opcional.',
+    },
+    {
       type: 'string',
       name: 'role',
       label: 'Cargo',

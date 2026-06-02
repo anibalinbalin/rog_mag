@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 /** Codex page-header formula:
     identity image → title → subtitle/role → relationship pill → bio
@@ -9,6 +10,8 @@ import Link from "next/link";
     can make these elements contextually editable. */
 export default function PageIdentity({
   avatar = false,
+  avatarSrc,
+  avatarField,
   pill,
   pillHref,
   pillField,
@@ -22,6 +25,8 @@ export default function PageIdentity({
   linksField,
 }: {
   avatar?: boolean;
+  avatarSrc?: string;
+  avatarField?: string;
   pill?: string;
   pillHref?: string;
   pillField?: string;
@@ -36,9 +41,22 @@ export default function PageIdentity({
 }) {
   return (
     <div className="mx-auto max-w-2xl px-4 pb-6 pt-12 text-center">
-      {/* Identity image — cream placeholder circle for authors */}
+      {/* Identity image — uploaded photo, or cream placeholder circle */}
       {avatar && (
-        <div className="mx-auto mb-6 h-36 w-36 rounded-full bg-paper-cream sm:h-44 sm:w-44" />
+        <div
+          data-tina-field={avatarField}
+          className="relative mx-auto mb-6 h-36 w-36 overflow-hidden rounded-full bg-paper-cream sm:h-44 sm:w-44"
+        >
+          {avatarSrc && (
+            <Image
+              src={avatarSrc}
+              alt={title}
+              fill
+              sizes="176px"
+              className="object-cover"
+            />
+          )}
+        </div>
       )}
 
       {/* Relationship pill */}

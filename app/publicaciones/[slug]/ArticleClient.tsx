@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { tinaField, useTina } from "tinacms/dist/react";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 import Header from "@/components/Header";
@@ -44,9 +45,23 @@ export default function ArticleClient(props: ArticleClientProps) {
 
       {/* Warm paper reading background — every.to article mode */}
       <main className="bg-paper-warm/40">
-        {/* Full-width cover band */}
+        {/* Full-width cover band — uploaded image, or cream placeholder */}
         <div className="mx-auto max-w-[1248px] px-4 pt-12">
-          <div className="aspect-[16/9] w-full bg-paper-cream" />
+          <div
+            data-tina-field={tinaField(post, "coverImage")}
+            className="relative aspect-[16/9] w-full overflow-hidden bg-paper-cream"
+          >
+            {post.coverImage && (
+              <Image
+                src={post.coverImage}
+                alt={post.title}
+                fill
+                priority
+                sizes="(min-width: 1280px) 1216px, 100vw"
+                className="object-cover"
+              />
+            )}
+          </div>
         </div>
 
         {/* 10-column article grid */}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Post } from "@/lib/blog";
 import { formatDate } from "@/lib/format";
 
@@ -32,12 +33,26 @@ export default function PostCard({
       href={`/publicaciones/${post.slug}`}
       className={`group block ${isFeature ? "text-center" : ""}`}
     >
-      {/* Cover placeholder — cream, like the journal covers */}
+      {/* Cover — uploaded image, or cream placeholder like the journal covers */}
       <div
-        className={`w-full bg-paper-cream ${
+        className={`relative w-full overflow-hidden bg-paper-cream ${
           isFeature ? "aspect-[16/10]" : "aspect-square"
         }`}
-      />
+      >
+        {post.coverImage && (
+          <Image
+            src={post.coverImage}
+            alt={post.title}
+            fill
+            sizes={
+              isFeature
+                ? "(min-width: 1024px) 50vw, 100vw"
+                : "(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            }
+            className="object-cover"
+          />
+        )}
+      </div>
 
       {/* Metadata row */}
       <p className="mt-5 text-xs uppercase tracking-widest text-ink-muted">

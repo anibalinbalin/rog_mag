@@ -7,6 +7,7 @@ const authorsDirectory = path.join(process.cwd(), "content/authors");
 export interface Author {
   slug: string;
   name: string;
+  photo: string;
   role: string;
   institution: string;
   bio: string;
@@ -23,6 +24,7 @@ function parseAuthor(fileName: string): Author {
   return {
     slug,
     name: data.name ?? "",
+    photo: data.photo ?? "",
     role: data.role ?? "",
     institution: data.institution ?? "",
     bio: content.trim(),

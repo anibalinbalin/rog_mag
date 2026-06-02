@@ -8,6 +8,7 @@ export interface Issue {
   slug: string;
   title: string;
   number: string;
+  cover: string;
   year: number;
   volume: number;
   issue: number;
@@ -28,6 +29,7 @@ function parseIssue(fileName: string): Issue {
     slug,
     title: data.title ?? "",
     number: data.number ?? "",
+    cover: data.cover ?? "",
     year: data.year ?? 0,
     volume: data.volume ?? 0,
     issue: data.issue ?? 0,

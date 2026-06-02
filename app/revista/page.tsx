@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import IssueContents from "@/components/IssueContents";
@@ -38,7 +39,17 @@ export default function RevistaPage() {
               </div>
 
               <div>
-                <div className="aspect-[3/4] w-full bg-paper-cream" />
+                <div className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream">
+                  {currentIssue.cover && (
+                    <Image
+                      src={currentIssue.cover}
+                      alt={`${currentIssue.number} (${currentIssue.year})`}
+                      fill
+                      sizes="(min-width: 1024px) 300px, 100vw"
+                      className="object-cover"
+                    />
+                  )}
+                </div>
                 <p className="mt-4 text-xs uppercase tracking-widest text-ink-muted">
                   Volumen {currentIssue.volume}, N.º {currentIssue.issue}
                 </p>

@@ -46,6 +46,8 @@ export default function AuthorClient(props: AuthorClientProps) {
       <main>
         <PageIdentity
           avatar
+          avatarSrc={author.photo ?? undefined}
+          avatarField={tinaField(author, "photo")}
           pill={
             primarySection ? `Escribe en ${primarySection.name}` : undefined
           }

@@ -64,6 +64,13 @@ const Post: Collection = {
       ui: { component: 'textarea' },
     },
     {
+      type: 'image',
+      name: 'coverImage',
+      label: 'Imagen de portada',
+      description:
+        'Imagen del artículo. Se muestra en las tarjetas y en la cabecera. Opcional.',
+    },
+    {
       type: 'string',
       name: 'author',
       label: 'Autor',

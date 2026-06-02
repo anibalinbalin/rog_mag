@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
@@ -62,7 +63,17 @@ export default function HomePage() {
                     href={`/revista`}
                     className="group mt-4 block"
                   >
-                    <div className="aspect-[3/4] w-full bg-paper-cream" />
+                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream">
+                      {currentIssue.cover && (
+                        <Image
+                          src={currentIssue.cover}
+                          alt={`${currentIssue.number} (${currentIssue.year})`}
+                          fill
+                          sizes="(min-width: 1024px) 300px, 100vw"
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
                     <p className="mt-4 font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
                       {currentIssue.number} ({currentIssue.year})
                     </p>

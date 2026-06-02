@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { tinaField, useTina } from "tinacms/dist/react";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 import Header from "@/components/Header";
@@ -70,7 +71,20 @@ export default function IssueClient(props: IssueClientProps) {
             </div>
 
             <div>
-              <div className="aspect-[3/4] w-full bg-paper-cream" />
+              <div
+                data-tina-field={tinaField(issue, "cover")}
+                className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream"
+              >
+                {issue.cover && (
+                  <Image
+                    src={issue.cover}
+                    alt={`${issue.number} (${issue.year})`}
+                    fill
+                    sizes="(min-width: 1024px) 300px, 100vw"
+                    className="object-cover"
+                  />
+                )}
+              </div>
               <p
                 data-tina-field={tinaField(issue, "volume")}
                 className="mt-4 text-xs uppercase tracking-widest text-ink-muted"

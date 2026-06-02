@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { getAllAuthors } from "@/lib/authors";
@@ -33,8 +34,18 @@ export default function AutoresPage() {
                 href={`/autores/${author.slug}`}
                 className="group block"
               >
-                {/* Portrait placeholder */}
-                <div className="aspect-square w-full bg-paper-cream" />
+                {/* Portrait — uploaded photo, or cream placeholder */}
+                <div className="relative aspect-square w-full overflow-hidden bg-paper-cream">
+                  {author.photo && (
+                    <Image
+                      src={author.photo}
+                      alt={author.name}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      className="object-cover"
+                    />
+                  )}
+                </div>
                 <p className="mt-5 font-serif text-2xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
                   {author.name}
                 </p>

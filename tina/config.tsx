@@ -31,10 +31,11 @@ const config = defineConfig({
     process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF! ||
     process.env.HEAD!,
   media: {
-    tina: {
-      publicFolder: 'public',
-      mediaRoot: 'uploads',
-      static: true,
+    // Cloudinary media store: uploads/deletes go through our own
+    // /api/cloudinary/[...media] route (Clerk-authenticated in prod).
+    loadCustomStore: async () => {
+      const pack = await import('next-tinacms-cloudinary');
+      return pack.TinaCloudCloudinaryMediaStore;
     },
   },
   build: {

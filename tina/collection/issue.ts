@@ -49,6 +49,13 @@ const Issue: Collection = {
       description: 'Ej: No. 3-4',
     },
     {
+      type: 'image',
+      name: 'cover',
+      label: 'Tapa',
+      description:
+        'Imagen de la tapa de esta edición. Se muestra en la portada y en /revista. Opcional.',
+    },
+    {
       type: 'number',
       name: 'year',
       label: 'Año',
