@@ -31,7 +31,10 @@ export default function RevistaPage() {
                   {currentIssue.title}
                 </h1>
 
-                <IssueContents issue={currentIssue} />
+                <IssueContents
+                  doctrina={currentIssue.doctrina}
+                  deInteres={currentIssue.deInteres}
+                />
               </div>
 
               <div>

@@ -1,11 +1,9 @@
 import { notFound } from "next/navigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import PageIdentity from "@/components/PageIdentity";
-import PostGrid from "@/components/PostGrid";
+import databaseClient from "@/tina/__generated__/databaseClient";
+import { plainify } from "@/lib/tina-serialize";
+import AuthorClient from "./AuthorClient";
 import { getPostsByAuthor } from "@/lib/blog";
 import { getAllAuthors, getAuthorBySlug } from "@/lib/authors";
-import { getSectionByName } from "@/lib/sections";
 
 export function generateStaticParams() {
   return getAllAuthors().map((author) => ({ slug: author.slug }));
@@ -25,55 +23,40 @@ export async function generateMetadata({
   };
 }
 
+type TinaAuthorProps = Awaited<ReturnType<typeof databaseClient.queries.author>>;
+
 /** Author page — every.to author-profile formula, personal branding:
-    avatar + section pill + name + role + bio + links + post grid. */
+    avatar + section pill + name + role + bio + links + post grid.
+
+    Content is fetched through the Tina databaseClient so the admin's
+    contextual editing can live-update the page; rendering happens in
+    AuthorClient (useTina + TinaMarkdown). */
 export default async function AuthorPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const author = getAuthorBySlug(slug);
-  if (!author) notFound();
 
-  const posts = getPostsByAuthor(author.name);
-  const primarySection = author.sections[0]
-    ? getSectionByName(author.sections[0])
-    : null;
+  let tinaProps: TinaAuthorProps | null = null;
+  try {
+    tinaProps = plainify(
+      await databaseClient.queries.author({ relativePath: `${slug}.md` })
+    );
+  } catch {
+    tinaProps = null;
+  }
+  if (!tinaProps) notFound();
+
+  // Posts by this author — resolved from the markdown readers.
+  const posts = getPostsByAuthor(tinaProps.data.author.name);
 
   return (
-    <>
-      <Header compact />
-
-      <main>
-        <PageIdentity
-          avatar
-          pill={primarySection ? `Escribe en ${primarySection.name}` : undefined}
-          pillHref={
-            primarySection ? `/secciones/${primarySection.slug}` : undefined
-          }
-          title={author.name}
-          subtitle={`${author.role} · ${author.institution}`}
-          bio={author.bio}
-          links={
-            author.linkedin
-              ? [{ label: "LinkedIn", href: author.linkedin }]
-              : undefined
-          }
-        />
-
-        <section className="mx-auto max-w-[1280px] px-4 pb-20 pt-6">
-          {posts.length > 0 ? (
-            <PostGrid posts={posts} />
-          ) : (
-            <p className="border-t border-dashed border-line-dark pt-10 text-center font-serif text-lg text-ink-muted">
-              Este autor aún no tiene publicaciones.
-            </p>
-          )}
-        </section>
-      </main>
-
-      <Footer />
-    </>
+    <AuthorClient
+      data={tinaProps.data}
+      variables={tinaProps.variables}
+      query={tinaProps.query}
+      posts={posts}
+    />
   );
 }

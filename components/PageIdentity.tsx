@@ -1,25 +1,38 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 
 /** Codex page-header formula:
     identity image → title → subtitle/role → relationship pill → bio
     → social links → dashed divider.
-    Sections use it institutionally (no avatar); authors personally. */
+    Sections use it institutionally (no avatar); authors personally.
+    The optional *Field props carry data-tina-field values so author pages
+    can make these elements contextually editable. */
 export default function PageIdentity({
   avatar = false,
   pill,
   pillHref,
+  pillField,
   title,
+  titleField,
   subtitle,
+  subtitleField,
   bio,
+  bioField,
   links,
+  linksField,
 }: {
   avatar?: boolean;
   pill?: string;
   pillHref?: string;
+  pillField?: string;
   title: string;
+  titleField?: string;
   subtitle?: string;
-  bio?: string;
+  subtitleField?: string;
+  bio?: ReactNode;
+  bioField?: string;
   links?: { label: string; href: string }[];
+  linksField?: string;
 }) {
   return (
     <div className="mx-auto max-w-2xl px-4 pb-6 pt-12 text-center">
@@ -33,38 +46,54 @@ export default function PageIdentity({
         (pillHref ? (
           <Link
             href={pillHref}
+            data-tina-field={pillField}
             className="mb-4 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted transition-colors hover:border-line-dark hover:text-ink"
           >
             {pill}
           </Link>
         ) : (
-          <p className="mb-4 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted">
+          <p
+            data-tina-field={pillField}
+            className="mb-4 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted"
+          >
             {pill}
           </p>
         ))}
 
       {/* Title */}
-      <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
+      <h1
+        data-tina-field={titleField}
+        className="font-serif text-4xl leading-tight text-ink sm:text-5xl"
+      >
         {title}
       </h1>
 
       {/* Subtitle / tagline / role */}
       {subtitle && (
-        <p className="mt-4 text-sm uppercase tracking-widest text-ink-muted">
+        <p
+          data-tina-field={subtitleField}
+          className="mt-4 text-sm uppercase tracking-widest text-ink-muted"
+        >
           {subtitle}
         </p>
       )}
 
-      {/* Bio / description */}
+      {/* Bio / description — div (not p) so rich-text children nest validly */}
       {bio && (
-        <p className="mx-auto mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft">
+        <div
+          data-tina-field={bioField}
+          className="mx-auto mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft"
+        >
           {bio}
-        </p>
+        </div>
       )}
 
       {/* Social / action links */}
       {links && links.length > 0 && (
-        <div className="mt-6 flex items-center justify-center gap-5">
+        <div
+          data-tina-field={linksField}
+          className="mt-6 flex items-center justify-center gap-5"
+        >
           {links.map((link) => (
             <a
               key={link.href + link.label}
