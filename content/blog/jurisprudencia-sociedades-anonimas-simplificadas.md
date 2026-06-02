@@ -6,6 +6,7 @@ excerpt: "Comentario al reciente fallo del Tribunal de Apelaciones en lo Civil s
 author: "Dra. Laura Martínez"
 authorRole: "Profesora de Derecho Comercial"
 date: "2026-05-02"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422734/covers/sociedades.jpg"
 ---
 
 Comentario al reciente fallo del Tribunal de Apelaciones en lo Civil sobre la responsabilidad de los accionistas en las sociedades por acciones simplificadas.

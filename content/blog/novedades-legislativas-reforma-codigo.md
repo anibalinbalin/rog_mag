@@ -6,6 +6,7 @@ excerpt: "La Cámara de Senadores aprobó en general el proyecto de ley que mode
 author: "Dr. Carlos Rodríguez"
 authorRole: "Abogado · Investigador"
 date: "2026-04-10"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422724/covers/doctrina.jpg"
 ---
 
 La Cámara de Senadores aprobó en general el proyecto de ley que moderniza el régimen de concursos y reorganización empresarial.

@@ -6,6 +6,7 @@ excerpt: "Montevideo será sede del XV Congreso Iberoamericano de Derecho Comerc
 author: "Dr. Carlos Rodríguez"
 authorRole: "Abogado · Investigador"
 date: "2026-05-20"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422729/covers/noticias.jpg"
 ---
 
 Montevideo será sede del XV Congreso Iberoamericano de Derecho Comercial, con la participación de especialistas de toda la región.

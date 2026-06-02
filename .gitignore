@@ -32,3 +32,6 @@ next-env.d.ts
 
 # claude code internals
 .claude/
+
+# Cover art samples (preview only, not committed)
+/public/cover-samples/

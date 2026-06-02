@@ -6,6 +6,7 @@ excerpt: "Las sociedades comerciales en Uruguay avanzan hacia procesos de gesti�
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"
 date: "2026-05-15"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422734/covers/sociedades.jpg"
 ---
 
 Las sociedades comerciales en Uruguay avanzan hacia procesos de gestión digital, incluyendo firmas electrónicas, reuniones virtuales y documentación societaria electrónica.

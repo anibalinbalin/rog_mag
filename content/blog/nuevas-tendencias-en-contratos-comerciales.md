@@ -6,6 +6,7 @@ excerpt: "El crecimiento del comercio digital ha impulsado nuevas formas de cont
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"
 date: "2026-04-20"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422737/covers/contratos.jpg"
 ---
 
 El crecimiento del comercio digital ha impulsado nuevas formas de contratación, exigiendo cláusulas más precisas sobre protección de datos, jurisdicción y responsabilidad contractual.

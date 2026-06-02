@@ -6,6 +6,7 @@ excerpt: "Las empresas uruguayas enfrentan nuevas obligaciones en materia de tra
 author: "Dr. Carlos Rodríguez"
 authorRole: "Abogado · Investigador"
 date: "2026-02-15"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422731/covers/mercado.jpg"
 ---
 
 Las empresas uruguayas enfrentan nuevas obligaciones en materia de tratamiento de datos, con especial énfasis en la designación de delegados y las evaluaciones de impacto.

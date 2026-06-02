@@ -6,6 +6,7 @@ excerpt: "La Suprema Corte de Justicia delimita el estándar de diligencia exigi
 author: "Dra. Laura Martínez"
 authorRole: "Profesora de Derecho Comercial"
 date: "2026-03-28"
+coverImage: "https://res.cloudinary.com/dz9zexfaf/image/upload/v1780422726/covers/jurisprudencia.jpg"
 ---
 
 La Suprema Corte de Justicia delimita el estándar de diligencia exigible a los directores de sociedades anónimas en operaciones de riesgo.
