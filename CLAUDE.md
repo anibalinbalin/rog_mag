@@ -67,7 +67,9 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 
 ## Editors / access
 
-- Allowed editors (`TINA_PUBLIC_ALLOWED_EMAILS`): `rolivera@olivera.com.uy`, `admin@olivera.com.uy`, `anibalin@gmail.com`
+- Allowed editors (`TINA_PUBLIC_ALLOWED_EMAILS`): `rolivera@olivera.com.uy`, `admin@olivera.com.uy`,
+  `rddcydle@gmail.com` (dedicated site account — "Revista de Derecho Comercial Y De La Empresa";
+  replaced Anibal's personal anibalin@gmail.com on 2026-06-02)
 - Auth = shared Clerk dev app `app_3ENa7rioipLIOsJsiGl1iaPm0Qj` (same as siblings).
   Secret key lives in `/mnt/data/sites-sync/2026/migrate_claude_code/clerk.env` on this box.
 
