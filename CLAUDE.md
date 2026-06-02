@@ -121,6 +121,7 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 ## Next steps (queue)
 
 1. Clerk auth for "Iniciar sesión" / "Suscribirme" buttons (non-functional)
-2. About page (editorial letter formula from the every.to spec)
+2. Carta editorial copy on /nosotros needs Rolivera's review (placeholder institutional text)
 
-Done: MONGODB_URI (2026-06-02), editor image uploads via Cloudinary + real image rendering (2026-06-02).
+Done: MONGODB_URI (2026-06-02), editor image uploads via Cloudinary + real image rendering (2026-06-02),
+Nano Banana cover art for all 13 content items + /nosotros about page (2026-06-02).
