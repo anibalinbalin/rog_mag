@@ -111,6 +111,10 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
   `http://localhost:4002/...` (hardcoded by the Tina CLI), which is unreachable from Anibal's
   MacBook over Tailscale ("Failed loading TinaCMS assets"). For remote testing of the editor,
   ALWAYS use the production admin (rog-mag.vercel.app/admin). The local :3003 site pages are fine.
+- **Admin collection search is production-only** — `tina/config.tsx` wires a custom `searchClient`
+  (queries our GraphQL backend, text-matches in the browser, no index). In dev mode Tina ignores it
+  and queries a hardcoded `localhost:4001` (our CLI runs on 4002), so dev-mode admin search never
+  works. The pinned tinacms types the searchClient slot as `undefined` → it's cast `as never`.
 
 ## Sister sites (live references)
 
@@ -124,4 +128,5 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 2. Carta editorial copy on /nosotros needs Rolivera's review (placeholder institutional text)
 
 Done: MONGODB_URI (2026-06-02), editor image uploads via Cloudinary + real image rendering (2026-06-02),
-Nano Banana cover art for all 13 content items + /nosotros about page (2026-06-02).
+Nano Banana cover art for all 13 content items + /nosotros about page (2026-06-02), admin collection
+search via custom searchClient (2026-06-02), Cloudinary demo folders cleaned out (2026-06-02).
