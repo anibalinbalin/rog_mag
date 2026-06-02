@@ -34,7 +34,14 @@ export default function Header({ compact = false }: { compact?: boolean }) {
             big ? "py-6" : "py-3"
           }`}
         >
-          <div className="w-32" />
+          <div className="flex w-32 items-center">
+            <Link
+              href="/buscar"
+              className="text-sm text-ink-muted transition-colors hover:text-ink"
+            >
+              Buscar
+            </Link>
+          </div>
 
           <Link href="/" className="block text-center">
             <span

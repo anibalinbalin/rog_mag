@@ -76,6 +76,14 @@ export default function Footer() {
                     Noticias
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    href="/buscar"
+                    className="text-sm text-paper/80 transition-colors hover:text-paper"
+                  >
+                    Buscar
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
