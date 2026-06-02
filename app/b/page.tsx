@@ -2,8 +2,9 @@ import Link from "next/link";
 import HeaderB from "@/components/b/HeaderB";
 import FooterB from "@/components/b/FooterB";
 import PostCard from "@/components/b/PostCard";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, getPostsBySection } from "@/lib/blog";
 import { getCurrentIssue } from "@/lib/issues";
+import { sections } from "@/lib/sections";
 
 export const metadata = {
   title: "Revista de Derecho Comercial y de la Empresa",
@@ -75,32 +76,42 @@ export default function HomeBPage() {
           </div>
         </section>
 
-        {/* Section: all publications — every.to section rhythm:
+        {/* Per-section rows — every.to section rhythm:
             uppercase header + description + arrow, then 4-col grid */}
-        <section className="mx-auto max-w-[1280px] border-t border-line px-4 py-12">
-          <div className="flex items-baseline justify-between">
-            <div>
-              <h2 className="text-xl font-medium uppercase tracking-wide text-ink">
-                Publicaciones
-              </h2>
-              <p className="mt-1 text-base text-ink-muted">
-                Doctrina, jurisprudencia y análisis del derecho comercial.
-              </p>
-            </div>
-            <Link
-              href="/b/publicaciones"
-              className="text-sm text-ink-soft transition-colors hover:text-ink"
-            >
-              Ver todas →
-            </Link>
-          </div>
+        {sections.map((section) => {
+          const sectionPosts = getPostsBySection(section.name);
+          if (sectionPosts.length === 0) return null;
 
-          <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-            {posts.map((post) => (
-              <PostCard key={post.slug} post={post} />
-            ))}
-          </div>
-        </section>
+          return (
+            <section
+              key={section.slug}
+              className="mx-auto max-w-[1280px] border-t border-line px-4 py-12"
+            >
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <h2 className="text-xl font-medium uppercase tracking-wide text-ink">
+                    {section.name}
+                  </h2>
+                  <p className="mt-1 text-base text-ink-muted">
+                    {section.tagline}
+                  </p>
+                </div>
+                <Link
+                  href={`/b/secciones/${section.slug}`}
+                  className="shrink-0 text-sm text-ink-soft transition-colors hover:text-ink"
+                >
+                  Ver sección →
+                </Link>
+              </div>
+
+              <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+                {sectionPosts.slice(0, 4).map((post) => (
+                  <PostCard key={post.slug} post={post} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </main>
 
       <FooterB />

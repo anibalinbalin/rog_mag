@@ -1,6 +1,7 @@
 ---
 title: "Nuevas tendencias en contratos comerciales"
-category: "Derecho Comercial"
+category: "Contratos Comerciales"
+section: "Doctrina"
 excerpt: "El crecimiento del comercio digital ha impulsado nuevas formas de contratación, exigiendo cláusulas más precisas sobre protección de datos, jurisdicción y responsabilidad contractual."
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"

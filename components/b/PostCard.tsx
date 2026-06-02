@@ -41,7 +41,7 @@ export default function PostCard({
 
       {/* Metadata row */}
       <p className="mt-5 text-xs uppercase tracking-widest text-ink-muted">
-        {formatDate(post.date)} · {post.category}
+        {formatDate(post.date)} · {post.section}
       </p>
 
       {/* Title */}

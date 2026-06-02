@@ -10,6 +10,7 @@ export interface Post {
   slug: string;
   title: string;
   category: string;
+  section: string;
   excerpt: string;
   author: string;
   authorRole: string;
@@ -31,6 +32,7 @@ function parsePost(fileName: string): Post {
     slug,
     title: data.title ?? "",
     category: data.category ?? "",
+    section: data.section ?? "Doctrina",
     excerpt: data.excerpt ?? "",
     author: data.author ?? "",
     authorRole: data.authorRole ?? "",
@@ -61,6 +63,25 @@ export async function getPostWithHtml(
   if (!post) return null;
   const processed = await remark().use(html).process(post.content);
   return { ...post, contentHtml: processed.toString() };
+}
+
+export function getPostsBySection(sectionName: string): Post[] {
+  return getAllPosts().filter((p) => p.section === sectionName);
+}
+
+export function getPostsByAuthor(authorName: string): Post[] {
+  return getAllPosts().filter((p) => p.author === authorName);
+}
+
+/** Related posts: same section first, then same author, excluding the
+    current post. Vertical-list treatment under articles (every.to pattern). */
+export function getRelatedPosts(post: Post, limit = 3): Post[] {
+  const others = getAllPosts().filter((p) => p.slug !== post.slug);
+  const sameSection = others.filter((p) => p.section === post.section);
+  const sameAuthor = others.filter(
+    (p) => p.section !== post.section && p.author === post.author
+  );
+  return [...sameSection, ...sameAuthor].slice(0, limit);
 }
 
 export function formatDate(dateString: string): string {

@@ -1,6 +1,7 @@
 ---
 title: "El régimen de garantías mobiliarias en el derecho uruguayo"
-category: "Derecho Comercial"
+category: "Garantías"
+section: "Doctrina"
 excerpt: "Un análisis del sistema de garantías sobre bienes muebles y su impacto en el acceso al crédito empresarial, con especial referencia a la prenda sin desplazamiento."
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"

@@ -1,6 +1,7 @@
 ---
 title: "Reforma societaria y digitalización empresarial"
-category: "Derecho Comercial"
+category: "Derecho Societario"
+section: "Doctrina"
 excerpt: "Las sociedades comerciales en Uruguay avanzan hacia procesos de gestión digital, incluyendo firmas electrónicas, reuniones virtuales y documentación societaria electrónica."
 author: "Dr. Ricardo Olivera"
 authorRole: "Abogado"

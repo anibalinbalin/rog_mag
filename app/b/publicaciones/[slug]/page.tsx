@@ -1,7 +1,17 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import HeaderB from "@/components/b/HeaderB";
 import FooterB from "@/components/b/FooterB";
-import { getAllPosts, getPostWithHtml, formatDate } from "@/lib/blog";
+import RelatedPosts from "@/components/b/RelatedPosts";
+import SubscribeModule from "@/components/b/SubscribeModule";
+import {
+  getAllPosts,
+  getPostWithHtml,
+  getRelatedPosts,
+  formatDate,
+} from "@/lib/blog";
+import { getAuthorByName } from "@/lib/authors";
+import { getSectionByName } from "@/lib/sections";
 import { getCurrentIssue } from "@/lib/issues";
 
 export function generateStaticParams() {
@@ -22,6 +32,9 @@ export async function generateMetadata({
   };
 }
 
+/** Article page — Codex article formula:
+    cover → 10-col shell (left author rail / center body / right spacer)
+    → subscribe module → related posts → footer. */
 export default async function ArticleBPage({
   params,
 }: {
@@ -31,6 +44,9 @@ export default async function ArticleBPage({
   const post = await getPostWithHtml(slug);
   if (!post) notFound();
 
+  const author = getAuthorByName(post.author);
+  const section = getSectionByName(post.section);
+  const related = getRelatedPosts(post);
   const currentIssue = getCurrentIssue();
 
   return (
@@ -44,7 +60,7 @@ export default async function ArticleBPage({
           <div className="aspect-[16/9] w-full bg-paper-cream" />
         </div>
 
-        {/* 10-column article grid: left meta rail / center body / right spacer */}
+        {/* 10-column article grid */}
         <article className="mx-auto max-w-[1248px] px-4 py-12">
           <div className="grid gap-10 lg:grid-cols-[2fr_6fr_2fr]">
             {/* Left rail: author credentials + issue + citation */}
@@ -53,11 +69,29 @@ export default async function ArticleBPage({
                 <p className="text-xs uppercase tracking-widest text-ink-muted">
                   Autor
                 </p>
-                <p className="mt-2 text-sm font-medium text-ink">
-                  {post.author}
-                </p>
-                {post.authorRole && (
-                  <p className="text-sm text-ink-muted">{post.authorRole}</p>
+                {author ? (
+                  <Link
+                    href={`/b/autores/${author.slug}`}
+                    className="group mt-2 block"
+                  >
+                    <p className="text-sm font-medium text-ink underline-offset-4 group-hover:underline">
+                      {post.author}
+                    </p>
+                    <p className="text-sm text-ink-muted">
+                      {author.role} · {author.institution}
+                    </p>
+                  </Link>
+                ) : (
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-ink">
+                      {post.author}
+                    </p>
+                    {post.authorRole && (
+                      <p className="text-sm text-ink-muted">
+                        {post.authorRole}
+                      </p>
+                    )}
+                  </div>
                 )}
 
                 <p className="mt-8 text-xs uppercase tracking-widest text-ink-muted">
@@ -69,6 +103,20 @@ export default async function ArticleBPage({
 
                 <p className="mt-8 text-xs uppercase tracking-widest text-ink-muted">
                   Sección
+                </p>
+                {section ? (
+                  <Link
+                    href={`/b/secciones/${section.slug}`}
+                    className="mt-2 block text-sm text-ink-soft underline-offset-4 hover:underline"
+                  >
+                    {post.section}
+                  </Link>
+                ) : (
+                  <p className="mt-2 text-sm text-ink-soft">{post.section}</p>
+                )}
+
+                <p className="mt-8 text-xs uppercase tracking-widest text-ink-muted">
+                  Tema
                 </p>
                 <p className="mt-2 text-sm text-ink-soft">{post.category}</p>
 
@@ -89,7 +137,7 @@ export default async function ArticleBPage({
             {/* Center: article body */}
             <div className="order-1 lg:order-2">
               <p className="text-xs uppercase tracking-widest text-ink-muted">
-                {post.category}
+                {post.section} · {post.category}
               </p>
               <h1 className="mt-4 font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl">
                 {post.title}
@@ -114,6 +162,12 @@ export default async function ArticleBPage({
                 className="prose-article mt-10"
                 dangerouslySetInnerHTML={{ __html: post.contentHtml }}
               />
+
+              {/* Post-body modules: access module → related reading */}
+              <div className="mt-16 space-y-12">
+                <SubscribeModule />
+                <RelatedPosts posts={related} />
+              </div>
             </div>
 
             {/* Right: spacer (actions rail in the future) */}

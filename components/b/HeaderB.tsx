@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 const navItems = [
-  { href: "/b", label: "Recientes" },
-  { href: "/b/publicaciones", label: "Publicaciones" },
+  { href: "/b", label: "Inicio" },
+  { href: "/b/secciones/doctrina", label: "Doctrina" },
+  { href: "/b/secciones/jurisprudencia", label: "Jurisprudencia" },
+  { href: "/b/secciones/noticias", label: "Noticias" },
+  { href: "/b/autores", label: "Autores" },
   { href: "/b/revista", label: "Revista" },
-  { href: "/b/noticias", label: "Noticias" },
 ];
 
 /** every.to-style header: utility bar with actions, oversized centered
