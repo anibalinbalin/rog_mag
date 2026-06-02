@@ -42,19 +42,11 @@ see below).
   `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`.
   Stored as plain encrypted (NOT write-only "Sensitive") so `vercel env pull --environment=production` works.
 
-### ⚠️ Pending: MONGODB_URI (the only missing piece)
+### ✅ MONGODB_URI — DONE (2026-06-02)
 
-Without it, `/admin` deploys but edits don't persist (local-DB fallback). To finish:
-
-1. Re-auth Atlas (needs Anibal's device code): `printf '\n\n' | atlas auth login --noBrowser`
-   then enter the code at https://account.mongodb.com/account/connect
-2. Mint the db user:
-   `atlas dbusers create readWriteAnyDatabase --username olivera_mag --password "$(openssl rand -base64 24 | tr -d '/+=')" --projectId 6a18f54236dce0b2d91b996f`
-   (record the password — Atlas can't show it again)
-3. Set the URI (format: `mongodb+srv://olivera_mag:<password>@tina-cms.gxznqty.mongodb.net/?retryWrites=true&w=majority`):
-   `printf '%s' "<uri>" | vercel env add MONGODB_URI production --scope anibals-projects-c9882c4c`
-   Also add it to local `.env`.
-4. Redeploy: `git commit --allow-empty -m "Redeploy with MongoDB" && git push`
+Atlas db user `olivera_mag` minted; `MONGODB_URI` set in Vercel Production AND in local `.env`
+(password is recoverable from `.env` — don't delete it). Content indexed into the `olivera_mag`
+database (collection `tinacms-main`) on the shared `tina-cms` cluster. Production editing is live.
 
 ## Editors / access
 
