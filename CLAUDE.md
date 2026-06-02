@@ -34,6 +34,10 @@ see below).
 - **Dedicated local ports:** Tina server **4002**, datalayer **9001** (baked into package.json scripts) —
   so olivera_mag's Tina never conflicts with elemental's (which uses defaults 4001/9000). Multiple
   `tinacms dev` instances CAN run concurrently on this box thanks to this.
+  **CRITICAL:** `createLocalDatabase({ port: 9001 })` in `tina/database.ts` MUST match the
+  `--datalayer-port` flag — it's a TCP client connecting to the CLI's datalayer server. A mismatch
+  (client default 9000, server on 9001) hangs builds forever. This hung a Vercel build for 46 min;
+  it "worked" locally only because elemental's dev server happened to be listening on 9000.
 - **Vercel env (Production), all set except MONGODB_URI:** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
   `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`.
   Stored as plain encrypted (NOT write-only "Sensitive") so `vercel env pull --environment=production` works.
