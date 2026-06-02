@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "TINA_PUBLIC_IS_LOCAL=true tinacms dev -p 4002 --datalayer-port 9001 -c \"next dev -p 3003\"",
     "dev:next": "next dev -p 3003",
-    "build": "tinacms build --partial-reindex -p 4002 --datalayer-port 9001 && next build",
+    "build": "tinacms build --partial-reindex --skip-search-index -p 4002 --datalayer-port 9001 && next build",
     "start": "next start -p 3003",
     "lint": "next lint",
     "typecheck": "tsc --noEmit"
