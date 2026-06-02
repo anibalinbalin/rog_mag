@@ -38,8 +38,9 @@ see below).
   `--datalayer-port` flag — it's a TCP client connecting to the CLI's datalayer server. A mismatch
   (client default 9000, server on 9001) hangs builds forever. This hung a Vercel build for 46 min;
   it "worked" locally only because elemental's dev server happened to be listening on 9000.
-- **Vercel env (Production), all set except MONGODB_URI:** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
-  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`.
+- **Vercel env (Production):** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
+  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`,
+  `MONGODB_URI`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
   Stored as plain encrypted (NOT write-only "Sensitive") so `vercel env pull --environment=production` works.
 
 ### ✅ MONGODB_URI — DONE (2026-06-02)
@@ -47,6 +48,22 @@ see below).
 Atlas db user `olivera_mag` minted; `MONGODB_URI` set in Vercel Production AND in local `.env`
 (password is recoverable from `.env` — don't delete it). Content indexed into the `olivera_mag`
 database (collection `tinacms-main`) on the shared `tina-cms` cluster. Production editing is live.
+
+## Media (Cloudinary) — wired 2026-06-02
+
+- **Cloud:** `dz9zexfaf` (free plan, account owner = Anibal). Credentials in local `.env`
+  (`CLOUDINARY_URL` works with the `cld` CLI: `CLOUDINARY_URL=... cld admin usage`).
+- **Package:** `next-tinacms-cloudinary@25.0.3` — PINNED; its peer dep is exactly `tinacms@3.8.3`.
+  Each next-tinacms-cloudinary version pins one exact tinacms version — when (ever) bumping tinacms,
+  bump this in lockstep (25.0.4 ↔ 3.8.4, etc.).
+- **Upload backend:** `pages/api/cloudinary/[...media].ts` — `createMediaHandler` with a Clerk
+  auth callback (same allowlist as the Tina GraphQL route). Local dev (`TINA_PUBLIC_IS_LOCAL=true`)
+  skips auth.
+- **Media store:** `tina/config.tsx` → `media.loadCustomStore` → `TinaCloudCloudinaryMediaStore`
+  (sends the Clerk token via the authProvider's fetchWithToken).
+- **Image fields (all optional):** `post.coverImage`, `author.photo`, `issue.cover`. Rendered with
+  `next/image` (`fill` + `object-cover`), cream placeholder is the fallback when unset.
+- **next.config.ts:** `images.remotePatterns` allows `res.cloudinary.com/dz9zexfaf/**`.
 
 ## Editors / access
 
@@ -58,7 +75,9 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 
 - **Clerk secret (sk_test):** `/mnt/data/sites-sync/2026/migrate_claude_code/clerk.env`
 - **GitHub token:** `gh auth token` (repo scope, account anibalinbalin)
-- **Mongo:** NOT recoverable anywhere — must mint a new Atlas db user (see Pending above)
+- **Mongo:** the Atlas user password is ONLY in local `.env` (and Vercel) — don't delete it
+- **Cloudinary:** API key/secret/cloud-name in local `.env` (and Vercel); also recoverable from
+  console.cloudinary.com (Anibal's account)
 - Local `.env` (gitignored) mirrors the Vercel production env for local prod-mode testing
 
 ## Gotchas (hard-won)
@@ -70,7 +89,15 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 - **Tina collection `defaultItem` goes at the collection top level**, not inside `ui`.
 - **Pinned deps (DON'T bump):** `tinacms@3.8.3`, `tinacms-clerk@22.0.3`, `@clerk/clerk-js@4.73.14`,
   `@clerk/backend@0.38.15`, `@tinacms/datalayer@2.0.22`, `tinacms-gitprovider-github@4.1.9`,
-  `mongodb-level@0.0.4`, `@tinacms/cli@2.4.1` (dev). tinacms-clerk@22 requires Clerk v4 SDKs.
+  `mongodb-level@0.0.4`, `next-tinacms-cloudinary@25.0.3`, `@tinacms/cli@2.4.1` (dev).
+  tinacms-clerk@22 requires Clerk v4 SDKs.
+- **Next.js pages-API `config` export must be an inline object literal** — `export const config =
+  mediaHandlerConfig` (imported identifier) fails `next build` with "Unknown identifier". Inline
+  `{ api: { bodyParser: false } }` instead.
+- **`tinacms build --partial-reindex` is git-commit-based**: it diffs Mongo's stored `lastSha`
+  against HEAD to decide what to reindex. Schema changes that are UNCOMMITTED are invisible to it →
+  local `bun run build` prerender fails with "Cannot query field X" against the stale Mongo schema.
+  COMMIT FIRST (tina-lock.json in the diff triggers the full reindex), then build, then push.
 - **atlas CLI sessions expire** — `atlas auth whoami` can lie; test with
   `atlas dbusers list --projectId 6a18f54236dce0b2d91b996f`.
 - **Keep post frontmatter flat**; filename === slug === URL.
@@ -91,7 +118,7 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 
 ## Next steps (queue)
 
-1. **MONGODB_URI** (see Pending above) — the only blocker for full production editing
-2. Real images: issue covers, author photos, article covers (cream placeholders now)
-3. Clerk auth for "Iniciar sesión" / "Suscribirme" buttons (non-functional)
-4. About page (editorial letter formula from the every.to spec)
+1. Clerk auth for "Iniciar sesión" / "Suscribirme" buttons (non-functional)
+2. About page (editorial letter formula from the every.to spec)
+
+Done: MONGODB_URI (2026-06-02), editor image uploads via Cloudinary + real image rendering (2026-06-02).
