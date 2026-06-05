@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import SectionBadge from "@/components/SectionBadge";
 import type { Post } from "@/lib/blog";
 import { formatDate } from "@/lib/format";
 
@@ -54,10 +55,17 @@ export default function PostCard({
         )}
       </div>
 
-      {/* Metadata row */}
-      <p className="mt-5 text-xs uppercase tracking-widest text-ink-muted">
-        {formatDate(post.date)} · {post.section}
-      </p>
+      {/* Metadata row — accent-bar section + date (Belen's pick) */}
+      <div
+        className={`mt-5 flex items-center gap-3 ${
+          isFeature ? "justify-center" : ""
+        }`}
+      >
+        <SectionBadge section={post.section} />
+        <span className="text-[11px] uppercase tracking-widest text-ink-muted">
+          {formatDate(post.date)}
+        </span>
+      </div>
 
       {/* Title */}
       <h3
@@ -70,17 +78,22 @@ export default function PostCard({
 
       {/* Dek */}
       <p
-        className={`mt-3 font-serif leading-relaxed text-ink-muted ${
-          isFeature ? "mx-auto max-w-xl text-lg" : "text-base"
+        className={`mt-3 leading-relaxed text-ink-soft ${
+          isFeature ? "mx-auto max-w-xl text-lg" : "text-sm"
         }`}
       >
         {post.excerpt}
       </p>
 
-      {/* Author row */}
-      <p className="mt-4 text-xs uppercase tracking-widest text-ink">
-        {post.author}
-      </p>
+      {/* Author — labelled */}
+      <div className={`mt-5 ${isFeature ? "text-center" : ""}`}>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-ink-faint">
+          Autor
+        </p>
+        <p className="mt-1 text-xs uppercase tracking-widest text-ink">
+          {post.author}
+        </p>
+      </div>
     </Link>
   );
 }

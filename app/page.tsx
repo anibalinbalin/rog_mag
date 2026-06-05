@@ -3,8 +3,8 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
+import SectionBadge from "@/components/SectionBadge";
 import { getAllPosts, getPostsBySection, formatDate } from "@/lib/blog";
-import { getCurrentIssue } from "@/lib/issues";
 
 export const metadata = {
   title: "Revista de Derecho Comercial y de la Empresa",
@@ -13,7 +13,6 @@ export const metadata = {
 
 export default function HomePage() {
   const posts = getAllPosts();
-  const currentIssue = getCurrentIssue();
 
   const latest = posts.slice(0, 4);
   const noticiasSection = getPostsBySection("Noticias");
@@ -26,13 +25,21 @@ export default function HomePage() {
       <Header />
 
       <main>
-        {/* Hero — burgundy-dark band, title + tan CTA, journal cover floated
-            right. (Placeholder background: Belen's mockup uses a desk photo —
-            swap in when we have the asset.) */}
-        <section className="bg-burgundy-dark text-paper">
-          <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 py-16 lg:grid-cols-2 lg:py-24">
-            <div>
-              <h1 className="font-serif text-4xl leading-[1.1] sm:text-5xl">
+        {/* Hero — full-bleed desk photo (the journal is in-frame on the right),
+            title + tan CTA overlaid on the darker left side. */}
+        <section className="relative isolate overflow-hidden bg-burgundy-dark">
+          <Image
+            src="/hero-desk.jpg"
+            alt="Revista de Derecho Comercial y de la Empresa sobre un escritorio"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-right"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
+          <div className="relative mx-auto flex min-h-[440px] max-w-[1280px] items-center px-4 py-20 lg:min-h-[560px]">
+            <div className="max-w-xl text-paper">
+              <h1 className="font-serif text-4xl leading-[1.1] drop-shadow-sm sm:text-5xl">
                 Revista de Derecho Comercial y de la Empresa
               </h1>
               <Link
@@ -42,21 +49,6 @@ export default function HomePage() {
                 Ver la revista
               </Link>
             </div>
-
-            {currentIssue?.cover && (
-              <div className="justify-self-center lg:justify-self-end">
-                <div className="relative aspect-[3/4] w-56 overflow-hidden shadow-2xl sm:w-64 lg:w-72">
-                  <Image
-                    src={currentIssue.cover}
-                    alt={`${currentIssue.number} (${currentIssue.year})`}
-                    fill
-                    sizes="(min-width: 1024px) 288px, 224px"
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </section>
 
@@ -73,18 +65,26 @@ export default function HomePage() {
                 href={`/publicaciones/${post.slug}`}
                 className="group block"
               >
-                <p className="text-xs uppercase tracking-widest text-ink-muted">
-                  {formatDate(post.date)} · {post.section}
-                </p>
+                <div className="flex items-center gap-3">
+                  <SectionBadge section={post.section} />
+                  <span className="text-[11px] uppercase tracking-widest text-ink-muted">
+                    {formatDate(post.date)}
+                  </span>
+                </div>
                 <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
                   {post.title}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-ink-soft">
                   {post.excerpt}
                 </p>
-                <p className="mt-4 text-xs uppercase tracking-widest text-ink">
-                  {post.author}
-                </p>
+                <div className="mt-5">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-ink-faint">
+                    Autor
+                  </p>
+                  <p className="mt-1 text-xs uppercase tracking-widest text-ink">
+                    {post.author}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>

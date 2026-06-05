@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import SectionBadge from "@/components/SectionBadge";
 import { formatDate } from "@/lib/format";
 
 export type PubItem = {
@@ -70,18 +71,26 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
             className="grid grid-cols-1 items-center gap-6 border-b border-dashed border-line-dark py-8 sm:grid-cols-[1fr_auto]"
           >
             <div>
-              <p className="text-xs uppercase tracking-widest text-ink-muted">
-                {formatDate(post.date)}
-              </p>
+              <div className="flex items-center gap-3">
+                <SectionBadge section={post.section} />
+                <span className="text-[11px] uppercase tracking-widest text-ink-muted">
+                  {formatDate(post.date)}
+                </span>
+              </div>
               <h3 className="mt-2 font-serif text-2xl font-semibold leading-snug text-ink">
                 {post.title}
               </h3>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
                 {post.excerpt}
               </p>
-              <p className="mt-4 text-xs uppercase tracking-widest text-ink">
-                {post.author}
-              </p>
+              <div className="mt-4">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-ink-faint">
+                  Autor
+                </p>
+                <p className="mt-1 text-xs uppercase tracking-widest text-ink">
+                  {post.author}
+                </p>
+              </div>
             </div>
             <Link
               href={`/publicaciones/${post.slug}`}

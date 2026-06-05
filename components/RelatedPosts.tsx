@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SectionBadge from "@/components/SectionBadge";
 import type { Post } from "@/lib/blog";
 import { formatDate } from "@/lib/format";
 
@@ -19,10 +20,12 @@ export default function RelatedPosts({ posts }: { posts: Post[] }) {
             href={`/publicaciones/${post.slug}`}
             className="group block py-6"
           >
-            <p className="text-xs uppercase tracking-widest text-ink-muted">
-              <span className="font-medium text-burgundy">{post.section}</span> ·{" "}
-              {post.category}
-            </p>
+            <div className="flex items-center gap-3">
+              <SectionBadge section={post.section} />
+              <span className="text-[11px] uppercase tracking-widest text-ink-muted">
+                {post.category}
+              </span>
+            </div>
             <p className="mt-2 font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
               {post.title}
             </p>
