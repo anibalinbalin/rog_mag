@@ -65,14 +65,14 @@ export default function PageIdentity({
           <Link
             href={pillHref}
             data-tina-field={pillField}
-            className="mb-4 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted transition-colors hover:border-line-dark hover:text-ink"
+            className="mb-4 inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
           >
             {pill}
           </Link>
         ) : (
           <p
             data-tina-field={pillField}
-            className="mb-4 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted"
+            className="mb-4 inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy"
           >
             {pill}
           </p>
@@ -118,7 +118,7 @@ export default function PageIdentity({
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-ink-muted underline underline-offset-4 transition-colors hover:text-ink"
+              className="text-sm text-ink-muted underline underline-offset-4 transition-colors hover:text-burgundy"
             >
               {link.label}
             </a>

@@ -73,7 +73,7 @@ export default function IssueClient(props: IssueClientProps) {
             <div>
               <div
                 data-tina-field={tinaField(issue, "cover")}
-                className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream"
+                className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream shadow-xl"
               >
                 {issue.cover && (
                   <Image

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { Inter, Crimson_Pro } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -7,9 +7,11 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const sourceSerif = Source_Serif_4({
+// Belen's direction (2026-06): Crimson Pro for títulos + subtítulos
+// (serif), Inter for body. Replaces Source Serif 4 across headings.
+const crimson = Crimson_Pro({
   subsets: ["latin"],
-  variable: "--font-source-serif",
+  variable: "--font-crimson",
 });
 
 export const metadata: Metadata = {
@@ -25,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className={`${inter.variable} ${sourceSerif.variable}`}>
+      <body className={`${inter.variable} ${crimson.variable}`}>
         {children}
       </body>
     </html>

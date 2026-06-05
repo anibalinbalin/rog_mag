@@ -123,7 +123,7 @@ export default function NosotrosPage() {
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   {section.tagline}
                 </p>
-                <p className="mt-3 text-xs uppercase tracking-widest text-ink-soft">
+                <p className="mt-3 text-xs uppercase tracking-widest text-burgundy">
                   Ver sección →
                 </p>
               </Link>
@@ -160,7 +160,7 @@ export default function NosotrosPage() {
               </p>
               <Link
                 href="/revista"
-                className="mt-8 inline-block border border-ink px-8 py-3 text-sm tracking-wide text-ink transition-colors hover:bg-ink hover:text-paper"
+                className="mt-8 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
               >
                 Ver el archivo de ediciones
               </Link>
@@ -180,7 +180,7 @@ export default function NosotrosPage() {
             </p>
             <Link
               href="/autores"
-              className="mt-6 inline-block text-sm text-ink underline underline-offset-4 transition-colors hover:text-ink-soft"
+              className="mt-6 inline-block text-sm text-burgundy underline underline-offset-4 transition-colors hover:text-burgundy-dark"
             >
               Conocer a los autores →
             </Link>

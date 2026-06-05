@@ -20,7 +20,8 @@ export default function RelatedPosts({ posts }: { posts: Post[] }) {
             className="group block py-6"
           >
             <p className="text-xs uppercase tracking-widest text-ink-muted">
-              {post.section} · {post.category}
+              <span className="font-medium text-burgundy">{post.section}</span> ·{" "}
+              {post.category}
             </p>
             <p className="mt-2 font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
               {post.title}

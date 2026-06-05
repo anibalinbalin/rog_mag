@@ -13,7 +13,7 @@ export default function LegalesPage() {
       <main>
         <section className="mx-auto max-w-[1280px] px-4 py-12">
           <div className="mx-auto max-w-2xl">
-            <p className="text-xs uppercase tracking-widest text-ink-muted">
+            <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
               Información legal
             </p>
             <h1 className="mt-4 font-serif text-4xl leading-tight text-ink">

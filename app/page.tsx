@@ -3,126 +3,113 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
-import { getAllPosts, getPostsBySection } from "@/lib/blog";
+import { getAllPosts, getPostsBySection, formatDate } from "@/lib/blog";
 import { getCurrentIssue } from "@/lib/issues";
-import { sections } from "@/lib/sections";
 
 export const metadata = {
   title: "Revista de Derecho Comercial y de la Empresa",
-  description:
-    "Análisis jurídico y pensamiento comercial contemporáneo.",
+  description: "Análisis jurídico y pensamiento comercial contemporáneo.",
 };
 
 export default function HomePage() {
   const posts = getAllPosts();
   const currentIssue = getCurrentIssue();
 
-  const [feature, ...rest] = posts;
-  const secondary = rest.slice(0, 2);
-  const recent = posts.slice(0, 4);
+  const latest = posts.slice(0, 4);
+  const noticiasSection = getPostsBySection("Noticias");
+  const noticias = (
+    noticiasSection.length >= 4 ? noticiasSection : posts.slice(4, 8)
+  ).slice(0, 4);
 
   return (
     <>
       <Header />
 
       <main>
-        {/* Asymmetrical feature grid — every.to's signature pattern:
-            secondary stories left, dominant feature center, recent list right.
-            Dashed dividers, not cards. */}
-        <section className="mx-auto max-w-[1280px] px-4 py-12">
-          <div className="grid gap-10 lg:grid-cols-[1fr_2fr_1fr] lg:gap-0">
-            {/* Left: secondary stories */}
-            <div className="flex flex-col gap-10 lg:border-r lg:border-dashed lg:border-line-dark lg:pr-8">
-              {secondary.map((post) => (
-                <PostCard key={post.slug} post={post} />
-              ))}
+        {/* Hero — burgundy-dark band, title + tan CTA, journal cover floated
+            right. (Placeholder background: Belen's mockup uses a desk photo —
+            swap in when we have the asset.) */}
+        <section className="bg-burgundy-dark text-paper">
+          <div className="mx-auto grid max-w-[1280px] items-center gap-10 px-4 py-16 lg:grid-cols-2 lg:py-24">
+            <div>
+              <h1 className="font-serif text-4xl leading-[1.1] sm:text-5xl">
+                Revista de Derecho Comercial y de la Empresa
+              </h1>
+              <Link
+                href="/revista"
+                className="mt-8 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+              >
+                Ver la revista
+              </Link>
             </div>
 
-            {/* Center: dominant feature */}
-            <div className="lg:px-8">
-              {feature && <PostCard post={feature} size="feature" />}
-            </div>
-
-            {/* Right: recent essays + current issue */}
-            <div className="lg:border-l lg:border-dashed lg:border-line-dark lg:pl-8">
-              <p className="text-xs uppercase tracking-widest text-ink-muted">
-                Recientes
-              </p>
-              <div className="mt-2 divide-y divide-line">
-                {recent.map((post) => (
-                  <PostCard key={post.slug} post={post} size="compact" />
-                ))}
-              </div>
-
-              {currentIssue && (
-                <div className="mt-10 border-t border-dashed border-line-dark pt-8">
-                  <p className="text-xs uppercase tracking-widest text-ink-muted">
-                    Última edición
-                  </p>
-                  <Link
-                    href={`/revista`}
-                    className="group mt-4 block"
-                  >
-                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream">
-                      {currentIssue.cover && (
-                        <Image
-                          src={currentIssue.cover}
-                          alt={`${currentIssue.number} (${currentIssue.year})`}
-                          fill
-                          sizes="(min-width: 1024px) 300px, 100vw"
-                          className="object-cover"
-                        />
-                      )}
-                    </div>
-                    <p className="mt-4 font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
-                      {currentIssue.number} ({currentIssue.year})
-                    </p>
-                    <p className="mt-1 text-xs uppercase tracking-widest text-ink-muted">
-                      Volumen {currentIssue.volume} · N.º {currentIssue.issue}
-                    </p>
-                  </Link>
+            {currentIssue?.cover && (
+              <div className="justify-self-center lg:justify-self-end">
+                <div className="relative aspect-[3/4] w-56 overflow-hidden shadow-2xl sm:w-64 lg:w-72">
+                  <Image
+                    src={currentIssue.cover}
+                    alt={`${currentIssue.number} (${currentIssue.year})`}
+                    fill
+                    sizes="(min-width: 1024px) 288px, 224px"
+                    className="object-cover"
+                    priority
+                  />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </section>
 
-        {/* Per-section rows — every.to section rhythm:
-            uppercase header + description + arrow, then 4-col grid */}
-        {sections.map((section) => {
-          const sectionPosts = getPostsBySection(section.name);
-          if (sectionPosts.length === 0) return null;
+        {/* Publicaciones — text-forward 4-col row + tan "Ver todas" */}
+        <section className="mx-auto max-w-[1280px] px-4 py-16">
+          <h2 className="font-serif text-3xl text-ink sm:text-4xl">
+            Publicaciones
+          </h2>
 
-          return (
-            <section
-              key={section.slug}
-              className="mx-auto max-w-[1280px] border-t border-line px-4 py-12"
+          <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {latest.map((post) => (
+              <Link
+                key={post.slug}
+                href={`/publicaciones/${post.slug}`}
+                className="group block"
+              >
+                <p className="text-xs uppercase tracking-widest text-ink-muted">
+                  {formatDate(post.date)} · {post.section}
+                </p>
+                <h3 className="mt-3 font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+                  {post.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-ink-soft">
+                  {post.excerpt}
+                </p>
+                <p className="mt-4 text-xs uppercase tracking-widest text-ink">
+                  {post.author}
+                </p>
+              </Link>
+            ))}
+          </div>
+
+          <div className="mt-12 flex justify-center">
+            <Link
+              href="/publicaciones"
+              className="inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
             >
-              <div className="flex items-baseline justify-between">
-                <div>
-                  <h2 className="text-xl font-medium uppercase tracking-wide text-ink">
-                    {section.name}
-                  </h2>
-                  <p className="mt-1 text-base text-ink-muted">
-                    {section.tagline}
-                  </p>
-                </div>
-                <Link
-                  href={`/secciones/${section.slug}`}
-                  className="shrink-0 text-sm text-ink-soft transition-colors hover:text-ink"
-                >
-                  Ver sección →
-                </Link>
-              </div>
+              Ver todas
+            </Link>
+          </div>
+        </section>
 
-              <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-                {sectionPosts.slice(0, 4).map((post) => (
-                  <PostCard key={post.slug} post={post} />
-                ))}
-              </div>
-            </section>
-          );
-        })}
+        {/* Noticias — kept as image cards (Belen: "está bueno como ya lo tenés") */}
+        {noticias.length > 0 && (
+          <section className="mx-auto max-w-[1280px] border-t border-line px-4 py-16">
+            <h2 className="font-serif text-3xl text-ink sm:text-4xl">Noticias</h2>
+            <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+              {noticias.map((post) => (
+                <PostCard key={post.slug} post={post} />
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
