@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RelatedPosts from "@/components/RelatedPosts";
 import SubscribeModule from "@/components/SubscribeModule";
+import SectionBadge from "@/components/SectionBadge";
 import { formatDate } from "@/lib/format";
 import type { PostQuery } from "@/tina/__generated__/types";
 import type { Post } from "@/lib/blog";
@@ -80,7 +81,7 @@ export default function ArticleClient(props: ArticleClientProps) {
                   >
                     <p
                       data-tina-field={tinaField(post, "author")}
-                      className="text-sm font-medium text-ink underline-offset-4 group-hover:underline"
+                      className="text-sm font-medium text-ink underline-offset-4 transition-colors group-hover:text-burgundy group-hover:underline"
                     >
                       {post.author}
                     </p>
@@ -124,7 +125,7 @@ export default function ArticleClient(props: ArticleClientProps) {
                   <Link
                     href={`/secciones/${section.slug}`}
                     data-tina-field={tinaField(post, "section")}
-                    className="mt-2 block text-sm text-ink-soft underline-offset-4 hover:underline"
+                    className="mt-2 block text-sm text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
                   >
                     {post.section}
                   </Link>
@@ -163,15 +164,19 @@ export default function ArticleClient(props: ArticleClientProps) {
 
             {/* Center: article body */}
             <div className="order-1 lg:order-2">
-              <p className="text-xs uppercase tracking-widest text-ink-muted">
-                <span data-tina-field={tinaField(post, "section")}>
-                  {post.section}
-                </span>{" "}
-                ·{" "}
-                <span data-tina-field={tinaField(post, "category")}>
+              <div className="flex flex-wrap items-center gap-3">
+                <SectionBadge
+                  section={post.section}
+                  field={tinaField(post, "section")}
+                  href={section ? `/secciones/${section.slug}` : undefined}
+                />
+                <span
+                  data-tina-field={tinaField(post, "category")}
+                  className="text-xs uppercase tracking-widest text-ink-muted"
+                >
                   {post.category}
                 </span>
-              </p>
+              </div>
               <h1
                 data-tina-field={tinaField(post, "title")}
                 className="mt-4 font-serif text-4xl font-semibold leading-tight text-ink sm:text-5xl"

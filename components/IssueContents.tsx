@@ -25,7 +25,7 @@ export default function IssueContents({
       </h2>
 
       <div className="mt-5" data-tina-field={doctrinaField}>
-        <p className="text-xs uppercase tracking-widest text-ink-muted">
+        <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
           Doctrina
         </p>
         <ul className="mt-3 space-y-2">
@@ -39,7 +39,7 @@ export default function IssueContents({
 
       {deInteresItems.length > 0 && (
         <div className="mt-8" data-tina-field={deInteresField}>
-          <p className="text-xs uppercase tracking-widest text-ink-muted">
+          <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
             De interés
           </p>
           <ul className="mt-3 space-y-2">

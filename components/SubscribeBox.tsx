@@ -14,7 +14,7 @@ export default function SubscribeBox({
         />
         <button
           type="submit"
-          className="shrink-0 bg-ink px-6 py-3 text-sm text-paper transition-opacity hover:opacity-85"
+          className="shrink-0 bg-burgundy px-6 py-3 text-sm text-paper transition-opacity hover:opacity-90"
         >
           Suscribirme
         </button>
