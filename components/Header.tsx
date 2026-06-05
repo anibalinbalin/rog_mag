@@ -1,87 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/", label: "Inicio" },
-  { href: "/secciones/doctrina", label: "Doctrina" },
-  { href: "/secciones/jurisprudencia", label: "Jurisprudencia" },
-  { href: "/secciones/noticias", label: "Noticias" },
-  { href: "/autores", label: "Autores" },
-  { href: "/revista", label: "Revista" },
-  { href: "/nosotros", label: "Nosotros" },
+  { href: "/revista", label: "Revista", match: "/revista" },
+  { href: "/secciones/noticias", label: "Noticias", match: "/secciones/noticias" },
+  { href: "/publicaciones", label: "Publicaciones", match: "/publicaciones" },
 ];
 
-/** every.to-style header: utility bar with actions, oversized centered
-    masthead that shrinks on scroll, segmented nav underneath. */
+/** Belen's direction (2026-06): slim header — left-aligned masthead,
+    inline nav with an active underline, burgundy Suscribirme on the right.
+    `compact` is kept for call-site compatibility (no longer toggles a
+    shrink-on-scroll masthead). */
 export default function Header({ compact = false }: { compact?: boolean }) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const big = !compact && !scrolled;
+  void compact;
+  const pathname = usePathname() ?? "";
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
-      <div className="relative mx-auto max-w-[1280px] px-4">
-        {/* Utility bar + masthead */}
-        <div
-          className={`flex items-center justify-between transition-all duration-300 ${
-            big ? "py-6" : "py-3"
-          }`}
+      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-5">
+        {/* Masthead */}
+        <Link
+          href="/"
+          className="font-serif text-2xl tracking-wide text-ink sm:text-[1.65rem]"
         >
-          <div className="flex w-32 items-center">
-            <Link
-              href="/buscar"
-              className="text-sm text-ink-muted transition-colors hover:text-ink"
-            >
-              Buscar
-            </Link>
-          </div>
+          REVISTA DCE
+        </Link>
 
-          <Link href="/" className="block text-center">
-            <span
-              className={`block font-serif tracking-wide text-ink transition-all duration-300 ${
-                big ? "text-3xl sm:text-4xl" : "text-xl"
-              }`}
-            >
-              REVISTA DCE
-            </span>
-          </Link>
-
-          <div className="flex w-32 items-center justify-end gap-3">
-            <button
-              type="button"
-              className="hidden text-sm text-ink-muted transition-colors hover:text-ink sm:block"
-            >
-              Iniciar sesión
-            </button>
-            <button
-              type="button"
-              className="bg-ink px-4 py-2 text-sm text-paper transition-opacity hover:opacity-85"
-            >
-              Suscribirme
-            </button>
-          </div>
-        </div>
-
-        {/* Segmented nav */}
-        <nav className="flex items-center justify-center gap-7 pb-3">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="text-sm text-ink-soft transition-colors hover:text-ink"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Inline nav */}
+        <nav className="hidden items-center gap-8 md:flex">
+          {navItems.map((item) => {
+            const active = pathname.startsWith(item.match);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-sm transition-colors ${
+                  active
+                    ? "text-ink underline decoration-burgundy decoration-2 underline-offset-[6px]"
+                    : "text-ink-soft hover:text-ink"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            className="hidden text-sm text-ink-soft transition-colors hover:text-ink sm:block"
+          >
+            Iniciar sesión
+          </button>
+          <button
+            type="button"
+            className="bg-burgundy px-5 py-2.5 text-sm text-paper transition-opacity hover:opacity-90"
+          >
+            Suscribirme
+          </button>
+        </div>
       </div>
     </header>
   );
