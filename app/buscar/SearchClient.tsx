@@ -67,7 +67,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Buscar artículos, autores, ediciones…"
-        className="w-full border-b-2 border-line-dark bg-transparent pb-4 font-serif text-3xl text-ink placeholder:text-ink-muted/60 focus:border-ink focus:outline-none sm:text-4xl"
+        className="w-full border-b-2 border-line-dark bg-transparent pb-4 font-serif text-3xl text-ink placeholder:text-ink-muted/60 focus:border-burgundy focus:outline-none sm:text-4xl"
       />
 
       {/* Result count / state line */}
@@ -95,7 +95,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
                   {groupResults.map((doc) => (
                     <li key={doc.href}>
                       <Link href={doc.href} className="group block py-5">
-                        <p className="font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+                        <p className="font-serif text-xl font-semibold leading-snug text-ink transition-colors group-hover:text-burgundy">
                           {doc.title}
                         </p>
                         {doc.excerpt && (
@@ -136,7 +136,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             <li>
               <Link
                 href="/secciones/doctrina"
-                className="font-serif text-lg text-ink-soft underline-offset-4 hover:underline"
+                className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Doctrina
               </Link>
@@ -144,7 +144,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             <li>
               <Link
                 href="/secciones/jurisprudencia"
-                className="font-serif text-lg text-ink-soft underline-offset-4 hover:underline"
+                className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Jurisprudencia
               </Link>
@@ -152,7 +152,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             <li>
               <Link
                 href="/secciones/noticias"
-                className="font-serif text-lg text-ink-soft underline-offset-4 hover:underline"
+                className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Noticias
               </Link>
@@ -160,7 +160,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             <li>
               <Link
                 href="/autores"
-                className="font-serif text-lg text-ink-soft underline-offset-4 hover:underline"
+                className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Autores
               </Link>
@@ -168,7 +168,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             <li>
               <Link
                 href="/revista"
-                className="font-serif text-lg text-ink-soft underline-offset-4 hover:underline"
+                className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Archivo de la revista
               </Link>

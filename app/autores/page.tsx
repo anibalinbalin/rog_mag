@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import SectionBadge from "@/components/SectionBadge";
 import { getAllAuthors } from "@/lib/authors";
 import { sections } from "@/lib/sections";
 import { getPostsBySection } from "@/lib/blog";
@@ -53,9 +54,10 @@ export default function AutoresPage() {
                   {author.role}
                 </p>
                 {author.sections[0] && (
-                  <p className="mt-3 inline-block border border-line px-3 py-1 text-xs uppercase tracking-widest text-ink-muted">
-                    {author.sections[0]}
-                  </p>
+                  <SectionBadge
+                    section={author.sections[0]}
+                    className="mt-3"
+                  />
                 )}
               </Link>
             ))}
@@ -101,7 +103,7 @@ export default function AutoresPage() {
             </p>
             <a
               href="mailto:admin@olivera.com.uy"
-              className="mt-6 inline-block border border-ink px-8 py-3 text-sm tracking-wide text-ink transition-colors hover:bg-ink hover:text-paper"
+              className="mt-6 inline-flex items-center bg-action-dark px-8 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
             >
               Enviar propuesta
             </a>
