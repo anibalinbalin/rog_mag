@@ -1,18 +1,40 @@
 import Link from "next/link";
-import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
 import SectionBadge from "@/components/SectionBadge";
+import HeroCarousel from "@/components/HeroCarousel";
 import { getAllPosts, getPostsBySection, formatDate } from "@/lib/blog";
+import { getPaginaInicio, type HeroSlide } from "@/lib/paginas";
 
 export const metadata = {
   title: "Revista de Derecho Comercial y de la Empresa",
   description: "Análisis jurídico y pensamiento comercial contemporáneo.",
 };
 
+/** Mirrors the original static hero — used when content/paginas/inicio.md is
+    missing or has no slides, so the homepage never renders an empty hero. */
+const FALLBACK_SLIDES: HeroSlide[] = [
+  {
+    image: "/hero-desk.jpg",
+    heading: "Última edición",
+    subheading: "DISPONIBLE",
+    ctaLabel: "Ver la revista",
+    ctaHref: "/revista",
+  },
+  {
+    image: "/hero-80-anos.jpg",
+    heading: "80 años",
+    subheading: "Desde 1946 construyendo pensamiento jurídico",
+    ctaLabel: "Leer más",
+    ctaHref: "/80-anos",
+  },
+];
+
 export default function HomePage() {
   const posts = getAllPosts();
+  const { slides } = getPaginaInicio();
+  const heroSlides = slides.length > 0 ? slides : FALLBACK_SLIDES;
 
   const latest = posts.slice(0, 4);
   const noticiasSection = getPostsBySection("Noticias");
@@ -25,32 +47,9 @@ export default function HomePage() {
       <Header />
 
       <main>
-        {/* Hero — full-bleed desk photo (the journal is in-frame on the right),
-            title + tan CTA overlaid on the darker left side. */}
-        <section className="relative isolate overflow-hidden bg-burgundy-dark">
-          <Image
-            src="/hero-desk.jpg"
-            alt="Revista de Derecho Comercial y de la Empresa sobre un escritorio"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-right"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent" />
-          <div className="relative mx-auto flex min-h-[440px] max-w-[1280px] items-center px-4 py-20 lg:min-h-[560px]">
-            <div className="max-w-xl text-paper">
-              <h1 className="font-serif text-4xl leading-[1.1] drop-shadow-sm sm:text-5xl">
-                Revista de Derecho Comercial y de la Empresa
-              </h1>
-              <Link
-                href="/revista"
-                className="mt-8 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
-              >
-                Ver la revista
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* Hero carousel — slides fed by getPaginaInicio(), with a static
+            fallback that mirrors the original desk hero. */}
+        <HeroCarousel slides={heroSlides} />
 
         {/* Publicaciones — text-forward 4-col row + tan "Ver todas" */}
         <section className="mx-auto max-w-[1280px] px-4 py-16">

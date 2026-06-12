@@ -5,6 +5,8 @@ import { ClerkAuthProvider } from 'tinacms-clerk/dist/tinacms';
 import Post from './collection/post';
 import Author from './collection/author';
 import Issue from './collection/issue';
+import Epoca from './collection/epoca';
+import Pagina from './collection/pagina';
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true';
 
@@ -138,7 +140,7 @@ const config = defineConfig({
     basePath: '',
   },
   schema: {
-    collections: [Post, Author, Issue],
+    collections: [Post, Author, Issue, Epoca, Pagina],
   },
 });
 

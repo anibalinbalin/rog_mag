@@ -1,13 +1,38 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/revista", label: "Revista", match: "/revista" },
+  { href: "/revista", label: "Revistas", match: "/revista" },
   { href: "/secciones/noticias", label: "Noticias", match: "/secciones/noticias" },
   { href: "/publicaciones", label: "Publicaciones", match: "/publicaciones" },
+  { href: "/80-anos", label: "80 Años", match: "/80-anos" },
 ];
+
+/** Masthead badge — the designer's self-contained SVG logo (REVISTA DCE_02.pdf
+    p.3). The SVG carries its own burgundy (#840238) background, so no wrapper
+    fill is needed. Aspect ratio 244.2×148.9 ≈ 1.64:1; sized ~56px tall on
+    mobile, ~68px on desktop to read as a prominent badge. */
+function Masthead() {
+  return (
+    <Link
+      href="/"
+      aria-label="Revista de Derecho Comercial y de la Empresa — Inicio"
+      className="block shrink-0"
+    >
+      <Image
+        src="/logo-rdcydle.svg"
+        alt="Revista de Derecho Comercial y de la Empresa"
+        width={244}
+        height={149}
+        priority
+        className="h-14 w-auto sm:h-[68px]"
+      />
+    </Link>
+  );
+}
 
 /** Belen's direction (2026-06): slim header — left-aligned masthead,
     inline nav with an active underline, burgundy Suscribirme on the right.
@@ -21,12 +46,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-5">
         {/* Masthead */}
-        <Link
-          href="/"
-          className="font-serif text-2xl tracking-wide text-ink sm:text-[1.65rem]"
-        >
-          REVISTA DCE
-        </Link>
+        <Masthead />
 
         {/* Inline nav */}
         <nav className="hidden items-center gap-8 md:flex">
