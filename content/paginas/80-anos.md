@@ -6,4 +6,6 @@ intro: "Fundada por el Profesor Sagunto Pérez Fontana bajo el nombre de Revista
 bibliografiaLabel: "Bibliografía Fontana"
 bibliografiaHref: "#bibliografia-pendiente"
 timelineHeading: "Seis épocas de historia en ocho décadas"
+founderImage: "/fontana.jpg"
+founderCaption: "Prof. Sagunto Pérez Fontana, fundador (1946)"
 ---

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -10,22 +11,25 @@ const navItems = [
   { href: "/80-anos", label: "80 Años", match: "/80-anos" },
 ];
 
-/** Stacked masthead badge — HTML/CSS approximation of the designer's mockup
-    (REVISTA DCE_02.pdf p.1): three white bold condensed uppercase lines, each
-    on its own burgundy rectangle hugging its text, left-aligned. This is a
-    placeholder pending an SVG from Belen. */
+/** Masthead badge — the designer's self-contained SVG logo (REVISTA DCE_02.pdf
+    p.3). The SVG carries its own burgundy (#840238) background, so no wrapper
+    fill is needed. Aspect ratio 244.2×148.9 ≈ 1.64:1; sized ~56px tall on
+    mobile, ~68px on desktop to read as a prominent badge. */
 function Masthead() {
-  const lineClass =
-    "inline-block self-start bg-burgundy px-1.5 py-[1px] font-sans font-bold uppercase leading-[1.15] tracking-[-0.01em] text-paper";
   return (
     <Link
       href="/"
       aria-label="Revista de Derecho Comercial y de la Empresa — Inicio"
-      className="flex flex-col gap-[2px] text-[0.7rem] sm:text-[0.85rem]"
+      className="block shrink-0"
     >
-      <span className={lineClass}>Revista de</span>
-      <span className={lineClass}>Derecho Comercial</span>
-      <span className={lineClass}>y de la Empresa</span>
+      <Image
+        src="/logo-rdcydle.svg"
+        alt="Revista de Derecho Comercial y de la Empresa"
+        width={244}
+        height={149}
+        priority
+        className="h-14 w-auto sm:h-[68px]"
+      />
     </Link>
   );
 }

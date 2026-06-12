@@ -25,6 +25,8 @@ export interface Pagina80Anos {
   bibliografiaLabel: string;
   bibliografiaHref: string;
   timelineHeading: string;
+  founderImage: string;
+  founderCaption: string;
 }
 
 function readPagina(slug: string): { [key: string]: unknown } | null {
@@ -64,5 +66,7 @@ export function getPagina80Anos(): Pagina80Anos {
     bibliografiaLabel: (data.bibliografiaLabel as string) ?? "",
     bibliografiaHref: (data.bibliografiaHref as string) ?? "",
     timelineHeading: (data.timelineHeading as string) ?? "",
+    founderImage: (data.founderImage as string) ?? "",
+    founderCaption: (data.founderCaption as string) ?? "",
   };
 }

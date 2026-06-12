@@ -113,6 +113,18 @@ const Pagina: Collection = {
       description:
         'Ej: Seis épocas de historia en ocho décadas. Solo para la página 80 años.',
     },
+    {
+      type: 'image',
+      name: 'founderImage',
+      label: 'Retrato del fundador',
+      description: 'Retrato de Sagunto Pérez Fontana. Solo para la página 80 Años.',
+    },
+    {
+      type: 'string',
+      name: 'founderCaption',
+      label: 'Pie del retrato del fundador',
+      description: 'Pie de foto del retrato. Solo para la página 80 Años.',
+    },
   ],
 };
 

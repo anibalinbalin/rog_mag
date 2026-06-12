@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -61,6 +62,23 @@ export default function OchentaAnosPage() {
             <p className="mx-auto mt-8 max-w-xl text-sm leading-relaxed text-ink-muted">
               {pagina.intro}
             </p>
+
+            {pagina.founderImage && (
+              <figure className="mx-auto mt-12 max-w-[600px]">
+                <Image
+                  src={pagina.founderImage}
+                  alt={pagina.founderCaption || "Retrato del fundador"}
+                  width={1440}
+                  height={990}
+                  className="h-auto w-full border border-line"
+                />
+                {pagina.founderCaption && (
+                  <figcaption className="mt-3 font-sans text-xs text-ink-muted">
+                    {pagina.founderCaption}
+                  </figcaption>
+                )}
+              </figure>
+            )}
 
             <Link
               href={pagina.bibliografiaHref}
