@@ -4,10 +4,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/revista", label: "Revista", match: "/revista" },
+  { href: "/revista", label: "Revistas", match: "/revista" },
   { href: "/secciones/noticias", label: "Noticias", match: "/secciones/noticias" },
   { href: "/publicaciones", label: "Publicaciones", match: "/publicaciones" },
+  { href: "/80-anos", label: "80 Años", match: "/80-anos" },
 ];
+
+/** Stacked masthead badge — HTML/CSS approximation of the designer's mockup
+    (REVISTA DCE_02.pdf p.1): three white bold condensed uppercase lines, each
+    on its own burgundy rectangle hugging its text, left-aligned. This is a
+    placeholder pending an SVG from Belen. */
+function Masthead() {
+  const lineClass =
+    "inline-block self-start bg-burgundy px-1.5 py-[1px] font-sans font-bold uppercase leading-[1.15] tracking-[-0.01em] text-paper";
+  return (
+    <Link
+      href="/"
+      aria-label="Revista de Derecho Comercial y de la Empresa — Inicio"
+      className="flex flex-col gap-[2px] text-[0.7rem] sm:text-[0.85rem]"
+    >
+      <span className={lineClass}>Revista de</span>
+      <span className={lineClass}>Derecho Comercial</span>
+      <span className={lineClass}>y de la Empresa</span>
+    </Link>
+  );
+}
 
 /** Belen's direction (2026-06): slim header — left-aligned masthead,
     inline nav with an active underline, burgundy Suscribirme on the right.
@@ -21,12 +42,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
       <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-5">
         {/* Masthead */}
-        <Link
-          href="/"
-          className="font-serif text-2xl tracking-wide text-ink sm:text-[1.65rem]"
-        >
-          REVISTA DCE
-        </Link>
+        <Masthead />
 
         {/* Inline nav */}
         <nav className="hidden items-center gap-8 md:flex">
