@@ -20,6 +20,12 @@ const nextConfig: NextConfig = {
         destination: "/secciones/noticias",
         permanent: true,
       },
+      // The anniversary page moved from /80-anos to /80-años; keep the old URL working.
+      {
+        source: "/80-anos",
+        destination: "/80-años",
+        permanent: true,
+      },
       // The B layout was promoted from /b to the site root; keep old URLs working.
       {
         source: "/b",

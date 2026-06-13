@@ -8,7 +8,7 @@ const navItems = [
   { href: "/revista", label: "Revistas", match: "/revista" },
   { href: "/secciones/noticias", label: "Noticias", match: "/secciones/noticias" },
   { href: "/publicaciones", label: "Publicaciones", match: "/publicaciones" },
-  { href: "/80-anos", label: "80 Años", match: "/80-anos" },
+  { href: "/80-años", label: "80 Años", match: "/80-años" },
 ];
 
 /** Masthead badge — the designer's self-contained SVG logo (REVISTA DCE_02.pdf
@@ -40,7 +40,16 @@ function Masthead() {
     shrink-on-scroll masthead). */
 export default function Header({ compact = false }: { compact?: boolean }) {
   void compact;
-  const pathname = usePathname() ?? "";
+  // usePathname() can return the percent-encoded form for non-ASCII routes
+  // (e.g. "/80-a%C3%B1os" for the /80-años page), so decode before matching the
+  // nav items — otherwise that tab's active underline never lights up.
+  const rawPathname = usePathname() ?? "";
+  let pathname = rawPathname;
+  try {
+    pathname = decodeURIComponent(rawPathname);
+  } catch {
+    // Malformed escape — fall back to the raw value.
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
