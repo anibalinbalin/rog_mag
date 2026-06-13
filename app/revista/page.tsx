@@ -36,7 +36,7 @@ export default function RevistaPage() {
 
                 <Link
                   href={`/revista/${currentIssue.slug}`}
-                  className="mt-6 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+                  className="mt-6 inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
                 >
                   Ver más
                 </Link>

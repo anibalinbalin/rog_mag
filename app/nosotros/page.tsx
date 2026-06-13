@@ -160,7 +160,7 @@ export default function NosotrosPage() {
               </p>
               <Link
                 href="/revista"
-                className="mt-8 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+                className="mt-8 inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
               >
                 Ver el archivo de ediciones
               </Link>

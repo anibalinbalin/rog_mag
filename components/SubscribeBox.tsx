@@ -10,11 +10,11 @@ export default function SubscribeBox({
           type="email"
           required
           placeholder="Ingresar correo electrónico"
-          className="w-full border border-line-dark bg-paper px-4 py-3 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-ink"
+          className="w-full rounded-l-sm border border-line-dark bg-paper px-4 py-3 text-sm text-ink outline-none placeholder:text-ink-muted focus:border-ink"
         />
         <button
           type="submit"
-          className="shrink-0 bg-burgundy px-6 py-3 text-sm text-paper transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-r-sm bg-burgundy px-6 py-3 text-sm text-paper transition-opacity hover:opacity-90"
         >
           Suscribirme
         </button>

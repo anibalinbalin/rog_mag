@@ -91,7 +91,7 @@ export default function HomePage() {
           <div className="mt-12 flex justify-center">
             <Link
               href="/publicaciones"
-              className="inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+              className="inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
             >
               Ver todas
             </Link>

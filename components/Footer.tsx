@@ -23,11 +23,11 @@ export default function Footer() {
                 type="email"
                 required
                 placeholder="Ingresar correo electrónico"
-                className="w-full border border-paper/30 bg-transparent px-4 py-3 text-sm text-paper outline-none placeholder:text-paper/40 focus:border-paper"
+                className="w-full rounded-l-sm border border-paper/30 bg-transparent px-4 py-3 text-sm text-paper outline-none placeholder:text-paper/40 focus:border-paper"
               />
               <button
                 type="submit"
-                className="shrink-0 bg-paper px-6 py-3 text-sm text-ink transition-opacity hover:opacity-85"
+                className="shrink-0 rounded-r-sm bg-paper px-6 py-3 text-sm text-ink transition-opacity hover:opacity-85"
               >
                 Suscribirme
               </button>
