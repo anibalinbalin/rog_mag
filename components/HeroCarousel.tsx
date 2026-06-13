@@ -2,10 +2,34 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Stepper, useAutoPlay } from "pasito/react";
+import "pasito/styles.css";
 import type { HeroSlide } from "@/lib/paginas";
 
-const AUTO_ADVANCE_MS = 7000;
+const AUTO_ADVANCE_MS = 3000;
+
+const PLAY_ICON = (
+  <svg className="size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M11.1967 2.71828C8.53683 0.970354 5 2.8783 5 6.0611V17.9387C5 21.1215 8.53684 23.0294 11.1967 21.2815L20.234 15.3427C22.6384 13.7627 22.6384 10.2371 20.234 8.65706L11.1967 2.71828Z"
+      fill="white"
+    />
+  </svg>
+);
+
+const PAUSE_ICON = (
+  <svg className="size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="M4 6C4 4.34315 5.34315 3 7 3C8.65685 3 10 4.34315 10 6V18C10 19.6569 8.65685 21 7 21C5.34315 21 4 19.6569 4 18V6Z"
+      fill="white"
+    />
+    <path
+      d="M14 6C14 4.34315 15.3431 3 17 3C18.6569 3 20 4.34315 20 6V18C20 19.6569 18.6569 21 17 21C15.3431 21 14 19.6569 14 18V6Z"
+      fill="white"
+    />
+  </svg>
+);
 
 /** Per-slide layout: the first slide reads like the original desk hero
     (left-aligned), the rest are centered like the "80 años" mockup. */
@@ -22,33 +46,34 @@ function objectPosition(index: number) {
 
 export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
   const [active, setActive] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const reducedMotion = useRef(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    reducedMotion.current = mq.matches;
-    const onChange = (e: MediaQueryListEvent) => {
-      reducedMotion.current = e.matches;
-    };
+    setReducedMotion(mq.matches);
+    const onChange = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const goTo = useCallback((index: number) => {
-    setActive(index);
-  }, []);
+  // Pasito drives the auto-advance and the active pill's visible fill progress.
+  const { playing, toggle, filling, fillDuration } = useAutoPlay({
+    count: slides.length,
+    active,
+    onStepChange: setActive,
+    stepDuration: AUTO_ADVANCE_MS,
+    loop: true,
+  });
 
+  // Start playing on mount (autoplay is paused by default), unless the visitor
+  // prefers reduced motion — then it waits behind the Play button.
+  const autoStartedRef = useRef(false);
   useEffect(() => {
-    if (slides.length < 2) return;
-    if (paused) return;
-    if (reducedMotion.current) return;
-    const id = window.setTimeout(() => {
-      setActive((prev) => (prev + 1) % slides.length);
-    }, AUTO_ADVANCE_MS);
-    return () => window.clearTimeout(id);
-  }, [active, paused, slides.length]);
+    if (autoStartedRef.current || reducedMotion || slides.length < 2) return;
+    autoStartedRef.current = true;
+    toggle();
+  }, [toggle, reducedMotion, slides.length]);
 
   if (slides.length === 0) return null;
 
@@ -57,10 +82,6 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       aria-roledescription="carousel"
       aria-label="Destacados"
       className="relative isolate overflow-hidden bg-burgundy-dark"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={() => setPaused(false)}
     >
       {/* Slides stacked; only opacity animates (GPU-safe crossfade) */}
       <div className="relative min-h-[440px] lg:min-h-[560px]">
@@ -127,10 +148,10 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     </p>
                   )}
                   {slide.ctaLabel && slide.ctaHref && (
-                    <div className={centered ? "mt-8 flex justify-center" : ""}>
+                    <div className={centered ? "mt-8 flex justify-center" : "mt-8"}>
                       <Link
                         href={slide.ctaHref}
-                        className="mt-0 inline-flex items-center bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+                        className="inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
                       >
                         {slide.ctaLabel}
                       </Link>
@@ -143,24 +164,25 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
         })}
       </div>
 
-      {/* Dots */}
+      {/* Pasito autoplay player — the fill-progress pill stepper + a play/pause toggle */}
       {slides.length > 1 && (
-        <div className="absolute inset-x-0 bottom-6 z-10 flex justify-center gap-3">
-          {slides.map((slide, i) => {
-            const isActive = i === active;
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => goTo(i)}
-                aria-label={`Ir a la diapositiva ${i + 1}: ${slide.heading}`}
-                aria-current={isActive}
-                className={`h-3 w-3 rounded-full border border-paper transition-colors duration-150 ease-[ease] ${
-                  isActive ? "bg-paper" : "bg-transparent hover:bg-paper/40"
-                }`}
-              />
-            );
-          })}
+        <div className="absolute inset-x-0 bottom-6 z-10 flex items-center justify-center gap-3">
+          <Stepper
+            className="hero-stepper"
+            count={slides.length}
+            active={active}
+            onStepClick={setActive}
+            filling={filling}
+            fillDuration={fillDuration}
+          />
+          <button
+            type="button"
+            onClick={toggle}
+            aria-label={playing ? "Pausar" : "Reproducir"}
+            className="grid size-8 place-items-center rounded-full bg-white/20 backdrop-blur-xl transition-colors hover:bg-white/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper/80"
+          >
+            {playing ? PAUSE_ICON : PLAY_ICON}
+          </button>
         </div>
       )}
     </section>

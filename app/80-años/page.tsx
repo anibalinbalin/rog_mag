@@ -82,7 +82,7 @@ export default function OchentaAnosPage() {
 
             <Link
               href={pagina.bibliografiaHref}
-              className="mt-12 inline-flex items-center bg-action px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
+              className="mt-12 inline-flex items-center rounded-sm bg-action px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
             >
               {pagina.bibliografiaLabel}
             </Link>

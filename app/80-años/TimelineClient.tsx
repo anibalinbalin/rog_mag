@@ -41,7 +41,7 @@ export default function TimelineClient({ epocas }: { epocas: Epoca[] }) {
               type="button"
               onClick={() => setSelected(index)}
               aria-pressed={isActive}
-              className={`min-w-[64px] px-5 py-2 text-sm tabular-nums tracking-wider transition-colors ${
+              className={`min-w-[64px] rounded-sm px-5 py-2 text-sm tabular-nums tracking-wider transition-colors ${
                 isActive
                   ? "bg-burgundy text-paper"
                   : "bg-action text-paper hover:bg-action-dark"

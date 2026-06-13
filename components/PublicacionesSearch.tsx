@@ -94,7 +94,7 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
             </div>
             <Link
               href={`/publicaciones/${post.slug}`}
-              className="inline-flex items-center justify-center justify-self-start bg-action-dark px-7 py-2.5 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90 sm:justify-self-end"
+              className="inline-flex items-center justify-center justify-self-start rounded-sm bg-action-dark px-7 py-2.5 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90 sm:justify-self-end"
             >
               Leer
             </Link>

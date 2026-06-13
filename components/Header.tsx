@@ -87,7 +87,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
           </button>
           <button
             type="button"
-            className="bg-burgundy px-5 py-2.5 text-sm text-paper transition-opacity hover:opacity-90"
+            className="rounded-sm bg-burgundy px-5 py-2.5 text-sm text-paper transition-opacity hover:opacity-90"
           >
             Suscribirme
           </button>

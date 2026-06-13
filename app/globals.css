@@ -39,6 +39,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Pasito autoplay stepper, themed for the hero — sits over dark photos, so
+   white pills on translucent glass. The active pill base is dim and the fill
+   is solid white, so the autoplay progress reads as it fills (matches the TGS
+   nature-image-carousel theme). */
+.pasito-container.hero-stepper {
+  --pill-dot-size: 8px;
+  --pill-active-width: 28px;
+  --pill-gap: 8px;
+  --pill-bg: rgba(255, 255, 255, 0.3);
+  --pill-active-bg: rgba(255, 255, 255, 0.3);
+  --pill-fill-bg: #ffffff;
+  --pill-container-bg: rgba(255, 255, 255, 0.2);
+  --pill-container-border: transparent;
+  height: 32px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
 /* Article body content rendered from markdown */
 .prose-article {
   font-family: var(--font-crimson), Georgia, serif;
