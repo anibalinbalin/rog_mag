@@ -74,7 +74,7 @@ export default function OchentaAnosPage() {
 
       <main>
         {/* Section 1 — intro (white) with the giant ghost "80" behind the title */}
-        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-36">
+        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-20 sm:pt-24">
           <div className="mx-auto max-w-3xl text-center">
             {/* Title + years, with the decorative ghost "80" hugging them */}
             <div className="relative isolate">

@@ -130,3 +130,11 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 Done: MONGODB_URI (2026-06-02), editor image uploads via Cloudinary + real image rendering (2026-06-02),
 Nano Banana cover art for all 13 content items + /nosotros about page (2026-06-02), admin collection
 search via custom searchClient (2026-06-02), Cloudinary demo folders cleaned out (2026-06-02).
+
+## Worktree Sessions (`claude -w`)
+
+If this session runs in a worktree (`.claude/worktrees/<name>/`):
+
+1. `bun install` first — node_modules is not copied. Gitignored env files arrive via `.worktreeinclude`.
+2. Dev server: pick a free port in 3005-3008 — all pre-mapped via `tailscale serve`, so the access URL is `https://claude-code-sec.tailf626.ts.net:<port>/` — never hand over localhost or the LAN IP.
+3. Finish with `/go` (commit → push → PR → merge, `anibal/` branch prefix). Never hand uncommitted files back to the main checkout — the hub tab only ever `git pull`s after merge.

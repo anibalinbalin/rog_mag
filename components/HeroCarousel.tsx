@@ -104,18 +104,6 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                 sizes="100vw"
                 className={`object-cover ${objectPosition(i)}`}
               />
-              {/* Base gradient: dark on the reading side, transparent away from it */}
-              <div
-                className={
-                  centered
-                    ? "absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/70"
-                    : "absolute inset-0 bg-gradient-to-r from-black/85 via-black/55 to-transparent"
-                }
-              />
-              {/* Centered slides sit text over the middle — add a vertical wash for contrast */}
-              {centered && (
-                <div className="absolute inset-0 bg-gradient-to-b from-black/45 via-black/55 to-black/45" />
-              )}
 
               <div
                 className={`relative mx-auto flex min-h-[440px] max-w-[1280px] items-center px-4 py-20 lg:min-h-[560px] ${
