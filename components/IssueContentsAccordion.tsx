@@ -11,7 +11,7 @@ export default function IssueContentsAccordion({
 }: {
   groups: Group[];
 }) {
-  const [open, setOpen] = useState<number | null>(0);
+  const [open, setOpen] = useState<number | null>(null);
 
   if (groups.length === 0) return null;
 
@@ -55,14 +55,20 @@ export default function IssueContentsAccordion({
 
               {isOpen && (
                 <ul className="space-y-2 pb-5">
-                  {group.items.map((item) => (
-                    <li
-                      key={item}
-                      className="font-serif text-lg leading-snug text-ink-soft"
-                    >
-                      {item}
+                  {group.items.length > 0 ? (
+                    group.items.map((item) => (
+                      <li
+                        key={item}
+                        className="font-serif text-lg leading-snug text-ink-soft"
+                      >
+                        {item}
+                      </li>
+                    ))
+                  ) : (
+                    <li className="font-serif text-lg italic leading-snug text-ink-muted">
+                      Contenido pendiente
                     </li>
-                  ))}
+                  )}
                 </ul>
               )}
             </div>

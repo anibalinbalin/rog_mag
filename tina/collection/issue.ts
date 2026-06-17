@@ -81,10 +81,23 @@ const Issue: Collection = {
       description: 'Ej: Primavera, Otoño.',
     },
     {
+      type: 'string',
+      name: 'month',
+      label: 'Mes',
+      description: 'Ej: Mayo, Diciembre. Se muestra en "Revistas Anteriores".',
+    },
+    {
       type: 'number',
       name: 'articleCount',
       label: 'Cantidad de artículos',
       description: 'Se muestra en el archivo de ediciones.',
+    },
+    {
+      type: 'string',
+      name: 'description',
+      label: 'Descripción breve',
+      ui: { component: 'textarea' },
+      description: 'Resumen de 1–2 líneas para la lista de Revistas Anteriores.',
     },
     {
       type: 'boolean',
@@ -106,6 +119,20 @@ const Issue: Collection = {
       label: 'Artículos de interés',
       list: true,
       description: 'Títulos de jurisprudencia comentada, reseñas, etc.',
+    },
+    {
+      type: 'string',
+      name: 'actualidadSociedades',
+      label: 'Actualidad de Sociedades Comerciales',
+      list: true,
+      description: 'Títulos de esta sección.',
+    },
+    {
+      type: 'string',
+      name: 'concursos',
+      label: 'Concursos',
+      list: true,
+      description: 'Títulos de esta sección.',
     },
     {
       type: 'rich-text',
