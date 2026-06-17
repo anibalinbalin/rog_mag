@@ -13,10 +13,14 @@ export interface Issue {
   volume: number;
   issue: number;
   season: string;
+  month: string;
   articleCount: number;
   current: boolean;
+  description: string;
   doctrina: string[];
   deInteres: string[];
+  actualidadSociedades: string[];
+  concursos: string[];
 }
 
 function parseIssue(fileName: string): Issue {
@@ -34,10 +38,14 @@ function parseIssue(fileName: string): Issue {
     volume: data.volume ?? 0,
     issue: data.issue ?? 0,
     season: data.season ?? "",
+    month: data.month ?? "",
     articleCount: data.articleCount ?? 0,
     current: data.current ?? false,
+    description: data.description ?? "",
     doctrina: data.doctrina ?? [],
     deInteres: data.deInteres ?? [],
+    actualidadSociedades: data.actualidadSociedades ?? [],
+    concursos: data.concursos ?? [],
   };
 }
 
