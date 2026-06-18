@@ -1,6 +1,8 @@
-import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import BibliografiaDepthShell from "@/components/BibliografiaDepthShell";
+import BibliografiaSheet from "@/components/BibliografiaSheet";
 import TimelineClient from "./TimelineClient";
 import { getEpocas } from "@/lib/epocas";
 import { getPagina80Anos } from "@/lib/paginas";
@@ -69,7 +71,7 @@ export default function OchentaAnosPage() {
   const epocas = getEpocas();
 
   return (
-    <>
+    <BibliografiaDepthShell>
       <Header compact />
 
       <main>
@@ -102,48 +104,72 @@ export default function OchentaAnosPage() {
             </p>
 
             <div className="mt-12">
-              <Link
-                href={pagina.bibliografiaHref}
-                className="inline-flex items-center rounded-sm bg-action px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
-              >
-                {pagina.bibliografiaLabel}
-              </Link>
+              <BibliografiaSheet
+                label={pagina.bibliografiaLabel}
+                eyebrow={pagina.bibliografiaEyebrow}
+                name={pagina.bibliografiaName}
+                years={pagina.bibliografiaYears}
+                photo={pagina.bibliografiaPhoto}
+                photoAlt={pagina.bibliografiaPhotoAlt}
+                body={pagina.bibliografiaBody}
+              />
             </div>
           </div>
         </section>
 
-        {/* Section 2 — timeline (warm gray band) */}
-        <section className="bg-paper-warm">
-          <div className="mx-auto max-w-[1280px] px-4 py-20">
-            <div className="mx-auto max-w-2xl">
-              <h2 className="font-serif text-3xl leading-tight text-ink sm:text-4xl">
-                {renderTimelineHeading(pagina.timelineHeading)}
-              </h2>
-
-              <div className="mt-12">
-                <TimelineClient epocas={epocas} />
+        {/* Section 2 — bound volumes (image bleeds to the left edge) + body */}
+        {pagina.librosImage && pagina.librosBody.length > 0 && (
+          <section className="border-y border-line">
+            <div className="grid items-stretch lg:grid-cols-2">
+              <div className="relative aspect-[1343/622] lg:aspect-auto lg:min-h-[460px]">
+                <Image
+                  src={pagina.librosImage}
+                  alt={pagina.librosAlt}
+                  fill
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex items-center px-4 py-12 lg:py-16">
+                <div className="mx-auto max-w-xl space-y-5 lg:ml-12 lg:mr-auto">
+                  {pagina.librosBody.map((paragraph, i) => (
+                    <p
+                      key={i}
+                      className="text-base leading-relaxed text-ink-soft"
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Bibliografía Fontana — quiet placeholder so the CTA lands somewhere */}
-        <section
-          id="bibliografia-pendiente"
-          className="mx-auto max-w-[1280px] px-4 py-16"
-        >
-          <div className="mx-auto max-w-2xl">
-            <h2 className="font-serif text-2xl text-ink">
-              {pagina.bibliografiaLabel}
-            </h2>
-            <p className="mt-3 text-sm text-ink-muted">
-              Contenido pendiente
+        {/* Section 3 — closing statement */}
+        {pagina.closing && (
+          <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:py-20">
+            <p className="font-serif text-2xl font-bold leading-snug text-ink sm:text-3xl">
+              {pagina.closing}
             </p>
+          </section>
+        )}
+
+        {/* Section 4 — timeline (warm gray band) */}
+        <section className="bg-paper-warm">
+          <div className="mx-auto max-w-[1280px] px-4 py-20 sm:py-24">
+            <h2 className="text-center font-serif text-3xl leading-tight text-ink sm:text-4xl">
+              {renderTimelineHeading(pagina.timelineHeading)}
+            </h2>
+
+            <div className="mx-auto mt-16 max-w-4xl">
+              <TimelineClient epocas={epocas} />
+            </div>
           </div>
         </section>
       </main>
 
       <Footer />
-    </>
+    </BibliografiaDepthShell>
   );
 }

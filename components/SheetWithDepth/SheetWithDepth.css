@@ -1,0 +1,43 @@
+.SheetWithDepth-outlet {
+  min-height: 100svh;
+  background: var(--color-paper);
+  transform-origin: 50% 0;
+  will-change: transform, border-radius;
+}
+
+.SheetWithDepth-view {
+  z-index: 1;
+  height: calc(var(--silk-100-lvh-dvh-pct) + 56px);
+}
+
+.SheetWithDepth-backdrop {
+  background: #111;
+}
+
+.SheetWithDepth-content {
+  box-sizing: border-box;
+  height: calc(var(--silk-100-lvh-dvh-pct) - 24px + env(safe-area-inset-bottom, 0px));
+  background: transparent;
+  display: grid;
+  padding: 0;
+}
+
+.SheetWithDepth-innerContent {
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  overflow: clip;
+  border-radius: 28px 28px 0 0;
+  background: var(--color-paper);
+  box-shadow:
+    0 24px 80px rgb(29 24 16 / 0.25),
+    0 2px 12px rgb(29 24 16 / 0.12);
+}
+
+.SheetWithDepth-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgb(70 59 45 / 0.24);
+  margin: 12px auto 8px;
+}

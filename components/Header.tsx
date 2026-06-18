@@ -12,15 +12,14 @@ const navItems = [
 ];
 
 /** Masthead badge — the designer's self-contained SVG logo (REVISTA DCE_02.pdf
-    p.3). The SVG carries its own burgundy (#840238) background, so no wrapper
-    fill is needed. Aspect ratio 244.2×148.9 ≈ 1.64:1; sized ~56px tall on
-    mobile, ~68px on desktop to read as a prominent badge. */
+    p.3). The SVG's burgundy (#840238) rect fills its full viewBox, so the badge
+    spans the entire navbar height (flush top/bottom/left) when stretched. */
 function Masthead() {
   return (
     <Link
       href="/"
       aria-label="Revista de Derecho Comercial y de la Empresa — Inicio"
-      className="block shrink-0"
+      className="flex shrink-0 items-stretch"
     >
       <Image
         src="/logo-rdcydle.svg"
@@ -28,7 +27,7 @@ function Masthead() {
         width={244}
         height={149}
         priority
-        className="h-14 w-auto sm:h-[68px]"
+        className="h-full w-auto"
       />
     </Link>
   );
@@ -53,8 +52,8 @@ export default function Header({ compact = false }: { compact?: boolean }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
-      <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-4 py-5">
-        {/* Masthead */}
+      <div className="mx-auto flex h-24 max-w-[1280px] items-stretch justify-between gap-6">
+        {/* Masthead — fills the full navbar height, flush to the top-left */}
         <Masthead />
 
         {/* Inline nav */}
@@ -78,7 +77,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
         </nav>
 
         {/* Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 pr-4 sm:pr-6">
           <button
             type="button"
             className="hidden text-sm text-ink-soft transition-colors hover:text-ink sm:block"

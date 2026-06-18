@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Crimson_Pro } from "next/font/google";
 import "./globals.css";
+import "@silk-hq/components/unlayered-styles.css";
 
 const inter = Inter({
   subsets: ["latin"],

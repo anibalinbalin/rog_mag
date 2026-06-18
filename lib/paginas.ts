@@ -24,6 +24,16 @@ export interface Pagina80Anos {
   intro: string;
   bibliografiaLabel: string;
   bibliografiaHref: string;
+  bibliografiaEyebrow: string;
+  bibliografiaName: string;
+  bibliografiaYears: string;
+  bibliografiaPhoto: string;
+  bibliografiaPhotoAlt: string;
+  bibliografiaBody: string[];
+  librosImage: string;
+  librosAlt: string;
+  librosBody: string[];
+  closing: string;
   timelineHeading: string;
   founderImage: string;
   founderCaption: string;
@@ -65,6 +75,20 @@ export function getPagina80Anos(): Pagina80Anos {
     intro: (data.intro as string) ?? "",
     bibliografiaLabel: (data.bibliografiaLabel as string) ?? "",
     bibliografiaHref: (data.bibliografiaHref as string) ?? "",
+    bibliografiaEyebrow: (data.bibliografiaEyebrow as string) ?? "",
+    bibliografiaName: (data.bibliografiaName as string) ?? "",
+    bibliografiaYears: (data.bibliografiaYears as string) ?? "",
+    bibliografiaPhoto: (data.bibliografiaPhoto as string) ?? "",
+    bibliografiaPhotoAlt: (data.bibliografiaPhotoAlt as string) ?? "",
+    bibliografiaBody: Array.isArray(data.bibliografiaBody)
+      ? (data.bibliografiaBody as string[]).filter(Boolean)
+      : [],
+    librosImage: (data.librosImage as string) ?? "",
+    librosAlt: (data.librosAlt as string) ?? "",
+    librosBody: Array.isArray(data.librosBody)
+      ? (data.librosBody as string[]).filter(Boolean)
+      : [],
+    closing: (data.closing as string) ?? "",
     timelineHeading: (data.timelineHeading as string) ?? "",
     founderImage: (data.founderImage as string) ?? "",
     founderCaption: (data.founderCaption as string) ?? "",
