@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import SectionBadge from "@/components/SectionBadge";
 import { formatDate } from "@/lib/format";
 
 export type PubItem = {
@@ -12,6 +12,7 @@ export type PubItem = {
   author: string;
   date: string;
   section: string;
+  coverImage: string;
 };
 
 /** Belen's direction (2026-06): Publicaciones as a searchable list — pill
@@ -68,33 +69,41 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
         {filtered.map((post) => (
           <div
             key={post.slug}
-            className="grid grid-cols-1 items-center gap-6 border-b border-dashed border-line-dark py-8 sm:grid-cols-[1fr_auto]"
+            className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 sm:grid-cols-[160px_1fr_auto] sm:items-center sm:gap-10"
           >
+            {/* Thumbnail (post cover) */}
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream">
+              {post.coverImage && (
+                <Image
+                  src={post.coverImage}
+                  alt={post.title}
+                  fill
+                  sizes="160px"
+                  className="object-cover"
+                />
+              )}
+            </div>
+
+            {/* Content */}
             <div>
-              <div className="flex items-center gap-3">
-                <SectionBadge section={post.section} />
-                <span className="text-[11px] uppercase tracking-widest text-ink-muted">
-                  {formatDate(post.date)}
-                </span>
-              </div>
+              <span className="text-[11px] uppercase tracking-widest text-ink-muted">
+                {formatDate(post.date)}
+              </span>
               <h3 className="mt-2 font-serif text-2xl font-semibold leading-snug text-ink">
                 {post.title}
               </h3>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
                 {post.excerpt}
               </p>
-              <div className="mt-4">
-                <p className="text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-                  Autor
-                </p>
-                <p className="mt-1 text-xs uppercase tracking-widest text-ink">
-                  {post.author}
-                </p>
-              </div>
+              <p className="mt-4 text-xs uppercase tracking-widest text-ink-soft">
+                {post.author}
+              </p>
             </div>
+
+            {/* CTA — own column on desktop, full-width row on mobile */}
             <Link
               href={`/publicaciones/${post.slug}`}
-              className="inline-flex items-center justify-center justify-self-start rounded-sm bg-action-dark px-7 py-2.5 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90 sm:justify-self-end"
+              className="col-span-2 inline-flex items-center justify-center justify-self-start rounded-sm bg-action-dark px-7 py-2.5 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90 sm:col-span-1 sm:justify-self-end"
             >
               Leer
             </Link>

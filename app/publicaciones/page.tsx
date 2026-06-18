@@ -19,6 +19,7 @@ export default function PublicacionesPage() {
     author: p.author,
     date: p.date,
     section: p.section,
+    coverImage: p.coverImage,
   }));
 
   const professionals = getAllAuthors().map((a) => ({
