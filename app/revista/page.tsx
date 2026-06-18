@@ -2,9 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import BookCover3D from "@/components/BookCover3D";
 import IssueContentsAccordion from "@/components/IssueContentsAccordion";
+import PublicacionesArchivo from "@/components/PublicacionesArchivo";
 import { getCurrentIssue, getAllIssues, type Issue } from "@/lib/issues";
+import { getArchivoYears } from "@/lib/archivo";
 
 export const metadata = {
   title: "Revista — Revista de Derecho Comercial y de la Empresa",
@@ -25,6 +26,7 @@ function issueListTitle(issue: Issue) {
 export default function RevistaPage() {
   const currentIssue = getCurrentIssue();
   const others = getAllIssues().filter((i) => !i.current);
+  const archivoYears = getArchivoYears();
 
   // The four mockup categories, always shown (empty ones render "pendiente").
   const groups = currentIssue
@@ -47,7 +49,7 @@ export default function RevistaPage() {
         <section className="mx-auto max-w-[1280px] px-4 py-12 lg:py-16">
           {/* Current issue — title + tan CTA + accordion, cover floated right */}
           {currentIssue && (
-            <div className="grid gap-12 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-16">
+            <div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start lg:gap-16">
               <div>
                 <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
                   {currentIssue.number} ({currentIssue.year})
@@ -60,18 +62,29 @@ export default function RevistaPage() {
                   Ver más
                 </Link>
 
-                <div className="mt-12">
+                {/* Accordion is constrained (max-w-2xl) so its divider lines
+                    match the mockup — they stop mid-page rather than running the
+                    full column width up to the cover. */}
+                <div className="mt-12 max-w-2xl">
                   <IssueContentsAccordion groups={groups} />
                 </div>
               </div>
 
+              {/* The cover asset (REVISTA 5-6.png) is already a rendered 3D
+                  hardcover with its own spine, page edges and drop shadow, so it
+                  renders as a plain image — NOT through BookCover3D (which would
+                  double up the 3D effect). */}
               <div className="justify-self-center lg:justify-self-end">
-                <BookCover3D
-                  src={currentIssue.cover}
-                  alt={`${currentIssue.number} (${currentIssue.year})`}
-                  priority
-                  className="w-64 sm:w-72 lg:w-[340px]"
-                />
+                {currentIssue.cover && (
+                  <Image
+                    src={currentIssue.cover}
+                    alt={`${currentIssue.number} (${currentIssue.year})`}
+                    width={779}
+                    height={1080}
+                    priority
+                    className="h-auto w-64 sm:w-72 lg:w-[380px]"
+                  />
+                )}
               </div>
             </div>
           )}
@@ -88,16 +101,20 @@ export default function RevistaPage() {
                   <Link
                     key={issue.slug}
                     href={`/revista/${issue.slug}`}
-                    className="group grid grid-cols-[88px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 sm:grid-cols-[112px_1fr] sm:gap-8"
+                    className="group grid grid-cols-[130px_1fr] items-center gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
                   >
-                    <div className="relative aspect-[3/4] w-full overflow-hidden bg-paper-cream shadow">
+                    {/* Cover assets are pre-rendered 3D books with their own
+                        shadow on a transparent background — object-contain (no
+                        cream box, no extra shadow) so the full book shows like
+                        the mockup. */}
+                    <div className="relative aspect-[3/4] w-full">
                       {issue.cover && (
                         <Image
                           src={issue.cover}
                           alt={`${issue.number} (${issue.year})`}
                           fill
-                          sizes="112px"
-                          className="object-cover"
+                          sizes="190px"
+                          className="object-contain"
                         />
                       )}
                     </div>
@@ -105,10 +122,10 @@ export default function RevistaPage() {
                       <p className="text-xs uppercase tracking-widest text-ink-muted">
                         {issueDateLabel(issue)}
                       </p>
-                      <h3 className="mt-2 font-serif text-2xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+                      <h3 className="mt-3 font-serif text-3xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
                         {issueListTitle(issue)}
                       </h3>
-                      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
+                      <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
                         {issue.description ||
                           `Volumen ${issue.volume} · N.º ${issue.issue} · ${issue.articleCount} artículos`}
                       </p>
@@ -119,6 +136,16 @@ export default function RevistaPage() {
             </div>
           )}
         </section>
+
+        {/* Publicaciones desde 1946 — the digitized "Sociedades Anónimas"
+            archive on its own light-gray band, full width. */}
+        {archivoYears.length > 0 && (
+          <section className="bg-paper-warm">
+            <div className="mx-auto max-w-[1280px] px-4 py-20">
+              <PublicacionesArchivo years={archivoYears} />
+            </div>
+          </section>
+        )}
       </main>
 
       <Footer />
