@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
+// Build stamp surfaced in the top strip (see app/layout.tsx) so editors can
+// confirm at a glance whether their browser is on the latest deploy. Stamped
+// from Vercel's git SHA at build time; "local" when built outside Vercel.
+const buildSha = (process.env.VERCEL_GIT_COMMIT_SHA || "local").slice(0, 7);
+const buildDate = `${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC`;
+
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_SHA: buildSha,
+    NEXT_PUBLIC_BUILD_DATE: buildDate,
+  },
   allowedDevOrigins: ["10.10.11.186", "claude-code-sec.tailf626.ts.net"],
   images: { unoptimized: true,
     // Editor media uploads live in Cloudinary (see tina/config.tsx media store).

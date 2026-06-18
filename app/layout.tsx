@@ -28,6 +28,11 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.variable} ${crimson.variable}`}>
+        {/* Temporary build stamp — lets editors confirm their browser is on the
+            latest deploy (cache-busting check). Remove once verified. */}
+        <div className="border-b border-line bg-paper py-1 text-center font-mono text-[11px] tracking-wide text-ink-soft">
+          build {process.env.NEXT_PUBLIC_BUILD_SHA} · {process.env.NEXT_PUBLIC_BUILD_DATE}
+        </div>
         {children}
       </body>
     </html>
