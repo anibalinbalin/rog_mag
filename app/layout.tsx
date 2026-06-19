@@ -29,12 +29,13 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.variable} ${crimson.variable}`}>
+        {children}
         {/* Temporary build stamp — lets editors confirm their browser is on the
-            latest deploy (cache-busting check). Remove once verified. */}
-        <div className="border-b border-line bg-paper py-1 text-center font-mono text-[11px] tracking-wide text-ink-soft">
+            latest deploy (cache-busting check). Remove once verified. Fixed,
+            bottom-right, non-interactive so it never blocks the UI. */}
+        <div className="pointer-events-none fixed bottom-2 right-2 z-40 rounded-sm border border-line bg-paper/80 px-2 py-0.5 font-mono text-[10px] tracking-wide text-ink-faint backdrop-blur-sm">
           build {process.env.NEXT_PUBLIC_BUILD_SHA} · {process.env.NEXT_PUBLIC_BUILD_DATE}
         </div>
-        {children}
       </body>
     </html>
   );
