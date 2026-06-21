@@ -39,9 +39,9 @@ function Masthead() {
     shrink-on-scroll masthead). */
 export default function Header({ compact = false }: { compact?: boolean }) {
   void compact;
-  // usePathname() can return the percent-encoded form for non-ASCII routes
-  // (e.g. "/80-a%C3%B1os" for the /80-años page), so decode before matching the
-  // nav items — otherwise that tab's active underline never lights up.
+  // The /80-años page is served under its accented URL (via a rewrite), and
+  // usePathname() can hand back the percent-encoded form ("/80-a%C3%B1os"), so
+  // decode before matching nav items — otherwise that tab's underline never lights up.
   const rawPathname = usePathname() ?? "";
   let pathname = rawPathname;
   try {

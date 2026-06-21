@@ -22,6 +22,21 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // The public URL keeps the ñ (/80-años); it maps internally to the ASCII
+  // app/aniversario route so `next dev` resolves it (a non-ASCII folder name
+  // 404s in the dev server). List the raw and percent-encoded forms since the
+  // incoming path can arrive either way.
+  async rewrites() {
+    // beforeFiles: run before the filesystem route check. In `next dev` the
+    // non-ASCII path 404s during that check, so an afterFiles rewrite never
+    // gets its turn — beforeFiles rewrites it to the ASCII route first.
+    return {
+      beforeFiles: [
+        { source: "/80-años", destination: "/aniversario" },
+        { source: "/80-a%C3%B1os", destination: "/aniversario" },
+      ],
+    };
+  },
   async redirects() {
     return [
       // Noticias is an editorial section — its permanent home is /secciones/noticias.
@@ -30,9 +45,17 @@ const nextConfig: NextConfig = {
         destination: "/secciones/noticias",
         permanent: true,
       },
-      // The anniversary page moved from /80-anos to /80-años; keep the old URL working.
+      // The anniversary page is canonical at /80-años (keep the ñ — "anos"
+      // without it reads badly in Spanish). The route folder is ASCII
+      // (app/aniversario) so `next dev` resolves it, and a rewrite (below)
+      // serves the page under the accented URL. Fold the alternates onto it.
       {
         source: "/80-anos",
+        destination: "/80-años",
+        permanent: true,
+      },
+      {
+        source: "/aniversario",
         destination: "/80-años",
         permanent: true,
       },
