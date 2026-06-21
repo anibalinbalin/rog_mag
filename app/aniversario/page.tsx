@@ -76,7 +76,7 @@ export default function OchentaAnosPage() {
 
       <main>
         {/* Section 1 — intro (white) with the giant ghost "80" behind the title */}
-        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-20 sm:pt-24">
+        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-36 sm:pt-45">
           <div className="mx-auto max-w-3xl text-center">
             {/* Title + years, with the decorative ghost "80" hugging them */}
             <div className="relative isolate">
@@ -95,7 +95,7 @@ export default function OchentaAnosPage() {
               </p>
             </div>
 
-            <p className="mx-auto mt-32 max-w-2xl font-serif text-xl font-semibold leading-relaxed text-ink sm:mt-36 sm:text-2xl">
+            <p className="mx-auto mt-24 max-w-2xl font-serif text-xl font-semibold leading-relaxed text-ink sm:mt-28 sm:text-2xl">
               {pagina.lede}
             </p>
 
