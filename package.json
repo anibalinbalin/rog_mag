@@ -16,6 +16,7 @@
     "@gsap/react": "^2.1.2",
     "@silk-hq/components": "^0.10.1",
     "@tinacms/datalayer": "2.0.22",
+    "agentation": "^3.0.2",
     "cloudinary": "^1.41.3",
     "gray-matter": "^4.0.3",
     "gsap": "^3.15.0",

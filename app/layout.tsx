@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Crimson_Pro } from "next/font/google";
+import { Agentation } from "agentation";
 import "./globals.css";
 import "@silk-hq/components/unlayered-styles.css";
 
@@ -36,6 +37,8 @@ export default function RootLayout({
         <div className="pointer-events-none fixed bottom-2 right-2 z-40 rounded-sm border border-line bg-paper/80 px-2 py-0.5 font-mono text-[10px] tracking-wide text-ink-faint backdrop-blur-sm">
           build {process.env.NEXT_PUBLIC_BUILD_SHA} · {process.env.NEXT_PUBLIC_BUILD_DATE}
         </div>
+        {/* Agentation visual-feedback toolbar — dev only, never ships to prod. */}
+        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   );
