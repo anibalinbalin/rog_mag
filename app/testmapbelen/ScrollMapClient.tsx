@@ -379,12 +379,9 @@ export default function ScrollMapClient({
             {embedded || !hero ? (
               <div className="pt-[6vh]">
                 <p className="font-serif text-2xl font-semibold italic text-ink sm:text-3xl">
-                  Seis épocas, ocho décadas
+                  Seis épocas de historia en ocho décadas
                 </p>
                 <p className="mt-5 text-xs uppercase tracking-[0.25em] text-burgundy">1946 — 2026</p>
-                <p className="mx-auto mt-8 max-w-sm text-sm leading-relaxed text-ink-muted">
-                  Desplazate para recorrer la ruta — el punto se detiene en cada año.
-                </p>
               </div>
             ) : (
               <>

@@ -19,20 +19,6 @@ export const metadata = {
 // /testmapbelen scroll-map (ScrollMapClient, embedded). Served at /80-años-test
 // via a rewrite to this ASCII folder (non-ASCII folders 404 in next dev).
 
-/** Splits the timeline heading so its tail ("ocho décadas") can be bolded. */
-function renderTimelineHeading(heading: string) {
-  const tail = "ocho décadas";
-  const idx = heading.toLowerCase().lastIndexOf(tail);
-  if (idx === -1) return heading;
-  return (
-    <>
-      {heading.slice(0, idx)}
-      <strong className="font-semibold">{heading.slice(idx, idx + tail.length)}</strong>
-      {heading.slice(idx + tail.length)}
-    </>
-  );
-}
-
 /** Breaks the journal title onto two balanced lines like the mockup. */
 function renderTitle(title: string) {
   const marker = " y de la Empresa";
@@ -150,17 +136,10 @@ export default function OchentaAnosTestPage() {
           </section>
         )}
 
-        {/* Section 4 — "Seis épocas", here as the testmapbelen scroll-map.
-            The heading sits in the warm band; the map runs full-width below it. */}
+        {/* Section 4 — "Seis épocas", here as the testmapbelen scroll-map. The
+            map introduces itself in its own right column (the section heading
+            lives there), so there's no separate full-width heading band. */}
         <section>
-          <div className="bg-paper-warm">
-            <div className="mx-auto max-w-[1280px] px-4 pb-6 pt-20 sm:pt-24">
-              <h2 className="text-center font-serif text-3xl leading-tight text-ink sm:text-4xl">
-                {renderTimelineHeading(pagina.timelineHeading)}
-              </h2>
-            </div>
-          </div>
-
           <ScrollMapClient epocas={epocas} embedded />
         </section>
       </main>
