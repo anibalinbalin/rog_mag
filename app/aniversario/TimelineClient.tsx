@@ -9,27 +9,33 @@ import type { Epoca } from "@/lib/epocas";
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 /* ─────────────────────────────────────────────────────────
- * TIMELINE STORYBOARD — "Directional + depth"  (gated by prefers-reduced-motion)
+ * TIMELINE STORYBOARD — "Directional + focus"  (gated by prefers-reduced-motion)
  *
  *   while scrolling  the burgundy spine fills top→bottom (scaleY, scrub)
  *   per row          the director card flies in from the left and the detail
  *                    card from the right, on that row's own scroll progress
- *   per year         a slight parallax-drift (yPercent) gives depth
- *   at the centre     the year nearest the viewport centre becomes the hero —
- *      line          it inks, scales up, and weights to semibold; exactly ONE
- *                    at a time, so 1946 hands the spotlight off as you descend
+ *   per year         a continuous depth-of-field focus: each year is small and
+ *                    faded at rest, and grows + inks + comes to full opacity as
+ *                    it approaches the viewport centre, easing back out as it
+ *                    recedes. The peak is at the centre, so focus rides the
+ *                    scroll smoothly rather than snapping between winners.
+ *                    A slight parallax-drift (yPercent) keeps the depth cue.
  * ───────────────────────────────────────────────────────── */
 
 const SCRUB = 0.6; // seconds of scroll catch-up (smoothing)
 const SPINE = { start: "top 72%", end: "bottom 60%" } as const;
 const CARDS = { throw: 96, start: "top 92%", end: "top 50%", ease: "power3.out" } as const;
-const YEARS = {
-  drift: 14, // yPercent parallax range
-  pop: 1.45, // hero scale
-  on: "#191919", // ink
-  off: "#9b9b9b", // faint
-  duration: 0.4,
-  ease: "power3.out",
+const FOCUS = {
+  restScale: 0.9, // size when far from centre
+  heroScale: 1.45, // size at the centre (peak)
+  restOpacity: 0.7, // off-centre years stay a clear, readable grey
+  drift: 14, // yPercent parallax range (depth)
+  on: "#191919", // ink — at the centre only
+  off: "#9b9b9b", // grey — above and below
+  growEase: "power2.out", // size expands steadily as it approaches…
+  fallEase: "power2.in", // …and eases back as it recedes (plateau at centre)
+  inkInEase: "power3.in", // colour holds grey until close, then inks at centre
+  inkOutEase: "power3.out", // and drops back to grey quickly as it recedes
 } as const;
 
 /** Renders inline content: **bold** spans and single newlines as <br>. */
@@ -86,15 +92,15 @@ export default function TimelineClient({ epocas }: { epocas: Epoca[] }) {
       const mm = gsap.matchMedia();
 
       // Reduced motion: no movement. 1946 stays the static anchor so the
-      // section still reads as anchored to the founding year.
+      // section still reads as anchored to the founding year; the rest stay
+      // at full opacity and a single weight, legible and still.
       mm.add("(prefers-reduced-motion: reduce)", () => {
         const founding = root.querySelector(".epoca-year[data-founding]");
-        gsap.set(founding, { color: YEARS.on, scale: 1.3, fontWeight: 600, transformOrigin: "center" });
+        gsap.set(founding, { color: FOCUS.on, scale: 1.3, fontWeight: 600, transformOrigin: "center center" });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         const rows = q(".epoca-row");
-        const years = q(".epoca-year");
         const fill = root.querySelector<HTMLElement>(".epoca-spine-fill");
 
         // 1) Burgundy spine fills top→bottom as you scroll.
@@ -111,66 +117,63 @@ export default function TimelineClient({ epocas }: { epocas: Epoca[] }) {
           );
         }
 
-        // 2) Cards fly in from their side, driven by each row's scroll progress.
         rows.forEach((row) => {
+          // 2) Cards fly in from their side, driven by each row's scroll progress.
           const dir = row.querySelector<HTMLElement>(".epoca-director");
           const det = row.querySelector<HTMLElement>(".epoca-detail");
-          const tl = gsap.timeline({
+          const cards = gsap.timeline({
             scrollTrigger: { trigger: row, start: CARDS.start, end: CARDS.end, scrub: SCRUB },
           });
-          if (dir) tl.fromTo(dir, { x: -CARDS.throw, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: CARDS.ease }, 0);
-          if (det) tl.fromTo(det, { x: CARDS.throw, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: CARDS.ease }, 0);
+          if (dir) cards.fromTo(dir, { x: -CARDS.throw, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: CARDS.ease }, 0);
+          if (det) cards.fromTo(det, { x: CARDS.throw, autoAlpha: 0 }, { x: 0, autoAlpha: 1, ease: CARDS.ease }, 0);
+
+          // 3) Year focus — a continuous depth-of-field that peaks at the
+          //    viewport centre. The row crosses centre at the timeline's
+          //    midpoint, so the year grows + inks + comes to full opacity on
+          //    the approach and eases back out as it recedes. Riding scroll
+          //    (scrub) means focus is shared smoothly, never snapped.
+          const year = row.querySelector<HTMLElement>(".epoca-year");
+          if (year) {
+            gsap.set(year, { transformOrigin: "center center" });
+            const focus = gsap.timeline({
+              scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: SCRUB },
+            });
+            // Size + opacity grow steadily across the approach…
+            focus
+              .fromTo(
+                year,
+                { scale: FOCUS.restScale, opacity: FOCUS.restOpacity },
+                { scale: FOCUS.heroScale, opacity: 1, ease: FOCUS.growEase, duration: 0.5 },
+                0
+              )
+              .to(
+                year,
+                { scale: FOCUS.restScale, opacity: FOCUS.restOpacity, ease: FOCUS.fallEase, duration: 0.5 },
+                0.5
+              )
+              // …but the ink is concentrated at the centre, on its own steeper
+              // curve: years above and below stay grey, and only the year at the
+              // centre darkens to near-black — so the eye lands on one year.
+              .fromTo(
+                year,
+                { color: FOCUS.off },
+                { color: FOCUS.on, ease: FOCUS.inkInEase, duration: 0.5 },
+                0
+              )
+              .to(year, { color: FOCUS.off, ease: FOCUS.inkOutEase, duration: 0.5 }, 0.5);
+
+            // …with a slight parallax-drift across the same range for depth.
+            gsap.fromTo(
+              year,
+              { yPercent: FOCUS.drift },
+              {
+                yPercent: -FOCUS.drift,
+                ease: "none",
+                scrollTrigger: { trigger: row, start: "top bottom", end: "bottom top", scrub: SCRUB },
+              }
+            );
+          }
         });
-
-        // 3) Years parallax-drift for depth as their row passes through.
-        years.forEach((year) => {
-          gsap.fromTo(
-            year,
-            { yPercent: YEARS.drift },
-            {
-              yPercent: -YEARS.drift,
-              ease: "none",
-              scrollTrigger: { trigger: year.closest(".epoca-row"), start: "top bottom", end: "bottom top", scrub: SCRUB },
-            }
-          );
-        });
-
-        // 4) Hero focus — exactly ONE year at a time. Each scroll tick we find
-        //    the on-screen year closest to the viewport centre and promote it
-        //    (ink + scale + semibold), demoting the previous. Prominence rides
-        //    the scroll; no two years ever co-star.
-        let active = -1;
-        const rest = (el: Element) =>
-          gsap.to(el, { color: YEARS.off, scale: 1, fontWeight: 400, duration: YEARS.duration, ease: YEARS.ease, overwrite: "auto" });
-        const hero = (el: Element) =>
-          gsap.to(el, { color: YEARS.on, scale: YEARS.pop, fontWeight: 600, duration: YEARS.duration, ease: YEARS.ease, overwrite: "auto" });
-
-        const setActive = (idx: number) => {
-          if (idx === active) return;
-          if (active >= 0 && years[active]) rest(years[active]);
-          if (idx >= 0 && years[idx]) hero(years[idx]);
-          active = idx;
-        };
-
-        const update = () => {
-          const centre = window.innerHeight / 2;
-          let best = -1;
-          let bestDist = Infinity;
-          years.forEach((year, i) => {
-            const r = year.getBoundingClientRect();
-            const yc = r.top + r.height / 2;
-            if (yc < 0 || yc > window.innerHeight) return; // off-screen years don't compete
-            const d = Math.abs(yc - centre);
-            if (d < bestDist) {
-              bestDist = d;
-              best = i;
-            }
-          });
-          setActive(best);
-        };
-
-        ScrollTrigger.create({ trigger: root, start: "top bottom", end: "bottom top", onUpdate: update, onRefresh: update });
-        update();
       });
     },
     { scope: rootRef }
