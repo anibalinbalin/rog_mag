@@ -27,7 +27,7 @@ const VB = 1500; // square viewBox
 const CX = 750; // centre column
 const TOP = 240; // y of the first station
 const GAP = 340; // vertical distance between stations
-const AMP = 220; // horizontal sweep of the serpentine
+const AMP = 200; // horizontal sweep of the serpentine
 
 interface Hero {
   title: string;
@@ -115,7 +115,6 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
   const root = useRef<HTMLDivElement>(null);
   const pts = stations(epocas.length);
   const d = smoothPath(pts);
-  const pathHeight = Math.max(1, (epocas.length - 1) * GAP);
 
   useGSAP(
     () => {
@@ -128,75 +127,41 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       const dot = r.querySelector<SVGCircleElement>(".dot");
       const route = r.querySelector<SVGPathElement>(".route");
       const section = r.querySelector<HTMLElement>("#scrollmap");
-      const expandBtn = r.querySelector<HTMLButtonElement>(".expand-map");
-      const closeBtn = r.querySelector<HTMLButtonElement>(".close-map");
       if (!map || !pov || !povg || !dot || !route || !section) return;
 
-      let expanded = false;
-      const xTo = gsap.quickTo(povg, "x", { duration: 1, ease: "expo" });
       const yTo = gsap.quickTo(povg, "y", { duration: 1, ease: "expo" });
 
-      // Pin the camera's scale pivot to the SVG origin (the dot's post-translate
-      // position), NOT the content bbox centre — otherwise a tall route scales
-      // about a point far down and the framing drifts as it zooms.
-      gsap.set(pov, { svgOrigin: "0 0" });
+      // Zoom arc: a wide establishing shot at the start, dive into a close POV
+      // through the middle, then pull back out at the end (out → in → out). The
+      // route stays horizontally centred (a vertical pan down the serpentine),
+      // so its full width fills the panel and no year clips off the edge.
+      const POV_SCALE = 2.0; // close ride
+      const WIDE_SCALE = 0.7; // establishing / closing shot
+      const RAMP = 0.16; // share of the scroll spent diving in / pulling out
+
+      // Pin the camera's scale pivot to the SVG origin so the tall route scales
+      // about the dot, not its bbox centre (which would drift the framing).
+      gsap.set(pov, { svgOrigin: "0 0", x: 750, y: 750, scale: WIDE_SCALE });
 
       // ── The scroll-driven ride ───────────────────────────
-      const tl = gsap.timeline({
-        scrollTrigger: { trigger: section, start: "0 0", end: "100% 100%", pin: map, scrub: 1 },
-        onUpdate: () => {
-          if (expanded) return;
-          xTo(-(gsap.getProperty(dot, "x") as number));
-          yTo(-(gsap.getProperty(dot, "y") as number));
-        },
-      })
-        .to(dot, { motionPath: { path: route }, immediateRender: true, ease: "none" }, 0)
-        .from(route, { drawSVG: "0 0", ease: "none" }, 0)
-        // a gentle zoom "breathe" across the ride (subtle, calm)
-        .fromTo(pov, { x: 750, y: 750, scale: 2 }, { scale: 2.18, ease: "sine.inOut", duration: 0.15, yoyo: true, repeat: 1, repeatDelay: 0.2 }, 0);
+      // The zoom rides the scroll as real timeline tweens (a quickTo on scale
+      // doesn't cooperate with svgOrigin). Dot + route span the whole timeline
+      // (duration 1); the camera dives in over the first RAMP, holds close, then
+      // pulls back out over the last RAMP.
+      gsap
+        .timeline({
+          scrollTrigger: { trigger: section, start: "0 0", end: "100% 100%", pin: map, scrub: 1 },
+          onUpdate: () => {
+            yTo(-(gsap.getProperty(dot, "y") as number));
+          },
+        })
+        .to(dot, { motionPath: { path: route }, immediateRender: true, ease: "none", duration: 1 }, 0)
+        .from(route, { drawSVG: "0 0", ease: "none", duration: 1 }, 0)
+        .to(pov, { scale: POV_SCALE, ease: "power2.inOut", duration: RAMP }, 0)
+        .to(pov, { scale: WIDE_SCALE, ease: "power2.inOut", duration: RAMP }, 1 - RAMP);
 
-      // centre the camera on the dot's starting point
-      gsap.set(povg, {
-        x: -(gsap.getProperty(dot, "x") as number),
-        y: -(gsap.getProperty(dot, "y") as number),
-      });
-
-      // ── Expand / collapse ────────────────────────────────
-      const fitScale = VB / (pathHeight + 560); // zoom out to fit the whole route
-      const fitGY = -(TOP + pathHeight / 2);
-
-      const onExpand = () => {
-        if (expanded) return;
-        expanded = true;
-        document.documentElement.style.overflow = "hidden";
-        gsap
-          .timeline({ defaults: { duration: 0.85, ease: "power3.inOut" } })
-          .to(map, { width: "100%", maxWidth: "100%" }, 0)
-          .to(tl, { progress: 1 }, 0)
-          .to(pov, { scale: fitScale, x: 750, y: 750 }, 0)
-          .to(povg, { x: -CX, y: fitGY }, 0)
-          .to(closeBtn, { autoAlpha: 1, duration: 0.3 }, 0.4);
-      };
-      const onClose = () => {
-        gsap
-          .timeline({ defaults: { duration: 0.8, ease: "power3.inOut" } })
-          .to(closeBtn, { autoAlpha: 0, duration: 0.2 }, 0)
-          .to(map, { width: "50%", maxWidth: "50%" }, 0)
-          .to(pov, { scale: 2, x: 750, y: 750 }, 0)
-          .to(povg, { x: -(gsap.getProperty(dot, "x") as number), y: -(gsap.getProperty(dot, "y") as number) }, 0)
-          .add(() => {
-            document.documentElement.style.overflow = "";
-            expanded = false;
-            ScrollTrigger.refresh();
-          });
-      };
-
-      expandBtn?.addEventListener("click", onExpand);
-      closeBtn?.addEventListener("click", onClose);
-      return () => {
-        expandBtn?.removeEventListener("click", onExpand);
-        closeBtn?.removeEventListener("click", onClose);
-      };
+      // centre the route horizontally; start panned to the first station
+      gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
     },
     { scope: root, dependencies: [] }
   );
@@ -214,8 +179,8 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
             <g className="pov">
               <g strokeLinecap="round" strokeLinejoin="round">
                 {/* faint full track + burgundy route that inks in */}
-                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={4} />
-                <path className="route" d={d} stroke="#7a1738" strokeWidth={6} />
+                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={5} />
+                <path className="route" d={d} stroke="#7a1738" strokeWidth={7} />
 
                 {/* stations: a ring + the year, the current one rides under the dot */}
                 {pts.map((p, i) => (
@@ -223,11 +188,11 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
                     <circle cx={p.x} cy={p.y} r={9} fill="#f0efe9" stroke="#7a1738" strokeWidth={3} />
                     <text
                       x={p.x}
-                      y={p.y - 34}
+                      y={p.y - 32}
                       textAnchor="middle"
                       fill="#191919"
                       style={{ fontFamily: "var(--font-crimson), Georgia, serif", fontWeight: 600 }}
-                      fontSize={62}
+                      fontSize={54}
                     >
                       {epocas[i].startYear}
                     </text>
@@ -295,27 +260,8 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
               )}
             </article>
           ))}
-
-          <div className="border-t border-line pt-12">
-            <button className="expand-map inline-flex items-center gap-2 rounded-sm border border-burgundy bg-burgundy px-6 py-3 font-serif text-lg text-white transition-transform active:scale-[0.97]">
-              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-                <path d="m11.39 15.18-4.97 4.97 1.76 1.66c.81.81.24 2.19-.91 2.19H1.28C.57 24 0 23.42 0 22.71v-6a1.28 1.28 0 0 1 2.19-.91l1.66 1.77 4.97-4.97a.86.86 0 0 1 1.21 0l1.36 1.36c.33.33.33.88 0 1.21Zm1.22-6.36 4.97-4.97-1.76-1.66A1.28 1.28 0 0 1 16.73 0h6c.71 0 1.28.58 1.28 1.29v6a1.28 1.28 0 0 1-2.19.91l-1.66-1.77-4.97 4.97a.86.86 0 0 1-1.21 0l-1.36-1.36a.86.86 0 0 1 0-1.21Z" />
-              </svg>
-              EXPANDIR MAPA
-            </button>
-          </div>
         </div>
       </section>
-
-      {/* fullscreen close button (hidden until expanded) */}
-      <button
-        className="close-map fixed bottom-5 right-5 z-[200] rounded-full border border-line bg-paper p-3 text-burgundy opacity-0 shadow-[0_2px_10px_rgba(25,25,25,0.15)]"
-        aria-label="Cerrar mapa"
-      >
-        <svg width={26} viewBox="0 0 24 24" className="fill-current">
-          <path d="M20.58.33a1.1 1.1 0 0 1 1.59 0l1.5 1.5c.44.44.44 1.15 0 1.59L19.59 7.5l1.83 1.83a1.13 1.13 0 0 1-.8 1.93h-6.75c-.62 0-1.12-.5-1.12-1.12V3.38a1.12 1.12 0 0 1 1.92-.8l1.83 1.83zM3.37 12.75h6.75c.62 0 1.12.5 1.12 1.12v6.75a1.12 1.12 0 0 1-1.92.8l-1.83-1.83-4.08 4.08c-.44.44-1.15.44-1.59 0l-1.5-1.5a1.1 1.1 0 0 1 0-1.59L4.4 16.5l-1.83-1.83a1.1 1.1 0 0 1-.24-1.23c.17-.42.58-.7 1.04-.7Z" />
-        </svg>
-      </button>
     </div>
   );
 }
