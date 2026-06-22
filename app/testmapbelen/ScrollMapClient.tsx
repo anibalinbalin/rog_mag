@@ -240,6 +240,25 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
         },
       });
 
+      // ── Keep the final época framed while the camera pulls out ──
+      // The left zooms out over "last centred → section bottom"; without this
+      // the right column would scroll the last época (2024) up and away, leaving
+      // empty space. Pin only the last block's INNER content (pinSpacing:false so
+      // the article box itself keeps scrolling — the camera-recenter above reads
+      // its live rect). End far past the bottom so it never un-pins on screen; it
+      // pins exactly where the content already sits (no jump) and holds 2024
+      // centred through the whole zoom-out.
+      const lastInner = last.querySelector<HTMLElement>(".epoca-inner");
+      if (lastInner) {
+        ScrollTrigger.create({
+          trigger: last,
+          start: "center center",
+          end: () => "+=" + Math.round(window.innerHeight * 4),
+          pin: lastInner,
+          pinSpacing: false,
+        });
+      }
+
       // centre the route horizontally; start panned to the first station
       gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
     },
@@ -329,22 +348,24 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
 
           {epocas.map((epoca) => (
             <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
-              <p className="font-serif text-6xl font-bold leading-none tabular-nums text-burgundy sm:text-7xl">
-                {epoca.startYear}
-              </p>
-              {epoca.director.trim() !== "" && (
-                <p className="mt-4 text-sm italic leading-relaxed text-ink-muted">
-                  {epoca.director.split("\n").map((line, i) => (
-                    <span key={i}>
-                      {line}
-                      {i < epoca.director.split("\n").length - 1 ? <br /> : null}
-                    </span>
-                  ))}
+              <div className="epoca-inner">
+                <p className="font-serif text-6xl font-bold leading-none tabular-nums text-burgundy sm:text-7xl">
+                  {epoca.startYear}
                 </p>
-              )}
-              {epoca.detail.trim() !== "" && (
-                <div className="mt-5 max-w-md text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
-              )}
+                {epoca.director.trim() !== "" && (
+                  <p className="mt-4 text-sm italic leading-relaxed text-ink-muted">
+                    {epoca.director.split("\n").map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i < epoca.director.split("\n").length - 1 ? <br /> : null}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                {epoca.detail.trim() !== "" && (
+                  <div className="mt-5 max-w-md text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
+                )}
+              </div>
             </article>
           ))}
         </div>
