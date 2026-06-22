@@ -216,7 +216,10 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
                 <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={5} />
                 <path className="route" d={d} stroke="#7a1738" strokeWidth={7} />
 
-                {/* stations: a ring + the year, the current one rides under the dot */}
+                {/* stations: a ring + the year. The year carries a paper-coloured
+                    halo (paint-order: stroke) so the route threads cleanly behind
+                    the numerals instead of slicing through them — a cartographic
+                    label casing in the panel's own background colour. */}
                 {pts.map((p, i) => (
                   <g key={epocas[i].slug}>
                     <circle cx={p.x} cy={p.y} r={9} fill="#f0efe9" stroke="#7a1738" strokeWidth={3} />
@@ -225,6 +228,10 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
                       y={p.y - 32}
                       textAnchor="middle"
                       fill="#191919"
+                      stroke="#f0efe9"
+                      strokeWidth={14}
+                      strokeLinejoin="round"
+                      paintOrder="stroke"
                       style={{ fontFamily: "var(--font-crimson), Georgia, serif", fontWeight: 600 }}
                       fontSize={54}
                     >
