@@ -134,7 +134,6 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       // Zoom arc bounds + dive timing (wide → close → wide).
       const POV_SCALE = 2.0; // close ride
       const WIDE_SCALE = 0.7; // establishing / closing shot
-      const RAMP = 0.16; // share of the ride spent diving in / pulling out
 
       // ── Sync map ↔ content ───────────────────────────────
       // The dot must sit on a station exactly when that época is centred on the
@@ -169,6 +168,35 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
         return frac[i] + (frac[i + 1] - frac[i]) * (ci - i);
       };
 
+      // ── Magnet: each hollow station ring is drawn toward the riding dot ──
+      // As the dot nears a ring the ring leans toward it and swells; they meet
+      // when the época is centred, then it releases as the dot rides on.
+      const rings = Array.from(r.querySelectorAll<SVGCircleElement>(".station-ring"));
+      const RING_R = 9;
+      const MAGNET_R = 250; // radius of influence (SVG units) ≈ ⅔ of a segment
+      const LEAN = 17; // how far a ring slides toward the dot at the peak
+      const GROW = 1.0; // how much a ring swells at the peak (× RING_R)
+      const magnetize = () => {
+        const dx = gsap.getProperty(dot, "x") as number;
+        const dy = gsap.getProperty(dot, "y") as number;
+        for (let i = 0; i < rings.length; i++) {
+          const sx = pts[i].x;
+          const sy = pts[i].y;
+          const dist = Math.hypot(dx - sx, dy - sy);
+          const tt = Math.max(0, 1 - dist / MAGNET_R);
+          const pull = tt * tt * (3 - 2 * tt); // smoothstep falloff
+          const nx = dist > 0.01 ? (dx - sx) / dist : 0;
+          const ny = dist > 0.01 ? (dy - sy) / dist : 0;
+          // Lean peaks mid-approach and returns to 0 at the meeting, so the ring
+          // slides toward the dot as it nears then settles into a clean concentric
+          // halo when they meet, and leans after as the dot departs.
+          const lean = LEAN * 4 * pull * (1 - pull);
+          gsap.set(rings[i], {
+            attr: { cx: sx + nx * lean, cy: sy + ny * lean, r: RING_R * (1 + GROW * pull) },
+          });
+        }
+      };
+
       // Pin the camera's scale pivot to the SVG origin so the tall route scales
       // about the dot, not its bbox centre (which would drift the framing).
       gsap.set(pov, { svgOrigin: "0 0", x: 750, y: 750, scale: WIDE_SCALE });
@@ -176,26 +204,51 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       // Pin the map across the whole section (hero + épocas).
       ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map });
 
+      // ── Zoom arc ─────────────────────────────────────────
+      // Dive from WIDE to POV as you scroll the hero and ARRIVE on 1946 (the
+      // founding year) — not somewhere between 1946 and 1971. Hold close through
+      // the journey, then pull back out to WIDE at the very end. Separate
+      // triggers (the dive needs to start before the ride does), as real tweens
+      // since a quickTo on scale doesn't cooperate with svgOrigin.
+      gsap.fromTo(
+        pov,
+        { scale: WIDE_SCALE },
+        {
+          scale: POV_SCALE,
+          ease: "power2.inOut",
+          scrollTrigger: { trigger: section, start: "top top", endTrigger: first, end: "center center", scrub: 1 },
+        }
+      );
+      gsap.fromTo(
+        pov,
+        { scale: POV_SCALE },
+        {
+          scale: WIDE_SCALE,
+          ease: "power2.inOut",
+          immediateRender: false,
+          scrollTrigger: { trigger: last, start: "center center", endTrigger: section, end: "bottom bottom", scrub: 1 },
+        }
+      );
+
       // ── The scroll-driven ride ───────────────────────────
       // Scrubbed across "first época centred → last época centred", so progress
-      // == which época is centred. Dot + route inking use the remap ease (a
-      // quickTo on scale doesn't cooperate with svgOrigin, so the zoom rides as
-      // timeline tweens): dive in over the first RAMP, hold close, pull out over
-      // the last RAMP. The camera follows the dot's height.
+      // == which época is centred. Dot + route inking use the remap ease so each
+      // station lands when its época is centred; the camera follows the dot's
+      // height; the rings magnetise toward the dot.
       gsap
         .timeline({
           scrollTrigger: { trigger: first, start: "center center", endTrigger: last, end: "center center", scrub: 1 },
           onUpdate: () => {
             yTo(-(gsap.getProperty(dot, "y") as number));
+            magnetize();
           },
         })
         .to(dot, { motionPath: { path: route }, immediateRender: true, ease: rideEase, duration: 1 }, 0)
-        .from(route, { drawSVG: "0 0", ease: rideEase, duration: 1 }, 0)
-        .to(pov, { scale: POV_SCALE, ease: "power2.inOut", duration: RAMP }, 0)
-        .to(pov, { scale: WIDE_SCALE, ease: "power2.inOut", duration: RAMP }, 1 - RAMP);
+        .from(route, { drawSVG: "0 0", ease: rideEase, duration: 1 }, 0);
 
       // centre the route horizontally; start panned to the first station
       gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
+      magnetize();
     },
     { scope: root, dependencies: [] }
   );
@@ -222,7 +275,7 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
                     label casing in the panel's own background colour. */}
                 {pts.map((p, i) => (
                   <g key={epocas[i].slug}>
-                    <circle cx={p.x} cy={p.y} r={9} fill="#f0efe9" stroke="#7a1738" strokeWidth={3} />
+                    <circle className="station-ring" cx={p.x} cy={p.y} r={9} fill="#f0efe9" stroke="#7a1738" strokeWidth={3} />
                     <text
                       x={p.x}
                       y={p.y - 32}
@@ -253,7 +306,7 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
         </div>
 
         {/* Right — the anniversary hero, then the épocas scroll past */}
-        <div className="info relative ml-[50%] w-[44%] px-[3%] py-[20vh] text-ink-muted">
+        <div className="info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] pb-[44vh] text-ink-muted">
           <header className="mb-[20vh] text-center">
             {/* Title + years, with the decorative ghost "80" hugging them */}
             <div className="relative isolate">
