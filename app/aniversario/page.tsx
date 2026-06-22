@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BibliografiaDepthShell from "@/components/BibliografiaDepthShell";
 import BibliografiaSheet from "@/components/BibliografiaSheet";
-import TimelineClient from "./TimelineClient";
+import ScrollMapClient from "./ScrollMapClient";
 import { getEpocas } from "@/lib/epocas";
 import { getPagina80Anos } from "@/lib/paginas";
 
@@ -12,22 +12,6 @@ export const metadata = {
   description:
     "Ocho décadas de la Revista de Derecho Comercial y de la Empresa (1946-2026): seis épocas de historia y la tradición editorial fundada por Sagunto Pérez Fontana.",
 };
-
-/** Splits the timeline heading so its tail ("ocho décadas") can be bolded
-    like the mockup. Robust to copy changes: only bolds when that exact tail
-    is present, otherwise renders the whole string plain. */
-function renderTimelineHeading(heading: string) {
-  const tail = "ocho décadas";
-  const idx = heading.toLowerCase().lastIndexOf(tail);
-  if (idx === -1) return heading;
-  return (
-    <>
-      {heading.slice(0, idx)}
-      <strong className="font-semibold">{heading.slice(idx, idx + tail.length)}</strong>
-      {heading.slice(idx + tail.length)}
-    </>
-  );
-}
 
 /** Breaks the journal title onto two balanced lines exactly as the mockup
     shows ("Revista de Derecho Comercial" / "y de la Empresa"). Falls back to
@@ -155,17 +139,11 @@ export default function OchentaAnosPage() {
           </section>
         )}
 
-        {/* Section 4 — timeline (warm gray band) */}
-        <section className="bg-paper-warm">
-          <div className="mx-auto max-w-[1280px] px-4 py-20 sm:py-24">
-            <h2 className="text-center font-serif text-3xl leading-tight text-ink sm:text-4xl">
-              {renderTimelineHeading(pagina.timelineHeading)}
-            </h2>
-
-            <div className="mx-auto mt-16 max-w-4xl">
-              <TimelineClient epocas={epocas} />
-            </div>
-          </div>
+        {/* Section 4 — "Seis épocas", rendered as the split-screen scroll-map.
+            The map introduces itself in its own right column (the section
+            heading lives there), so there's no separate full-width heading band. */}
+        <section>
+          <ScrollMapClient epocas={epocas} embedded />
         </section>
       </main>
 

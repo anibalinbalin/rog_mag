@@ -11,23 +11,19 @@ import type { Epoca } from "@/lib/epocas";
 gsap.registerPlugin(useGSAP, ScrollTrigger, MotionPathPlugin, DrawSVGPlugin);
 
 /* ─────────────────────────────────────────────────────────
- * TEST PAGE — CodePen "Scroll Map, Split-Screen & Expandable"
- * (creativeocean / myOVZYO) ported to the 80 Años content, with
- * the real anniversary hero on the right.
+ * 80 Años scroll-map — CodePen "Scroll Map, Split-Screen &
+ * Expandable" (creativeocean / myOVZYO) ported to the épocas.
  *
  *   A 50/50 split: the left panel is pinned while the hero + épocas
- *   scroll on the right. A dot rides a serpentine "80-year route"
+ *   scroll on the right. A dot rides a straight "80-year route"
  *   (1946 → 2026) as you scroll; a POV camera follows the dot so the
- *   current year stays centred; the route inks in (DrawSVG); and
- *   EXPANDIR blows the panel to full width, zooming out to the whole
- *   route.
+ *   current year stays centred; and the route inks in (DrawSVG).
  * ───────────────────────────────────────────────────────── */
 
 const VB = 1500; // square viewBox
 const CX = 750; // centre column
 const TOP = 240; // y of the first station
 const GAP = 340; // vertical distance between stations
-const AMP = 200; // horizontal sweep of the serpentine
 
 interface Hero {
   title: string;
@@ -36,30 +32,21 @@ interface Hero {
   intro: string;
 }
 
+// Stations march straight down the centre column — a plain vertical timeline.
 function stations(n: number) {
   return Array.from({ length: n }, (_, i) => ({
-    x: CX + AMP * Math.sin(i * 1.05),
+    x: CX,
     y: TOP + i * GAP,
   }));
 }
 
-/** Catmull-Rom → cubic bézier: a smooth route through the stations. */
-function smoothPath(pts: { x: number; y: number }[]) {
+/** A straight vertical line from the first station to the last. */
+function linePath(pts: { x: number; y: number }[]) {
   if (pts.length < 2) return "";
   const f = (v: number) => v.toFixed(1);
-  let d = `M ${f(pts[0].x)} ${f(pts[0].y)}`;
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] ?? pts[i];
-    const p1 = pts[i];
-    const p2 = pts[i + 1];
-    const p3 = pts[i + 2] ?? p2;
-    const c1x = p1.x + (p2.x - p0.x) / 6;
-    const c1y = p1.y + (p2.y - p0.y) / 6;
-    const c2x = p2.x - (p3.x - p1.x) / 6;
-    const c2y = p2.y - (p3.y - p1.y) / 6;
-    d += ` C ${f(c1x)} ${f(c1y)} ${f(c2x)} ${f(c2y)} ${f(p2.x)} ${f(p2.y)}`;
-  }
-  return d;
+  const a = pts[0];
+  const b = pts[pts.length - 1];
+  return `M ${f(a.x)} ${f(a.y)} L ${f(b.x)} ${f(b.y)}`;
 }
 
 /** Title: break onto two lines at " y de la Empresa", like /80-años. */
@@ -119,13 +106,13 @@ export default function ScrollMapClient({
   epocas: Epoca[];
   /** Optional — the full anniversary hero on the right column. Omitted (or with
    *  `embedded`) the right column leads with a slim section intro instead, so the
-   *  map can sit inside a page that already has its own hero (e.g. /80-años-test). */
+   *  map can sit inside a page that already has its own hero (e.g. /80-años). */
   hero?: Hero;
   embedded?: boolean;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const pts = stations(epocas.length);
-  const d = smoothPath(pts);
+  const d = linePath(pts);
 
   useGSAP(
     () => {
@@ -148,10 +135,9 @@ export default function ScrollMapClient({
 
       // ── Sync map ↔ content ───────────────────────────────
       // The dot must sit on a station exactly when that época is centred on the
-      // right. Stations aren't evenly spaced along the path (the serpentine's
-      // curves add length unevenly), so remap the ride with a custom ease that
-      // routes each even step of progress through that station's true path
-      // fraction.
+      // right. On the straight route the stations are evenly spaced, so this
+      // remap is effectively linear — kept (rather than a bare linear ease) so
+      // the alignment stays exact if the station spacing ever changes.
       const blocks = Array.from(r.querySelectorAll<HTMLElement>(".epoca-block"));
       const first = blocks[0];
       const last = blocks[blocks.length - 1];
@@ -187,7 +173,7 @@ export default function ScrollMapClient({
       gsap.set(pov, { svgOrigin: "0 0", x: 750, y: 750, scale: WIDE_SCALE });
 
       // Pin the map across the whole section (hero + épocas). Embedded inside a
-      // page wrapped by a transformed ancestor (e.g. /80-años-test's Silk depth
+      // page wrapped by a transformed ancestor (e.g. /80-años's Silk depth
       // shell, whose outlet has will-change:transform), a position:fixed pin is
       // positioned relative to THAT ancestor, not the viewport, and drifts off
       // screen — so pin by transform there. Standalone keeps the cheaper fixed pin.

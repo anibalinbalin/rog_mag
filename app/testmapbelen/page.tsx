@@ -1,4 +1,4 @@
-import ScrollMapClient from "./ScrollMapClient";
+import ScrollMapClient from "../aniversario/ScrollMapClient";
 import { getEpocas } from "@/lib/epocas";
 import { getPagina80Anos } from "@/lib/paginas";
 

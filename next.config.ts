@@ -34,9 +34,6 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: "/80-años", destination: "/aniversario" },
         { source: "/80-a%C3%B1os", destination: "/aniversario" },
-        // Test variant (noindex): the scroll-map in place of the timeline section.
-        { source: "/80-años-test", destination: "/aniversario-test" },
-        { source: "/80-a%C3%B1os-test", destination: "/aniversario-test" },
       ],
     };
   },
@@ -62,16 +59,28 @@ const nextConfig: NextConfig = {
         destination: "/80-años",
         permanent: true,
       },
-      // Test variant: fold its alternates onto the accented URL (temporary, 302).
+      // The /80-años-test experiment (the split-screen scroll-map) won and was
+      // promoted into the canonical /80-años page, so the test route is gone.
+      // Fold every test URL onto the canonical one so old links still land.
+      {
+        source: "/80-años-test",
+        destination: "/80-años",
+        permanent: true,
+      },
+      {
+        source: "/80-a%C3%B1os-test",
+        destination: "/80-años",
+        permanent: true,
+      },
       {
         source: "/80-anos-test",
-        destination: "/80-años-test",
-        permanent: false,
+        destination: "/80-años",
+        permanent: true,
       },
       {
         source: "/aniversario-test",
-        destination: "/80-años-test",
-        permanent: false,
+        destination: "/80-años",
+        permanent: true,
       },
       // The magazine archive moved /revista → /revistas (plural, matches the
       // "Revistas" nav label). Fold the old singular URLs — listing and each
