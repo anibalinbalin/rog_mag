@@ -111,7 +111,18 @@ function renderDetail(text: string) {
     ));
 }
 
-export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; hero: Hero }) {
+export default function ScrollMapClient({
+  epocas,
+  hero,
+  embedded = false,
+}: {
+  epocas: Epoca[];
+  /** Optional — the full anniversary hero on the right column. Omitted (or with
+   *  `embedded`) the right column leads with a slim section intro instead, so the
+   *  map can sit inside a page that already has its own hero (e.g. /80-años-test). */
+  hero?: Hero;
+  embedded?: boolean;
+}) {
   const root = useRef<HTMLDivElement>(null);
   const pts = stations(epocas.length);
   const d = smoothPath(pts);
@@ -175,8 +186,13 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       // about the dot, not its bbox centre (which would drift the framing).
       gsap.set(pov, { svgOrigin: "0 0", x: 750, y: 750, scale: WIDE_SCALE });
 
-      // Pin the map across the whole section (hero + épocas).
-      ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map });
+      // Pin the map across the whole section (hero + épocas). Embedded inside a
+      // page wrapped by a transformed ancestor (e.g. /80-años-test's Silk depth
+      // shell, whose outlet has will-change:transform), a position:fixed pin is
+      // positioned relative to THAT ancestor, not the viewport, and drifts off
+      // screen — so pin by transform there. Standalone keeps the cheaper fixed pin.
+      const pinType: "fixed" | "transform" = embedded ? "transform" : "fixed";
+      ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map, pinType });
 
       // ── Zoom arc ─────────────────────────────────────────
       // Dive from WIDE to POV as you scroll the hero and ARRIVE on 1946 (the
@@ -215,7 +231,27 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       // station lands when its época is centred.
       gsap
         .timeline({
-          scrollTrigger: { trigger: first, start: "center center", endTrigger: last, end: "center center", scrub: 1 },
+          scrollTrigger: {
+            trigger: first,
+            start: "center center",
+            endTrigger: last,
+            end: "center center",
+            scrub: 1,
+            // ── Magnet snap ──────────────────────────────────
+            // Settle the dot onto a year when scrolling pauses; a deliberate
+            // scroll moves on. snapTo increments of 1/(N-1) == each station
+            // (progress is remapped so station i is centred at i/(N-1), so the
+            // content centres on that year too). Confined to the year ride —
+            // the opening dive and final pull-out are separate triggers, so they
+            // stay free-scroll. Tuned in the magnet playground.
+            snap: {
+              snapTo: 1 / (N - 1),
+              duration: { min: 0.29, max: 0.59 },
+              ease: "expo.out",
+              directional: true,
+              delay: 0.08,
+            },
+          },
         })
         .to(dot, { motionPath: { path: route }, immediateRender: true, ease: rideEase, duration: 1 }, 0)
         .from(route, { drawSVG: "0 0", ease: rideEase, duration: 1 }, 0);
@@ -253,9 +289,16 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
         ScrollTrigger.create({
           trigger: last,
           start: "center center",
-          end: () => "+=" + Math.round(window.innerHeight * 4),
+          // Standalone: end far past the bottom so 2024 never un-pins on screen
+          // (there's nothing below it). Embedded: end exactly at the section
+          // bottom so 2024 releases WITH the map and the footer follows cleanly —
+          // otherwise the held content floats on over the footer.
+          ...(embedded
+            ? { endTrigger: section, end: "bottom bottom" }
+            : { end: () => "+=" + Math.round(window.innerHeight * 4) }),
           pin: lastInner,
           pinSpacing: false,
+          pinType,
         });
       }
 
@@ -272,8 +315,15 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
   return (
     <div ref={root} className="bg-paper">
       <section id="scrollmap" className="relative w-full">
-        {/* Left — pinned "map" panel with the 80-year route */}
-        <div className="map absolute left-0 top-0 z-50 h-screen w-1/2 overflow-hidden border-r border-line bg-paper-warm">
+        {/* Left — pinned "map" panel with the 80-year route. Embedded inside a
+            page with a sticky h-24 navbar (z-50), the full-height panel would
+            cover the navbar's left half — so inset it below the navbar there and
+            sit under it (z-40). Standalone keeps the full-bleed h-screen panel. */}
+        <div
+          className={`map absolute left-0 w-1/2 overflow-hidden border-r border-line bg-paper-warm ${
+            embedded ? "top-24 z-40 h-[calc(100svh-6rem)]" : "top-0 z-50 h-screen"
+          }`}
+        >
           <svg className="h-full w-full" viewBox={`0 0 ${VB} ${VB}`} preserveAspectRatio="xMidYMid slice" fill="none">
             <g className="pov">
               <g strokeLinecap="round" strokeLinejoin="round">
@@ -317,33 +367,53 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
           </div>
         </div>
 
-        {/* Right — the anniversary hero, then the épocas scroll past */}
-        <div className="info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] pb-[64vh] text-ink-muted">
+        {/* Right — the anniversary hero (or a slim section intro when embedded),
+            then the épocas scroll past. The header height is the runway the
+            opening dive zooms across, so keep it tall either way. */}
+        <div
+          className={`info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] text-ink-muted ${
+            embedded ? "pb-[40vh]" : "pb-[64vh]"
+          }`}
+        >
           <header className="mb-[20vh] text-center">
-            {/* Title + years, with the decorative ghost "80" hugging them */}
-            <div className="relative isolate">
-              <span
-                aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-[56%] select-none font-serif text-[15rem] italic leading-none text-paper-gray/70 sm:text-[20rem]"
-              >
-                80
-              </span>
+            {embedded || !hero ? (
+              <div className="pt-[6vh]">
+                <p className="font-serif text-2xl font-semibold italic text-ink sm:text-3xl">
+                  Seis épocas, ocho décadas
+                </p>
+                <p className="mt-5 text-xs uppercase tracking-[0.25em] text-burgundy">1946 — 2026</p>
+                <p className="mx-auto mt-8 max-w-sm text-sm leading-relaxed text-ink-muted">
+                  Desplazate para recorrer la ruta — el punto se detiene en cada año.
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Title + years, with the decorative ghost "80" hugging them */}
+                <div className="relative isolate">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-[56%] select-none font-serif text-[15rem] italic leading-none text-paper-gray/70 sm:text-[20rem]"
+                  >
+                    80
+                  </span>
 
-              <h1 className="font-serif text-3xl font-bold leading-[1.1] text-ink sm:text-4xl">
-                {renderTitle(hero.title)}
-              </h1>
-              <p className="mt-4 font-serif text-xl font-semibold italic text-ink sm:text-2xl">
-                {hero.yearsLabel}
-              </p>
-            </div>
+                  <h1 className="font-serif text-3xl font-bold leading-[1.1] text-ink sm:text-4xl">
+                    {renderTitle(hero.title)}
+                  </h1>
+                  <p className="mt-4 font-serif text-xl font-semibold italic text-ink sm:text-2xl">
+                    {hero.yearsLabel}
+                  </p>
+                </div>
 
-            <p className="mx-auto mt-16 max-w-md font-serif text-lg font-semibold leading-relaxed text-ink sm:text-xl">
-              {hero.lede}
-            </p>
+                <p className="mx-auto mt-16 max-w-md font-serif text-lg font-semibold leading-relaxed text-ink sm:text-xl">
+                  {hero.lede}
+                </p>
 
-            <p className="mx-auto mt-8 max-w-md text-sm leading-relaxed text-ink-muted">
-              {renderIntro(hero.intro)}
-            </p>
+                <p className="mx-auto mt-8 max-w-md text-sm leading-relaxed text-ink-muted">
+                  {renderIntro(hero.intro)}
+                </p>
+              </>
+            )}
           </header>
 
           {epocas.map((epoca) => (
