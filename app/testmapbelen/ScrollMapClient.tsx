@@ -146,6 +146,9 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       const last = blocks[blocks.length - 1];
       if (!first || !last) return;
       const N = pts.length;
+      const pathHeight = (N - 1) * GAP;
+      const routeCenterY = TOP + pathHeight / 2;
+      const fitScale = 1240 / pathHeight; // zoom out far enough to frame the whole route
       const L = route.getTotalLength();
       const SAMPLES = 700;
       const frac = pts.map((s) => {
@@ -178,9 +181,10 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
       // ── Zoom arc ─────────────────────────────────────────
       // Dive from WIDE to POV as you scroll the hero and ARRIVE on 1946 (the
       // founding year) — not somewhere between 1946 and 1971. Hold close through
-      // the journey, then pull back out to WIDE at the very end. Separate
-      // triggers (the dive needs to start before the ride does), as real tweens
-      // since a quickTo on scale doesn't cooperate with svgOrigin.
+      // the journey, then at the very end pull all the way out to frame the
+      // WHOLE map. Separate triggers (the dive needs to start before the ride
+      // does), as real tweens since a quickTo on scale doesn't cooperate with
+      // svgOrigin.
       gsap.fromTo(
         pov,
         { scale: WIDE_SCALE },
@@ -190,31 +194,51 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
           scrollTrigger: { trigger: section, start: "top top", endTrigger: first, end: "center center", scrub: 1 },
         }
       );
+      // Final stage: zoom out to the fit scale (real tween — a quickTo on scale
+      // doesn't cooperate with svgOrigin)…
       gsap.fromTo(
         pov,
         { scale: POV_SCALE },
         {
-          scale: WIDE_SCALE,
+          scale: fitScale,
           ease: "power2.inOut",
           immediateRender: false,
           scrollTrigger: { trigger: last, start: "center center", endTrigger: section, end: "bottom bottom", scrub: 1 },
         }
       );
+      // (the camera recentre that pairs with this zoom-out is driven by the
+      // single povg.y controller below.)
 
       // ── The scroll-driven ride ───────────────────────────
       // Scrubbed across "first época centred → last época centred", so progress
       // == which época is centred. Dot + route inking use the remap ease so each
-      // station lands when its época is centred; the camera follows the dot's
-      // height.
+      // station lands when its época is centred.
       gsap
         .timeline({
           scrollTrigger: { trigger: first, start: "center center", endTrigger: last, end: "center center", scrub: 1 },
-          onUpdate: () => {
-            yTo(-(gsap.getProperty(dot, "y") as number));
-          },
         })
         .to(dot, { motionPath: { path: route }, immediateRender: true, ease: rideEase, duration: 1 }, 0)
         .from(route, { drawSVG: "0 0", ease: rideEase, duration: 1 }, 0);
+
+      // ── Camera height: ONE controller for povg.y ─────────
+      // A single trigger spanning the whole ride so nothing else fights over
+      // povg.y. While riding it follows the dot's height; once the last época
+      // scrolls past centre it blends up to the route's middle, so the final
+      // zoomed-out stage frames every year (1946 → 2026) of the inked route.
+      ScrollTrigger.create({
+        trigger: first,
+        start: "center center",
+        endTrigger: section,
+        end: "bottom bottom",
+        onUpdate: () => {
+          const dy = gsap.getProperty(dot, "y") as number;
+          const lr = last.getBoundingClientRect();
+          const overshoot = window.innerHeight / 2 - (lr.top + lr.height / 2);
+          const blend = Math.min(1, Math.max(0, overshoot / (window.innerHeight * 0.5)));
+          const be = blend * blend * (3 - 2 * blend);
+          yTo(-(dy + (routeCenterY - dy) * be));
+        },
+      });
 
       // centre the route horizontally; start panned to the first station
       gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
@@ -275,7 +299,7 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
         </div>
 
         {/* Right — the anniversary hero, then the épocas scroll past */}
-        <div className="info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] pb-[44vh] text-ink-muted">
+        <div className="info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] pb-[64vh] text-ink-muted">
           <header className="mb-[20vh] text-center">
             {/* Title + years, with the decorative ghost "80" hugging them */}
             <div className="relative isolate">
