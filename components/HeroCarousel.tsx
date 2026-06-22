@@ -83,8 +83,10 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       aria-label="Destacados"
       className="relative isolate overflow-hidden bg-burgundy-dark"
     >
-      {/* Slides stacked; only opacity animates (GPU-safe crossfade) */}
-      <div className="relative min-h-[440px] lg:min-h-[560px]">
+      {/* Slides stacked; only opacity animates (GPU-safe crossfade).
+          Fills the viewport below the sticky h-24 (6rem) header so the hero
+          owns the whole first screen. */}
+      <div className="relative min-h-[calc(100svh-6rem)]">
         {slides.map((slide, i) => {
           const centered = isCentered(i);
           const isActive = i === active;
@@ -106,7 +108,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               />
 
               <div
-                className={`relative mx-auto flex min-h-[440px] max-w-[1280px] items-center px-4 py-20 lg:min-h-[560px] ${
+                className={`relative mx-auto flex min-h-[calc(100svh-6rem)] max-w-[1280px] items-center px-4 py-20 ${
                   centered ? "justify-center text-center" : ""
                 }`}
               >
