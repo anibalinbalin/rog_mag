@@ -2,6 +2,8 @@
 
 import { useState, type CSSProperties } from "react";
 import Image from "next/image";
+import { Scroll } from "@silk-hq/components";
+import { SheetWithDepth } from "@/components/SheetWithDepth";
 import type { ArchivoYear } from "@/lib/archivo";
 
 /** Decades shown as filter pills (mockup), even before every one has scans —
@@ -23,6 +25,44 @@ function SearchIcon() {
     >
       <circle cx="11" cy="11" r="7" />
       <path d="M20 20l-3.5-3.5" />
+    </svg>
+  );
+}
+
+/** Magnifier-with-plus — the "ampliar" affordance that fades in over the
+    exposed inside page when a magazine is open. */
+function MagnifyPlusIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="7" />
+      <path d="M20 20l-3.5-3.5M11 8.5v5M8.5 11h5" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+    >
+      <path d="M6 6l12 12M18 6L6 18" />
     </svg>
   );
 }
@@ -62,6 +102,12 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
   const [decade, setDecade] = useState(firstWithData);
   const [yearIdx, setYearIdx] = useState(0);
   const [query, setQuery] = useState("");
+  // The sumario currently enlarged in the depth sheet (null = closed).
+  const [viewing, setViewing] = useState<{
+    src: string;
+    label: string;
+    year: number;
+  } | null>(null);
 
   const decadeYears = byDecade.get(decade) ?? [];
   const safeIdx = Math.min(yearIdx, Math.max(0, decadeYears.length - 1));
@@ -195,52 +241,80 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             >
               {visibleMonths.map((m) => {
                 const book = bookJitter(active.year * 100 + Number(m.num));
+                const bookStyle = {
+                  "--open": `${book.angle}deg`,
+                  "--tilt": `${book.tilt}deg`,
+                  "--dur": `${book.dur}ms`,
+                } as CSSProperties;
+                const bookClass =
+                  "archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20";
+
+                /* Magazine flip-open: the cover is hinged on the spine and swings
+                   open on hover to reveal the sumario inside (two-faced — cover art
+                   in front, a cream inside-cover behind). Each book opens to a
+                   slightly different angle, speed and resting tilt (deterministic
+                   per issue, so SSR matches). All children are phrasing content so
+                   the whole book can be a <button> when there's a sumario to open.
+                   Pure CSS; reduced motion keeps clean static covers. */
+                const inner = (
+                  <span className="archivo-inner">
+                    {m.sumario && (
+                      <Image
+                        className="archivo-sum"
+                        src={m.sumario}
+                        alt=""
+                        aria-hidden="true"
+                        fill
+                        sizes="160px"
+                      />
+                    )}
+                    <span className="archivo-gutter" aria-hidden="true" />
+                    <span className="archivo-cover">
+                      <Image
+                        className="archivo-front"
+                        src={m.cover}
+                        alt={`Sociedades Anónimas — ${m.label} ${active.year}`}
+                        fill
+                        sizes="160px"
+                      />
+                      <span className="archivo-back" aria-hidden="true" />
+                    </span>
+                    {/* "ampliar" affordance — fades in over the exposed inside page
+                        once the cover is open (only when there's a sumario). */}
+                    {m.sumario && (
+                      <span className="archivo-hint" aria-hidden="true">
+                        <MagnifyPlusIcon />
+                      </span>
+                    )}
+                  </span>
+                );
+
                 return (
                   <div key={m.num} className="text-center">
                     <p className="mb-4 text-sm uppercase tracking-widest text-ink-muted">
                       {m.label}
                     </p>
-                    {/* Magazine flip-open: the cover is hinged on the spine and
-                        swings open on hover to reveal the sumario inside (two-
-                        faced — cover art in front, a cream inside-cover behind).
-                        Each book opens to a slightly different angle, speed and
-                        resting tilt (deterministic per issue, so SSR matches), so
-                        the grid reads as placed by hand rather than mechanical.
-                        Pure CSS; reduced motion keeps clean static covers. */}
-                    <div
-                      className="archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20"
-                      style={
-                        {
-                          "--open": `${book.angle}deg`,
-                          "--tilt": `${book.tilt}deg`,
-                          "--dur": `${book.dur}ms`,
-                        } as CSSProperties
-                      }
-                    >
-                      <div className="archivo-inner">
-                        {m.sumario && (
-                          <Image
-                            className="archivo-sum"
-                            src={m.sumario}
-                            alt=""
-                            aria-hidden="true"
-                            fill
-                            sizes="160px"
-                          />
-                        )}
-                        <span className="archivo-gutter" aria-hidden="true" />
-                        <div className="archivo-cover">
-                          <Image
-                            className="archivo-front"
-                            src={m.cover}
-                            alt={`Sociedades Anónimas — ${m.label} ${active.year}`}
-                            fill
-                            sizes="160px"
-                          />
-                          <span className="archivo-back" aria-hidden="true" />
-                        </div>
+                    {m.sumario ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setViewing({
+                            src: m.sumario!,
+                            label: m.label,
+                            year: active.year,
+                          })
+                        }
+                        aria-label={`Ampliar el sumario de ${m.label} ${active.year}`}
+                        className={`${bookClass} block cursor-pointer appearance-none border-0 bg-transparent p-0`}
+                        style={bookStyle}
+                      >
+                        {inner}
+                      </button>
+                    ) : (
+                      <div className={bookClass} style={bookStyle}>
+                        {inner}
                       </div>
-                    </div>
+                    )}
                   </div>
                 );
               })}
@@ -257,6 +331,70 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           </p>
         )}
       </div>
+
+      {/* One shared "sheet with depth" for the whole grid: clicking any open
+          magazine slides its sumario scan up over the page (which recedes), where
+          it can be read at size and scrolled. Controlled by `viewing`; dismiss via
+          the X, the backdrop, swipe-down, or Esc. Depth recede binds to the page's
+          DepthShell Outlet (forComponent="closest"). */}
+      <SheetWithDepth.Root
+        presented={!!viewing}
+        onPresentedChange={(open) => {
+          if (!open) setViewing(null);
+        }}
+      >
+        <SheetWithDepth.Portal>
+          <SheetWithDepth.View>
+            <SheetWithDepth.Backdrop />
+            {/* Narrow, centered panel — the sumario is a portrait page, so a
+                full-width sheet wastes paper on both sides. Capping the width lets
+                more of the receded page show left and right. (Scoped to this sheet
+                via className; the shared /80-años sheet is unchanged.) */}
+            <SheetWithDepth.Content className="mx-auto w-full max-w-[640px]">
+              <div className="relative h-full">
+                <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
+                  <SheetWithDepth.Trigger
+                    action="dismiss"
+                    aria-label="Cerrar"
+                    className="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-warm"
+                  >
+                    <CloseIcon />
+                  </SheetWithDepth.Trigger>
+                </div>
+
+                <Scroll.Root className="h-full">
+                  <Scroll.View className="h-full" scrollGestureTrap={{ yEnd: true }}>
+                    <Scroll.Content>
+                      <div className="px-5 pb-16 pt-16 sm:px-8 sm:pt-20">
+                        {viewing && (
+                          <>
+                            <p className="text-center text-xs uppercase tracking-widest text-ink-muted">
+                              Sociedades Anónimas · {viewing.label} {viewing.year}
+                            </p>
+                            <SheetWithDepth.Title className="mt-2 text-center font-serif text-2xl text-ink sm:text-3xl">
+                              Sumario
+                            </SheetWithDepth.Title>
+                            <div className="mt-8 overflow-hidden rounded-sm bg-paper-cream shadow-lg">
+                              <Image
+                                src={viewing.src}
+                                alt={`Sumario — Sociedades Anónimas ${viewing.label} ${viewing.year}`}
+                                width={729}
+                                height={1000}
+                                sizes="(min-width: 768px) 768px, 100vw"
+                                className="h-auto w-full"
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </Scroll.Content>
+                  </Scroll.View>
+                </Scroll.Root>
+              </div>
+            </SheetWithDepth.Content>
+          </SheetWithDepth.View>
+        </SheetWithDepth.Portal>
+      </SheetWithDepth.Root>
 
       <style>{`
         @keyframes archivoFadeIn {
@@ -312,6 +450,26 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           content: ""; position: absolute; inset: 0;
           background: linear-gradient(90deg, rgba(0,0,0,.06), transparent 55%);
         }
+        /* "ampliar" badge over the exposed inside page — hidden until the book is
+           open (it lives above the sumario plane; pointer-events off so the click
+           falls through to the book button). */
+        .archivo-hint {
+          position: absolute; right: 7px; bottom: 7px;
+          display: flex; align-items: center; justify-content: center;
+          width: 30px; height: 30px; border-radius: 999px;
+          background: rgba(250, 248, 243, 0.92);
+          color: var(--color-ink-soft, #4a4036);
+          box-shadow: 0 2px 8px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.04);
+          opacity: 0; transform: translateZ(1px) scale(0.8);
+          transition: opacity var(--dur, 520ms) ease-out,
+                      transform var(--dur, 520ms) ease-out;
+          pointer-events: none;
+        }
+        .archivo-book:focus-visible {
+          outline: 2px solid var(--color-burgundy, #7a1f2b);
+          outline-offset: 4px;
+          border-radius: 2px;
+        }
         @media (hover: hover) {
           /* OPEN (hover): overshoot easing so the cover snaps a touch past its
              resting angle and settles, like a real cover being flipped open. */
@@ -320,11 +478,17 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             transition: transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
           }
           .archivo-book:hover .archivo-gutter { opacity: 1; }
+          .archivo-book:hover .archivo-hint {
+            opacity: 1; transform: translateZ(1px) scale(1);
+          }
         }
         @media (prefers-reduced-motion: reduce) {
           .archivo-cover { transition: none; }
           .archivo-book:hover .archivo-cover { transform: none; }
           .archivo-gutter { display: none; }
+          /* No flip → the inside page never exposes, so the hint would float
+             over a closed cover. Hide it; the book is still a button. */
+          .archivo-hint { display: none; }
         }
       `}</style>
     </div>

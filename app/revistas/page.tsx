@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import DepthShell from "@/components/DepthShell";
 import IssueContentsAccordion from "@/components/IssueContentsAccordion";
 import PublicacionesArchivo from "@/components/PublicacionesArchivo";
 import { getCurrentIssue, getAllIssues, type Issue } from "@/lib/issues";
@@ -42,7 +43,7 @@ export default function RevistaPage() {
     : [];
 
   return (
-    <>
+    <DepthShell>
       <Header compact />
 
       <main>
@@ -149,6 +150,6 @@ export default function RevistaPage() {
       </main>
 
       <Footer />
-    </>
+    </DepthShell>
   );
 }
