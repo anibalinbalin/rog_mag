@@ -4,6 +4,7 @@ import { useState, type CSSProperties } from "react";
 import Image from "next/image";
 import { Scroll } from "@silk-hq/components";
 import { SheetWithDepth } from "@/components/SheetWithDepth";
+import ScanZoom from "@/components/ScanZoom";
 import type { ArchivoYear } from "@/lib/archivo";
 
 /** Decades shown as filter pills (mockup), even before every one has scans —
@@ -102,12 +103,23 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
   const [decade, setDecade] = useState(firstWithData);
   const [yearIdx, setYearIdx] = useState(0);
   const [query, setQuery] = useState("");
-  // The sumario currently enlarged in the depth sheet (null = closed).
+  // The issue currently enlarged in the depth sheet (null = closed). Holds both
+  // the cover (tapa) and the sumario so the sheet can show the full spread.
   const [viewing, setViewing] = useState<{
-    src: string;
+    cover: string;
+    sumario: string;
     label: string;
     year: number;
   } | null>(null);
+  // Which page is open in the focused zoom viewer (null = showing the spread).
+  const [zoomPage, setZoomPage] = useState<"cover" | "sumario" | null>(null);
+
+  // Closing the sheet always drops back to the spread, so re-opening another
+  // issue never lands mid-zoom on a stale page.
+  const closeSheet = () => {
+    setViewing(null);
+    setZoomPage(null);
+  };
 
   const decadeYears = byDecade.get(decade) ?? [];
   const safeIdx = Math.min(yearIdx, Math.max(0, decadeYears.length - 1));
@@ -299,7 +311,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                         type="button"
                         onClick={() =>
                           setViewing({
-                            src: m.sumario!,
+                            cover: m.cover,
+                            sumario: m.sumario!,
                             label: m.label,
                             year: active.year,
                           })
@@ -333,34 +346,37 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
       </div>
 
       {/* One shared "sheet with depth" for the whole grid: clicking any open
-          magazine slides its sumario scan up over the page (which recedes), where
-          it can be read at size and scrolled. Controlled by `viewing`; dismiss via
-          the X, the backdrop, swipe-down, or Esc. Depth recede binds to the page's
+          magazine slides its tapa + sumario scans up over the page (which
+          recedes). The spread is the overview; tapping a page opens a focused
+          zoom viewer (ScanZoom) built for older readers. Dismiss via the X, the
+          backdrop, swipe-down, or Esc. Depth recede binds to the page's
           DepthShell Outlet (forComponent="closest"). */}
       <SheetWithDepth.Root
         presented={!!viewing}
         onPresentedChange={(open) => {
-          if (!open) setViewing(null);
+          if (!open) closeSheet();
         }}
       >
         <SheetWithDepth.Portal>
           <SheetWithDepth.View>
             <SheetWithDepth.Backdrop />
-            {/* Narrow, centered panel — the sumario is a portrait page, so a
-                full-width sheet wastes paper on both sides. Capping the width lets
-                more of the receded page show left and right. (Scoped to this sheet
-                via className; the shared /80-años sheet is unchanged.) */}
-            <SheetWithDepth.Content className="mx-auto w-full max-w-[640px]">
+            {/* Full-width sheet: with both the tapa and the sumario shown as a
+                two-up spread, the width earns its keep instead of wasting paper. */}
+            <SheetWithDepth.Content>
               <div className="relative h-full">
-                <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
-                  <SheetWithDepth.Trigger
-                    action="dismiss"
-                    aria-label="Cerrar"
-                    className="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-warm"
-                  >
-                    <CloseIcon />
-                  </SheetWithDepth.Trigger>
-                </div>
+                {/* Global close — hidden while the focused viewer is up (it has
+                    its own Volver + Cerrar) so there's never a stray control. */}
+                {!zoomPage && (
+                  <div className="absolute right-4 top-4 z-10 sm:right-6 sm:top-6">
+                    <SheetWithDepth.Trigger
+                      action="dismiss"
+                      aria-label="Cerrar"
+                      className="flex h-11 w-11 items-center justify-center rounded-full text-ink-soft transition-colors hover:bg-paper-warm"
+                    >
+                      <CloseIcon />
+                    </SheetWithDepth.Trigger>
+                  </div>
+                )}
 
                 <Scroll.Root className="h-full">
                   <Scroll.View className="h-full" scrollGestureTrap={{ yEnd: true }}>
@@ -372,17 +388,46 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                               Sociedades Anónimas · {viewing.label} {viewing.year}
                             </p>
                             <SheetWithDepth.Title className="mt-2 text-center font-serif text-2xl text-ink sm:text-3xl">
-                              Sumario
+                              Tapa y sumario
                             </SheetWithDepth.Title>
-                            <div className="mt-8 overflow-hidden rounded-sm bg-paper-cream shadow-lg">
-                              <Image
-                                src={viewing.src}
-                                alt={`Sumario — Sociedades Anónimas ${viewing.label} ${viewing.year}`}
-                                width={729}
-                                height={1000}
-                                sizes="(min-width: 768px) 768px, 100vw"
-                                className="h-auto w-full"
-                              />
+                            <p className="mt-3 text-center text-sm text-ink-muted">
+                              Tocá una página para ampliarla y leerla cómodo.
+                            </p>
+                            {/* Tapa + sumario side by side on wider screens (a
+                                real two-page spread), stacked on phones. Each page
+                                is a button that opens the focused zoom viewer. */}
+                            <div className="mx-auto mt-8 flex max-w-5xl flex-col items-start gap-8 sm:flex-row sm:justify-center sm:gap-10">
+                              {([
+                                { key: "cover", label: "Tapa", src: viewing.cover },
+                                { key: "sumario", label: "Sumario", src: viewing.sumario },
+                              ] as const).map((p) => (
+                                <figure key={p.key} className="w-full sm:w-1/2 sm:max-w-[420px]">
+                                  <button
+                                    type="button"
+                                    onClick={() => setZoomPage(p.key)}
+                                    aria-label={`Ampliar ${p.label.toLowerCase()} — Sociedades Anónimas ${viewing.label} ${viewing.year}`}
+                                    className="group relative block w-full cursor-zoom-in overflow-hidden rounded-sm bg-paper-cream shadow-lg transition-shadow hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-burgundy"
+                                  >
+                                    <Image
+                                      src={p.src}
+                                      alt={`${p.label} — Sociedades Anónimas ${viewing.label} ${viewing.year}`}
+                                      width={729}
+                                      height={1000}
+                                      sizes="(min-width: 640px) 420px, 100vw"
+                                      className="h-auto w-full"
+                                    />
+                                    {/* Always-visible "Ampliar" pill — older readers
+                                        shouldn't have to discover a hover affordance. */}
+                                    <span className="pointer-events-none absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-paper/95 px-4 py-2 text-sm font-medium text-ink shadow-md ring-1 ring-black/5 transition-transform group-hover:scale-105">
+                                      <MagnifyPlusIcon />
+                                      Ampliar
+                                    </span>
+                                  </button>
+                                  <figcaption className="mt-3 text-center text-xs uppercase tracking-widest text-ink-muted">
+                                    {p.label}
+                                  </figcaption>
+                                </figure>
+                              ))}
                             </div>
                           </>
                         )}
@@ -390,6 +435,19 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                     </Scroll.Content>
                   </Scroll.View>
                 </Scroll.Root>
+
+                {/* Focused, elderly-friendly zoom for the chosen page. Keyed so
+                    switching tapa↔sumario remounts clean (fresh zoom + pan). */}
+                {viewing && zoomPage && (
+                  <ScanZoom
+                    key={zoomPage}
+                    src={zoomPage === "cover" ? viewing.cover : viewing.sumario}
+                    pageLabel={zoomPage === "cover" ? "Tapa" : "Sumario"}
+                    caption={`Sociedades Anónimas · ${viewing.label} ${viewing.year}`}
+                    onBack={() => setZoomPage(null)}
+                    onClose={closeSheet}
+                  />
+                )}
               </div>
             </SheetWithDepth.Content>
           </SheetWithDepth.View>
