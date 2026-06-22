@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
       beforeFiles: [
         { source: "/80-años", destination: "/aniversario" },
         { source: "/80-a%C3%B1os", destination: "/aniversario" },
+        // Test variant (noindex): the scroll-map in place of the timeline section.
+        { source: "/80-años-test", destination: "/aniversario-test" },
+        { source: "/80-a%C3%B1os-test", destination: "/aniversario-test" },
       ],
     };
   },
@@ -58,6 +61,17 @@ const nextConfig: NextConfig = {
         source: "/aniversario",
         destination: "/80-años",
         permanent: true,
+      },
+      // Test variant: fold its alternates onto the accented URL (temporary, 302).
+      {
+        source: "/80-anos-test",
+        destination: "/80-años-test",
+        permanent: false,
+      },
+      {
+        source: "/aniversario-test",
+        destination: "/80-años-test",
+        permanent: false,
       },
       // The B layout was promoted from /b to the site root; keep old URLs working.
       {
