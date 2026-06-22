@@ -131,32 +131,66 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
 
       const yTo = gsap.quickTo(povg, "y", { duration: 1, ease: "expo" });
 
-      // Zoom arc: a wide establishing shot at the start, dive into a close POV
-      // through the middle, then pull back out at the end (out → in → out). The
-      // route stays horizontally centred (a vertical pan down the serpentine),
-      // so its full width fills the panel and no year clips off the edge.
+      // Zoom arc bounds + dive timing (wide → close → wide).
       const POV_SCALE = 2.0; // close ride
       const WIDE_SCALE = 0.7; // establishing / closing shot
-      const RAMP = 0.16; // share of the scroll spent diving in / pulling out
+      const RAMP = 0.16; // share of the ride spent diving in / pulling out
+
+      // ── Sync map ↔ content ───────────────────────────────
+      // The dot must sit on a station exactly when that época is centred on the
+      // right. Stations aren't evenly spaced along the path (the serpentine's
+      // curves add length unevenly), so remap the ride with a custom ease that
+      // routes each even step of progress through that station's true path
+      // fraction.
+      const blocks = Array.from(r.querySelectorAll<HTMLElement>(".epoca-block"));
+      const first = blocks[0];
+      const last = blocks[blocks.length - 1];
+      if (!first || !last) return;
+      const N = pts.length;
+      const L = route.getTotalLength();
+      const SAMPLES = 700;
+      const frac = pts.map((s) => {
+        let bestLen = 0;
+        let bestD = Infinity;
+        for (let k = 0; k <= SAMPLES; k++) {
+          const len = (k / SAMPLES) * L;
+          const pt = route.getPointAtLength(len);
+          const dd = (pt.x - s.x) ** 2 + (pt.y - s.y) ** 2;
+          if (dd < bestD) {
+            bestD = dd;
+            bestLen = len;
+          }
+        }
+        return bestLen / L;
+      });
+      const rideEase = (t: number) => {
+        const ci = t * (N - 1);
+        const i = Math.min(N - 2, Math.max(0, Math.floor(ci)));
+        return frac[i] + (frac[i + 1] - frac[i]) * (ci - i);
+      };
 
       // Pin the camera's scale pivot to the SVG origin so the tall route scales
       // about the dot, not its bbox centre (which would drift the framing).
       gsap.set(pov, { svgOrigin: "0 0", x: 750, y: 750, scale: WIDE_SCALE });
 
+      // Pin the map across the whole section (hero + épocas).
+      ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map });
+
       // ── The scroll-driven ride ───────────────────────────
-      // The zoom rides the scroll as real timeline tweens (a quickTo on scale
-      // doesn't cooperate with svgOrigin). Dot + route span the whole timeline
-      // (duration 1); the camera dives in over the first RAMP, holds close, then
-      // pulls back out over the last RAMP.
+      // Scrubbed across "first época centred → last época centred", so progress
+      // == which época is centred. Dot + route inking use the remap ease (a
+      // quickTo on scale doesn't cooperate with svgOrigin, so the zoom rides as
+      // timeline tweens): dive in over the first RAMP, hold close, pull out over
+      // the last RAMP. The camera follows the dot's height.
       gsap
         .timeline({
-          scrollTrigger: { trigger: section, start: "0 0", end: "100% 100%", pin: map, scrub: 1 },
+          scrollTrigger: { trigger: first, start: "center center", endTrigger: last, end: "center center", scrub: 1 },
           onUpdate: () => {
             yTo(-(gsap.getProperty(dot, "y") as number));
           },
         })
-        .to(dot, { motionPath: { path: route }, immediateRender: true, ease: "none", duration: 1 }, 0)
-        .from(route, { drawSVG: "0 0", ease: "none", duration: 1 }, 0)
+        .to(dot, { motionPath: { path: route }, immediateRender: true, ease: rideEase, duration: 1 }, 0)
+        .from(route, { drawSVG: "0 0", ease: rideEase, duration: 1 }, 0)
         .to(pov, { scale: POV_SCALE, ease: "power2.inOut", duration: RAMP }, 0)
         .to(pov, { scale: WIDE_SCALE, ease: "power2.inOut", duration: RAMP }, 1 - RAMP);
 
@@ -241,7 +275,7 @@ export default function ScrollMapClient({ epocas, hero }: { epocas: Epoca[]; her
           </header>
 
           {epocas.map((epoca) => (
-            <article key={epoca.slug} className="flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
+            <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
               <p className="font-serif text-6xl font-bold leading-none tabular-nums text-burgundy sm:text-7xl">
                 {epoca.startYear}
               </p>
