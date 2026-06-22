@@ -134,7 +134,7 @@ export default function NosotrosPage() {
         {/* Print edition */}
         <section className="mx-auto max-w-[1280px] border-b border-dashed border-line-dark px-4 py-16">
           <div className="grid items-center gap-12 lg:grid-cols-[300px_1fr]">
-            <Link href="/revista" className="group block">
+            <Link href="/revistas" className="group block">
               <div className="relative aspect-[3/4] w-full max-w-[300px] overflow-hidden bg-paper-cream">
                 <Image
                   src={ART.tapa}
@@ -159,7 +159,7 @@ export default function NosotrosPage() {
                 está disponible en línea.
               </p>
               <Link
-                href="/revista"
+                href="/revistas"
                 className="mt-8 inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
               >
                 Ver el archivo de ediciones

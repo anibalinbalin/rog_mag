@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-  { href: "/revista", label: "Revistas", match: "/revista" },
+  { href: "/revistas", label: "Revistas", match: "/revistas" },
   { href: "/secciones/noticias", label: "Noticias", match: "/secciones/noticias" },
   { href: "/publicaciones", label: "Publicaciones", match: "/publicaciones" },
   { href: "/80-años", label: "80 Años", match: "/80-años" },

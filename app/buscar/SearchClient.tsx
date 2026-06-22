@@ -167,7 +167,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
             </li>
             <li>
               <Link
-                href="/revista"
+                href="/revistas"
                 className="font-serif text-lg text-ink-soft underline-offset-4 transition-colors hover:text-burgundy hover:underline"
               >
                 Archivo de la revista

@@ -56,7 +56,7 @@ export default function RevistaPage() {
                 </h1>
 
                 <Link
-                  href={`/revista/${currentIssue.slug}`}
+                  href={`/revistas/${currentIssue.slug}`}
                   className="mt-6 inline-flex items-center rounded-sm bg-action-dark px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
                 >
                   Ver más
@@ -100,7 +100,7 @@ export default function RevistaPage() {
                 {others.map((issue) => (
                   <Link
                     key={issue.slug}
-                    href={`/revista/${issue.slug}`}
+                    href={`/revistas/${issue.slug}`}
                     className="group grid grid-cols-[130px_1fr] items-center gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
                   >
                     {/* Cover assets are pre-rendered 3D books with their own

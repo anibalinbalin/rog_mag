@@ -73,6 +73,19 @@ const nextConfig: NextConfig = {
         destination: "/80-años-test",
         permanent: false,
       },
+      // The magazine archive moved /revista → /revistas (plural, matches the
+      // "Revistas" nav label). Fold the old singular URLs — listing and each
+      // issue — onto the new ones so existing links and bookmarks keep working.
+      {
+        source: "/revista",
+        destination: "/revistas",
+        permanent: true,
+      },
+      {
+        source: "/revista/:slug*",
+        destination: "/revistas/:slug*",
+        permanent: true,
+      },
       // The B layout was promoted from /b to the site root; keep old URLs working.
       {
         source: "/b",

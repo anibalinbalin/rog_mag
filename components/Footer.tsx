@@ -62,7 +62,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    href="/revista"
+                    href="/revistas"
                     className="text-sm text-paper/80 transition-colors hover:text-paper"
                   >
                     Revista

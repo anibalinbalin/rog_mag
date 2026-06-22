@@ -16,7 +16,7 @@ const FALLBACK_SLIDES: HeroSlide[] = [
     heading: "Última edición",
     subheading: "DISPONIBLE",
     ctaLabel: "Ver la revista",
-    ctaHref: "/revista",
+    ctaHref: "/revistas",
   },
   {
     image: "/hero-80-anos.jpg",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import Image from "next/image";
 import type { ArchivoYear } from "@/lib/archivo";
 
@@ -27,9 +27,30 @@ function SearchIcon() {
   );
 }
 
+/** Deterministic per-issue jitter so each magazine opens a little differently —
+    a slightly different angle, speed and a faint resting tilt — instead of every
+    cover flipping identically. Keyed off the issue (year+month) so the server and
+    client agree (no hydration flicker), and stable across renders. */
+function bookJitter(seed: number) {
+  const rnd = (salt: number) => {
+    // avalanche hash (murmur3 finalizer) so consecutive issues scatter rather
+    // than ramping in lockstep down a row.
+    let h = Math.imul((seed ^ Math.imul(salt, 0x9e3779b1)) | 0, 0x85ebca6b);
+    h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+    h ^= h >>> 16;
+    return ((h >>> 0) % 100000) / 100000; // [0,1)
+  };
+  return {
+    angle: 150 + Math.round(rnd(1) * 22), // 150–172° open
+    tilt: +((rnd(2) * 2 - 1) * 1.3).toFixed(2), // −1.3…+1.3° resting tilt
+    dur: 460 + Math.round(rnd(3) * 150), // 460–610ms
+  };
+}
+
 /** "Publicaciones desde 1946" — the digitized "Sociedades Anónimas" archive
-    (tapas y sumarios). Browse by decade, then by year; each month shows the
-    cover with its sumario peeking out behind it. */
+    (tapas y sumarios). Browse by decade, then by year; each month shows just
+    the cover, which flips open on hover — like a real magazine — to reveal the
+    sumario inside. */
 export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }) {
   const byDecade = new Map<number, ArchivoYear[]>();
   for (const y of years) {
@@ -172,35 +193,57 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
               key={active.year}
               className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
             >
-              {visibleMonths.map((m) => (
-                <div key={m.num} className="text-center">
-                  <p className="mb-4 text-sm uppercase tracking-widest text-ink-muted">
-                    {m.label}
-                  </p>
-                  {/* Cover in front, sumario peeking out behind it (right) */}
-                  <div className="relative mx-auto w-full max-w-[180px]">
-                    {m.sumario && (
-                      <Image
-                        src={m.sumario}
-                        alt=""
-                        aria-hidden="true"
-                        width={729}
-                        height={1000}
-                        sizes="160px"
-                        className="absolute right-0 top-[5%] z-0 h-auto w-[76%] shadow-md ring-1 ring-black/5"
-                      />
-                    )}
-                    <Image
-                      src={m.cover}
-                      alt={`Sociedades Anónimas — ${m.label} ${active.year}`}
-                      width={729}
-                      height={1000}
-                      sizes="160px"
-                      className="relative z-10 h-auto w-[80%] shadow-md ring-1 ring-black/5"
-                    />
+              {visibleMonths.map((m) => {
+                const book = bookJitter(active.year * 100 + Number(m.num));
+                return (
+                  <div key={m.num} className="text-center">
+                    <p className="mb-4 text-sm uppercase tracking-widest text-ink-muted">
+                      {m.label}
+                    </p>
+                    {/* Magazine flip-open: the cover is hinged on the spine and
+                        swings open on hover to reveal the sumario inside (two-
+                        faced — cover art in front, a cream inside-cover behind).
+                        Each book opens to a slightly different angle, speed and
+                        resting tilt (deterministic per issue, so SSR matches), so
+                        the grid reads as placed by hand rather than mechanical.
+                        Pure CSS; reduced motion keeps clean static covers. */}
+                    <div
+                      className="archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20"
+                      style={
+                        {
+                          "--open": `${book.angle}deg`,
+                          "--tilt": `${book.tilt}deg`,
+                          "--dur": `${book.dur}ms`,
+                        } as CSSProperties
+                      }
+                    >
+                      <div className="archivo-inner">
+                        {m.sumario && (
+                          <Image
+                            className="archivo-sum"
+                            src={m.sumario}
+                            alt=""
+                            aria-hidden="true"
+                            fill
+                            sizes="160px"
+                          />
+                        )}
+                        <span className="archivo-gutter" aria-hidden="true" />
+                        <div className="archivo-cover">
+                          <Image
+                            className="archivo-front"
+                            src={m.cover}
+                            alt={`Sociedades Anónimas — ${m.label} ${active.year}`}
+                            fill
+                            sizes="160px"
+                          />
+                          <span className="archivo-back" aria-hidden="true" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {visibleMonths.length === 0 && (
                 <p className="col-span-full py-8 text-center text-sm text-ink-muted">
                   No se encontraron revistas para “{query}”.
@@ -219,6 +262,69 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         @keyframes archivoFadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
+        }
+
+        /* ── Magazine flip-open ──────────────────────────────
+           rest  : closed cover (the inner sits at its faint --tilt).
+           hover : the cover swings open on the left spine by --open and the
+                   spine gutter shadow fades in, revealing the sumario inside.
+           Per-issue --open / --dur / --tilt make each one a little different. */
+        .archivo-book { perspective: 1500px; }
+        .archivo-inner {
+          position: absolute; inset: 0;
+          transform: rotate(var(--tilt, 0deg));
+          transform-style: preserve-3d;
+        }
+        .archivo-sum {
+          object-fit: cover;
+          transform: translateZ(-2px);
+          box-shadow: 0 8px 18px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.05);
+        }
+        .archivo-gutter {
+          position: absolute; left: 0; top: 0; bottom: 0; width: 34%;
+          pointer-events: none; opacity: 0; transform: translateZ(-1px);
+          background: linear-gradient(90deg, rgba(40,22,10,.32), transparent);
+          transition: opacity var(--dur, 520ms) ease-out;
+        }
+        .archivo-cover {
+          position: absolute; inset: 0;
+          transform-origin: left center;
+          transform-style: preserve-3d;
+          /* CLOSE (mouse-out): plain ease-out, NO overshoot. The bouncy open
+             easing lives in the :hover rule below — applied here too it would
+             swing the cover past closed and bounce back, reading as a phantom
+             "second flip" on mouse-out. */
+          transition: transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .archivo-front {
+          object-fit: cover;
+          backface-visibility: hidden;
+          box-shadow: 0 8px 18px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
+        }
+        .archivo-back {
+          position: absolute; inset: 0;
+          backface-visibility: hidden;
+          transform: rotateY(180deg);
+          background: #e9e6dd;
+          box-shadow: inset 0 0 44px rgba(60,40,20,.14);
+        }
+        .archivo-back::after {
+          content: ""; position: absolute; inset: 0;
+          background: linear-gradient(90deg, rgba(0,0,0,.06), transparent 55%);
+        }
+        @media (hover: hover) {
+          /* OPEN (hover): overshoot easing so the cover snaps a touch past its
+             resting angle and settles, like a real cover being flipped open. */
+          .archivo-book:hover .archivo-cover {
+            transform: rotateY(calc(-1 * var(--open, 160deg)));
+            transition: transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+          }
+          .archivo-book:hover .archivo-gutter { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .archivo-cover { transition: none; }
+          .archivo-book:hover .archivo-cover { transform: none; }
+          .archivo-gutter { display: none; }
         }
       `}</style>
     </div>

@@ -75,7 +75,7 @@ export function getSearchCorpus(): SearchDoc[] {
   const issues: SearchDoc[] = getAllIssues().map((issue) => ({
     type: "issue",
     title: `${issue.number} (${issue.year}): ${issue.title}`,
-    href: `/revista/${issue.slug}`,
+    href: `/revistas/${issue.slug}`,
     meta: [
       issue.volume ? `Vol. ${issue.volume}` : null,
       issue.season || null,
