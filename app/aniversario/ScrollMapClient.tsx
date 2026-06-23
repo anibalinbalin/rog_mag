@@ -14,8 +14,8 @@ gsap.registerPlugin(useGSAP, ScrollTrigger, MotionPathPlugin, DrawSVGPlugin);
  * 80 Años scroll-map — CodePen "Scroll Map, Split-Screen &
  * Expandable" (creativeocean / myOVZYO) ported to the épocas.
  *
- *   A 50/50 split: the left panel is pinned while the hero + épocas
- *   scroll on the right. A dot rides a straight "80-year route"
+ *   A 1/3 ⁄ 2/3 split: the left map panel is pinned while the hero +
+ *   épocas scroll on the right. A dot rides a straight "80-year route"
  *   (1946 → 2026) as you scroll; a POV camera follows the dot so the
  *   current year stays centred; and the route inks in (DrawSVG).
  * ───────────────────────────────────────────────────────── */
@@ -306,7 +306,7 @@ export default function ScrollMapClient({
             cover the navbar's left half — so inset it below the navbar there and
             sit under it (z-40). Standalone keeps the full-bleed h-screen panel. */}
         <div
-          className={`map absolute left-0 w-1/2 overflow-hidden border-r border-line bg-paper-warm ${
+          className={`map absolute left-0 w-1/3 overflow-hidden border-r border-line bg-paper-warm ${
             embedded ? "top-24 z-40 h-[calc(100svh-6rem)]" : "top-0 z-50 h-screen"
           }`}
         >
@@ -314,8 +314,8 @@ export default function ScrollMapClient({
             <g className="pov">
               <g strokeLinecap="round" strokeLinejoin="round">
                 {/* faint full track + burgundy route that inks in */}
-                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={5} />
-                <path className="route" d={d} stroke="#7a1738" strokeWidth={7} />
+                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={3} />
+                <path className="route" d={d} stroke="#7a1738" strokeWidth={4} />
 
                 {/* stations: a ring + the year. The year carries a paper-coloured
                     halo (paint-order: stroke) so the route threads cleanly behind
@@ -357,7 +357,7 @@ export default function ScrollMapClient({
             then the épocas scroll past. The header height is the runway the
             opening dive zooms across, so keep it tall either way. */}
         <div
-          className={`info relative ml-[50%] w-[44%] px-[3%] pt-[20vh] text-ink-muted ${
+          className={`info relative ml-[34%] w-[60%] px-[3%] pt-[20vh] text-ink-muted ${
             embedded ? "pb-[40vh]" : "pb-[64vh]"
           }`}
         >
