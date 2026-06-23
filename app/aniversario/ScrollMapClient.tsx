@@ -328,8 +328,8 @@ export default function ScrollMapClient({
             <g className="pov">
               <g strokeLinecap="round" strokeLinejoin="round">
                 {/* faint full track + burgundy route that inks in */}
-                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={3} />
-                <path className="route" d={d} stroke="#7a1738" strokeWidth={4} />
+                <path className="route-bg" d={d} stroke="#c9c8c4" strokeWidth={2} />
+                <path className="route" d={d} stroke="#7a1738" strokeWidth={2.5} />
 
                 {/* stations: a ring + the year. The year carries a paper-coloured
                     halo (paint-order: stroke) so the route threads cleanly behind
@@ -337,17 +337,17 @@ export default function ScrollMapClient({
                     label casing in the panel's own background colour. */}
                 {pts.map((p, i) => (
                   <g key={epocas[i].slug}>
-                    <circle cx={p.x} cy={p.y} r={9} fill="#f0efe9" stroke="#7a1738" strokeWidth={3} />
+                    <circle cx={p.x} cy={p.y} r={7} fill="#f0efe9" stroke="#7a1738" strokeWidth={1.5} />
                     <text
                       x={p.x}
                       y={p.y - 32}
                       textAnchor="middle"
-                      fill="#191919"
+                      fill="#3f3f3d"
                       stroke="#f0efe9"
-                      strokeWidth={14}
+                      strokeWidth={9}
                       strokeLinejoin="round"
                       paintOrder="stroke"
-                      style={{ fontFamily: "var(--font-crimson), Georgia, serif", fontWeight: 600 }}
+                      style={{ fontFamily: "var(--font-crimson), Georgia, serif", fontWeight: 400 }}
                       fontSize={54}
                     >
                       {epocas[i].startYear}
@@ -355,8 +355,8 @@ export default function ScrollMapClient({
                   </g>
                 ))}
 
-                <circle className="dot-start" cx={pts[0].x} cy={pts[0].y} r={9} fill="#7a1738" />
-                <circle className="dot" cx={0} cy={0} r={13} fill="#7a1738" stroke="#fff" strokeWidth={4} />
+                <circle className="dot-start" cx={pts[0].x} cy={pts[0].y} r={7} fill="#7a1738" />
+                <circle className="dot" cx={0} cy={0} r={9} fill="#7a1738" stroke="#fff" strokeWidth={2.5} />
               </g>
             </g>
           </svg>
@@ -372,7 +372,7 @@ export default function ScrollMapClient({
             then the épocas scroll past. The header height is the runway the
             opening dive zooms across, so keep it tall either way. */}
         <div
-          className={`info relative ml-[22%] w-[78%] pl-[3%] pr-4 pt-[20vh] text-ink-muted sm:pr-6 ${
+          className={`info relative ml-[22%] w-[78%] px-[3%] pt-[20vh] text-ink-muted ${
             embedded ? "pb-[40vh]" : "pb-[64vh]"
           }`}
         >
@@ -420,7 +420,7 @@ export default function ScrollMapClient({
                 {/* Image(s) on top — generous, using the room — then the text
                     below. The year is intentionally omitted: it already labels
                     this station on the map, so repeating it here was redundant. */}
-                <div className="flex w-full flex-wrap items-end gap-5">
+                <div className="flex w-full max-w-[714px] flex-wrap items-end gap-5">
                   {epoca.photos.length > 0 ? (
                     epoca.photos.map((photo) => {
                       const [w, h] = photo.aspect.split("/").map(Number);
@@ -428,10 +428,11 @@ export default function ScrollMapClient({
                       return (
                         <figure
                           key={photo.src}
-                          // The image row spans the full content width (out to the
-                          // Suscribirme button's line). Landscape fills it; two
-                          // portraits share it evenly, so together they match a
-                          // landscape's width.
+                          // The image row's right edge lines up with the navbar's
+                          // "Iniciar sesión" left edge (max-w-[714px], stable since
+                          // the navbar sits in the fixed max-w-[1280px] box).
+                          // Landscape fills the row; two portraits share it evenly,
+                          // so together they match a landscape's width.
                           className={landscape ? "w-full" : "min-w-0 flex-1 basis-0"}
                         >
                           <div
