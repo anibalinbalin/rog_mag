@@ -3,7 +3,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BibliografiaDepthShell from "@/components/BibliografiaDepthShell";
 import BibliografiaSheet from "@/components/BibliografiaSheet";
-import ScrollMapClient from "./ScrollMapClient";
+import ScrollMap from "./ScrollMap";
+import VersionToggle from "./VersionToggle";
 import { getEpocas } from "@/lib/epocas";
 import { getPagina80Anos } from "@/lib/paginas";
 
@@ -56,7 +57,7 @@ export default function OchentaAnosPage() {
 
   return (
     <BibliografiaDepthShell>
-      <Header compact />
+      <Header compact aside={<VersionToggle />} />
 
       <main>
         {/* Section 1 — intro (white) with the giant ghost "80" behind the title */}
@@ -143,7 +144,7 @@ export default function OchentaAnosPage() {
             The map introduces itself in its own right column (the section
             heading lives there), so there's no separate full-width heading band. */}
         <section>
-          <ScrollMapClient epocas={epocas} embedded />
+          <ScrollMap epocas={epocas} />
         </section>
       </main>
 

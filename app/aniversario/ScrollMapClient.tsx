@@ -7,7 +7,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { DrawSVGPlugin } from "gsap/DrawSVGPlugin";
 import { useGSAP } from "@gsap/react";
-import type { Epoca } from "@/lib/epocas";
+import type { Epoca, EpocaPhoto } from "@/lib/epocas";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, MotionPathPlugin, DrawSVGPlugin);
 
@@ -99,10 +99,65 @@ function renderDetail(text: string) {
     ));
 }
 
+/** A single época portrait. Landscape fills its row; portraits share it (flex-1)
+ *  so two together match a landscape's width. Used by both layout versions. */
+function PhotoFigure({ photo }: { photo: EpocaPhoto }) {
+  const [w, h] = photo.aspect.split("/").map(Number);
+  const landscape = !(w && h) || w >= h;
+  return (
+    <figure className={landscape ? "w-full" : "min-w-0 flex-1 basis-0"}>
+      <div
+        className="relative overflow-hidden rounded-sm border border-line bg-paper-cream"
+        style={{ aspectRatio: photo.aspect }}
+      >
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          sizes={landscape ? "(min-width: 640px) 42rem, 90vw" : "(min-width: 640px) 21rem, 45vw"}
+          className={`object-cover ${landscape ? "object-center" : "object-top"}`}
+        />
+      </div>
+      {photo.name && (
+        <figcaption className="mt-2 text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted">
+          {photo.name}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+/** Dashed fallback shown on épocas that have no portrait yet. */
+function PhotoPlaceholder() {
+  return (
+    <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
+      <div className="flex flex-col items-center gap-2 text-ink-muted/70">
+        <svg
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <rect x="3" y="3" width="18" height="18" rx="2" />
+          <circle cx="9" cy="9" r="1.6" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+        <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
+      </div>
+    </div>
+  );
+}
+
 export default function ScrollMapClient({
   epocas,
   hero,
   embedded = false,
+  version = 1,
 }: {
   epocas: Epoca[];
   /** Optional — the full anniversary hero on the right column. Omitted (or with
@@ -110,6 +165,10 @@ export default function ScrollMapClient({
    *  map can sit inside a page that already has its own hero (e.g. /80-años). */
   hero?: Hero;
   embedded?: boolean;
+  /** Layout variant (1 = image on top, 2 = image left / text right + year focus).
+   *  The parent remounts this component (via `key`) on change, so GSAP re-inits
+   *  cleanly against the new DOM — don't switch this in place. */
+  version?: 1 | 2;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const pts = stations(epocas.length);
@@ -225,12 +284,36 @@ export default function ScrollMapClient({
       // (the camera recentre that pairs with this zoom-out is driven by the
       // single povg.y controller below.)
 
+      // ── Year focus (version 2) ───────────────────────────
+      // The year nearest the dot stays in full ink; the rest fade to a muted grey
+      // so the rail subtly directs the eye. Tokens: ink-soft focused → ink-faint
+      // greyed. Driven by the ride timeline's own onUpdate (below) so it stays
+      // locked to the dot through scrub catch-up — a separate scroll trigger
+      // freezes mid-glide because it only fires while the wheel is moving.
+      const years = Array.from(r.querySelectorAll<SVGTextElement>(".year-label"));
+      const YEAR_FOCUS = "#4a4a4a"; // --color-ink-soft
+      const YEAR_GREY = "#9b9b9b"; // --color-ink-faint
+      const focusYear = (centeredIndex: number) => {
+        years.forEach((t, i) => {
+          const w = Math.max(0, 1 - Math.abs(i - centeredIndex));
+          gsap.set(t, { attr: { fill: gsap.utils.interpolate(YEAR_GREY, YEAR_FOCUS, w) } });
+        });
+      };
+      if (version === 2) focusYear(0); // 1946 in focus at rest
+      else years.forEach((t) => gsap.set(t, { attr: { fill: "#3f3f3d" } }));
+
       // ── The scroll-driven ride ───────────────────────────
       // Scrubbed across "first época centred → last época centred", so progress
       // == which época is centred. Dot + route inking use the remap ease so each
       // station lands when its época is centred.
       gsap
         .timeline({
+          onUpdate:
+            version === 2
+              ? function (this: gsap.core.Timeline) {
+                  focusYear(this.progress() * (N - 1));
+                }
+              : undefined,
           scrollTrigger: {
             trigger: first,
             start: "center center",
@@ -304,6 +387,13 @@ export default function ScrollMapClient({
 
       // centre the route horizontally; start panned to the first station
       gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
+
+      // This component is remounted (via `key`) when the version toggles, so its
+      // ScrollTriggers are created right after the previous instance's pin spacer
+      // is torn down in the same tick. Force one refresh so every trigger's
+      // start/end (the ride, the pins, the camera) is measured against the final
+      // DOM — without it the dot stays parked on 1946 in the remounted instance.
+      ScrollTrigger.refresh();
     },
     { scope: root, dependencies: [] }
   );
@@ -339,6 +429,7 @@ export default function ScrollMapClient({
                   <g key={epocas[i].slug}>
                     <circle cx={p.x} cy={p.y} r={7} fill="#f0efe9" stroke="#7a1738" strokeWidth={1.5} />
                     <text
+                      className="year-label"
                       x={p.x}
                       y={p.y - 32}
                       textAnchor="middle"
@@ -414,90 +505,52 @@ export default function ScrollMapClient({
             )}
           </header>
 
-          {epocas.map((epoca) => (
-            <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
-              <div className="epoca-inner">
-                {/* Image(s) on top — generous, using the room — then the text
-                    below. The year is intentionally omitted: it already labels
-                    this station on the map, so repeating it here was redundant. */}
-                <div className="flex w-full max-w-[714px] flex-wrap items-end gap-5">
-                  {epoca.photos.length > 0 ? (
-                    epoca.photos.map((photo) => {
-                      const [w, h] = photo.aspect.split("/").map(Number);
-                      const landscape = !(w && h) || w >= h;
-                      return (
-                        <figure
-                          key={photo.src}
-                          // The image row's right edge lines up with the navbar's
-                          // "Iniciar sesión" left edge (max-w-[714px], stable since
-                          // the navbar sits in the fixed max-w-[1280px] box).
-                          // Landscape fills the row; two portraits share it evenly,
-                          // so together they match a landscape's width.
-                          className={landscape ? "w-full" : "min-w-0 flex-1 basis-0"}
-                        >
-                          <div
-                            className="relative overflow-hidden rounded-sm border border-line bg-paper-cream"
-                            style={{ aspectRatio: photo.aspect }}
-                          >
-                            <Image
-                              src={photo.src}
-                              alt={photo.alt}
-                              fill
-                              sizes={landscape ? "(min-width: 640px) 42rem, 90vw" : "(min-width: 640px) 21rem, 45vw"}
-                              className={`object-cover ${landscape ? "object-center" : "object-top"}`}
-                            />
-                          </div>
-                          {photo.name && (
-                            <figcaption className="mt-2 text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted">
-                              {photo.name}
-                            </figcaption>
-                          )}
-                        </figure>
-                      );
-                    })
-                  ) : (
-                    <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
-                      <div className="flex flex-col items-center gap-2 text-ink-muted/70">
-                        <svg
-                          width="40"
-                          height="40"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <rect x="3" y="3" width="18" height="18" rx="2" />
-                          <circle cx="9" cy="9" r="1.6" />
-                          <path d="M21 15l-5-5L5 21" />
-                        </svg>
-                        <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          {epocas.map((epoca) => {
+            // The year is intentionally omitted from the entry: it already labels
+            // this station on the map, so repeating it here was redundant.
+            const photosBlock =
+              epoca.photos.length > 0 ? (
+                epoca.photos.map((photo) => <PhotoFigure key={photo.src} photo={photo} />)
+              ) : (
+                <PhotoPlaceholder />
+              );
+            const textBlock = (
+              <>
+                {epoca.director.trim() !== "" && (
+                  <p className="text-sm italic leading-relaxed text-ink-muted">
+                    {epoca.director.split("\n").map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i < epoca.director.split("\n").length - 1 ? <br /> : null}
+                      </span>
+                    ))}
+                  </p>
+                )}
+                {epoca.detail.trim() !== "" && (
+                  <div className="mt-4 text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
+                )}
+              </>
+            );
 
-                {/* Text below the image(s). */}
-                <div className="mt-6 max-w-2xl">
-                  {epoca.director.trim() !== "" && (
-                    <p className="text-sm italic leading-relaxed text-ink-muted">
-                      {epoca.director.split("\n").map((line, i) => (
-                        <span key={i}>
-                          {line}
-                          {i < epoca.director.split("\n").length - 1 ? <br /> : null}
-                        </span>
-                      ))}
-                    </p>
-                  )}
-                  {epoca.detail.trim() !== "" && (
-                    <div className="mt-4 text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
-                  )}
-                </div>
-              </div>
-            </article>
-          ))}
+            return (
+              <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
+                {version === 2 ? (
+                  /* Version 2 — image on the left, text on the right. */
+                  <div className="epoca-inner grid grid-cols-1 items-center gap-8 md:grid-cols-2 lg:gap-12">
+                    <div className="flex flex-wrap items-end gap-5">{photosBlock}</div>
+                    <div className="max-w-md">{textBlock}</div>
+                  </div>
+                ) : (
+                  /* Version 1 — image(s) on top (row out to the "Iniciar sesión"
+                     line), text below. */
+                  <div className="epoca-inner">
+                    <div className="flex w-full max-w-[714px] flex-wrap items-end gap-5">{photosBlock}</div>
+                    <div className="mt-6 max-w-2xl">{textBlock}</div>
+                  </div>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
     </div>
