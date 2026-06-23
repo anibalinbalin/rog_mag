@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
@@ -180,6 +181,19 @@ export default function ScrollMapClient({
       const pinType: "fixed" | "transform" = embedded ? "transform" : "fixed";
       ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map, pinType });
 
+      // The "1946 — 2026" corner caption is a header for the rail at rest. Once
+      // you scroll and the year stations start riding, it collides with them —
+      // so fade it out over the first screen of scroll. Reversible: scrub fades
+      // it back in at the top.
+      const mapLabel = r.querySelector<HTMLElement>(".map-label");
+      if (mapLabel) {
+        gsap.to(mapLabel, {
+          opacity: 0,
+          ease: "none",
+          scrollTrigger: { trigger: section, start: "top top", end: () => "+=" + window.innerHeight * 0.6, scrub: true },
+        });
+      }
+
       // ── Zoom arc ─────────────────────────────────────────
       // Dive from WIDE to POV as you scroll the hero and ARRIVE on 1946 (the
       // founding year) — not somewhere between 1946 and 1971. Hold close through
@@ -300,13 +314,13 @@ export default function ScrollMapClient({
 
   return (
     <div ref={root} className="bg-paper">
-      <section id="scrollmap" className="relative w-full">
+      <section id="scrollmap" className="relative mx-auto w-full max-w-[1280px]">
         {/* Left — pinned "map" panel with the 80-year route. Embedded inside a
             page with a sticky h-24 navbar (z-50), the full-height panel would
             cover the navbar's left half — so inset it below the navbar there and
             sit under it (z-40). Standalone keeps the full-bleed h-screen panel. */}
         <div
-          className={`map absolute left-0 w-1/3 overflow-hidden border-r border-line bg-paper-warm ${
+          className={`map absolute left-0 w-1/5 overflow-hidden border-r border-line bg-paper-warm ${
             embedded ? "top-24 z-40 h-[calc(100svh-6rem)]" : "top-0 z-50 h-screen"
           }`}
         >
@@ -347,8 +361,9 @@ export default function ScrollMapClient({
             </g>
           </svg>
 
-          {/* corner label so the panel reads as a "journey" */}
-          <div className="pointer-events-none absolute left-6 top-6 font-serif text-sm uppercase tracking-[0.2em] text-burgundy">
+          {/* corner label so the panel reads as a "journey" — fades out once the
+              year stations start riding (see the fade tween in useGSAP). */}
+          <div className="map-label pointer-events-none absolute left-6 top-6 font-serif text-sm uppercase tracking-[0.2em] text-burgundy">
             1946 — 2026
           </div>
         </div>
@@ -357,7 +372,7 @@ export default function ScrollMapClient({
             then the épocas scroll past. The header height is the runway the
             opening dive zooms across, so keep it tall either way. */}
         <div
-          className={`info relative ml-[34%] w-[60%] px-[3%] pt-[20vh] text-ink-muted ${
+          className={`info relative ml-[22%] w-[78%] pl-[3%] pr-4 pt-[20vh] text-ink-muted sm:pr-6 ${
             embedded ? "pb-[40vh]" : "pb-[64vh]"
           }`}
         >
@@ -402,43 +417,83 @@ export default function ScrollMapClient({
           {epocas.map((epoca) => (
             <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
               <div className="epoca-inner">
-                {/* Image slot — a per-época visual goes here (placeholder for
-                    now). The year is intentionally omitted: it already labels
-                    this station on the map to the left, so repeating it here
-                    was redundant. */}
-                <div className="relative mb-6 flex aspect-[4/3] w-full max-w-md items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
-                  <div className="flex flex-col items-center gap-2 text-ink-muted/70">
-                    <svg
-                      width="40"
-                      height="40"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={1.5}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="9" cy="9" r="1.6" />
-                      <path d="M21 15l-5-5L5 21" />
-                    </svg>
-                    <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
-                  </div>
+                {/* Image(s) on top — generous, using the room — then the text
+                    below. The year is intentionally omitted: it already labels
+                    this station on the map, so repeating it here was redundant. */}
+                <div className="flex w-full flex-wrap items-end gap-5">
+                  {epoca.photos.length > 0 ? (
+                    epoca.photos.map((photo) => {
+                      const [w, h] = photo.aspect.split("/").map(Number);
+                      const landscape = !(w && h) || w >= h;
+                      return (
+                        <figure
+                          key={photo.src}
+                          // The image row spans the full content width (out to the
+                          // Suscribirme button's line). Landscape fills it; two
+                          // portraits share it evenly, so together they match a
+                          // landscape's width.
+                          className={landscape ? "w-full" : "min-w-0 flex-1 basis-0"}
+                        >
+                          <div
+                            className="relative overflow-hidden rounded-sm border border-line bg-paper-cream"
+                            style={{ aspectRatio: photo.aspect }}
+                          >
+                            <Image
+                              src={photo.src}
+                              alt={photo.alt}
+                              fill
+                              sizes={landscape ? "(min-width: 640px) 42rem, 90vw" : "(min-width: 640px) 21rem, 45vw"}
+                              className={`object-cover ${landscape ? "object-center" : "object-top"}`}
+                            />
+                          </div>
+                          {photo.name && (
+                            <figcaption className="mt-2 text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted">
+                              {photo.name}
+                            </figcaption>
+                          )}
+                        </figure>
+                      );
+                    })
+                  ) : (
+                    <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
+                      <div className="flex flex-col items-center gap-2 text-ink-muted/70">
+                        <svg
+                          width="40"
+                          height="40"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <rect x="3" y="3" width="18" height="18" rx="2" />
+                          <circle cx="9" cy="9" r="1.6" />
+                          <path d="M21 15l-5-5L5 21" />
+                        </svg>
+                        <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                {epoca.director.trim() !== "" && (
-                  <p className="mt-4 text-sm italic leading-relaxed text-ink-muted">
-                    {epoca.director.split("\n").map((line, i) => (
-                      <span key={i}>
-                        {line}
-                        {i < epoca.director.split("\n").length - 1 ? <br /> : null}
-                      </span>
-                    ))}
-                  </p>
-                )}
-                {epoca.detail.trim() !== "" && (
-                  <div className="mt-5 max-w-md text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
-                )}
+
+                {/* Text below the image(s). */}
+                <div className="mt-6 max-w-2xl">
+                  {epoca.director.trim() !== "" && (
+                    <p className="text-sm italic leading-relaxed text-ink-muted">
+                      {epoca.director.split("\n").map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          {i < epoca.director.split("\n").length - 1 ? <br /> : null}
+                        </span>
+                      ))}
+                    </p>
+                  )}
+                  {epoca.detail.trim() !== "" && (
+                    <div className="mt-4 text-base leading-relaxed text-ink-soft">{renderDetail(epoca.detail)}</div>
+                  )}
+                </div>
               </div>
             </article>
           ))}
