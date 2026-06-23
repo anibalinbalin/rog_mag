@@ -402,9 +402,30 @@ export default function ScrollMapClient({
           {epocas.map((epoca) => (
             <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
               <div className="epoca-inner">
-                <p className="font-serif text-6xl font-bold leading-none tabular-nums text-burgundy sm:text-7xl">
-                  {epoca.startYear}
-                </p>
+                {/* Image slot — a per-época visual goes here (placeholder for
+                    now). The year is intentionally omitted: it already labels
+                    this station on the map to the left, so repeating it here
+                    was redundant. */}
+                <div className="relative mb-6 flex aspect-[4/3] w-full max-w-md items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
+                  <div className="flex flex-col items-center gap-2 text-ink-muted/70">
+                    <svg
+                      width="40"
+                      height="40"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={1.5}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <circle cx="9" cy="9" r="1.6" />
+                      <path d="M21 15l-5-5L5 21" />
+                    </svg>
+                    <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
+                  </div>
+                </div>
                 {epoca.director.trim() !== "" && (
                   <p className="mt-4 text-sm italic leading-relaxed text-ink-muted">
                     {epoca.director.split("\n").map((line, i) => (
