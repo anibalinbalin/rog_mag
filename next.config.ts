@@ -82,6 +82,13 @@ const nextConfig: NextConfig = {
         destination: "/80-años",
         permanent: true,
       },
+      // /testmapbelen was the original noindex scroll-map experiment; its layout
+      // is now the canonical /80-años, so the route is removed — fold it on too.
+      {
+        source: "/testmapbelen",
+        destination: "/80-años",
+        permanent: true,
+      },
       // The magazine archive moved /revista → /revistas (plural, matches the
       // "Revistas" nav label). Fold the old singular URLs — listing and each
       // issue — onto the new ones so existing links and bookmarks keep working.
