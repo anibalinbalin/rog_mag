@@ -157,7 +157,6 @@ export default function ScrollMapClient({
   epocas,
   hero,
   embedded = false,
-  version = 1,
 }: {
   epocas: Epoca[];
   /** Optional — the full anniversary hero on the right column. Omitted (or with
@@ -165,10 +164,6 @@ export default function ScrollMapClient({
    *  map can sit inside a page that already has its own hero (e.g. /80-años). */
   hero?: Hero;
   embedded?: boolean;
-  /** Layout variant (1 = image on top, 2 = image left / text right + year focus).
-   *  The parent remounts this component (via `key`) on change, so GSAP re-inits
-   *  cleanly against the new DOM — don't switch this in place. */
-  version?: 1 | 2;
 }) {
   const root = useRef<HTMLDivElement>(null);
   const pts = stations(epocas.length);
@@ -284,7 +279,7 @@ export default function ScrollMapClient({
       // (the camera recentre that pairs with this zoom-out is driven by the
       // single povg.y controller below.)
 
-      // ── Year focus (version 2) ───────────────────────────
+      // ── Year focus ───────────────────────────────────────
       // The year nearest the dot stays in full ink; the rest fade to a muted grey
       // so the rail subtly directs the eye. Tokens: ink-soft focused → ink-faint
       // greyed. Driven by the ride timeline's own onUpdate (below) so it stays
@@ -299,8 +294,7 @@ export default function ScrollMapClient({
           gsap.set(t, { attr: { fill: gsap.utils.interpolate(YEAR_GREY, YEAR_FOCUS, w) } });
         });
       };
-      if (version === 2) focusYear(0); // 1946 in focus at rest
-      else years.forEach((t) => gsap.set(t, { attr: { fill: "#3f3f3d" } }));
+      focusYear(0); // 1946 in focus at rest
 
       // ── The scroll-driven ride ───────────────────────────
       // Scrubbed across "first época centred → last época centred", so progress
@@ -308,12 +302,9 @@ export default function ScrollMapClient({
       // station lands when its época is centred.
       gsap
         .timeline({
-          onUpdate:
-            version === 2
-              ? function (this: gsap.core.Timeline) {
-                  focusYear(this.progress() * (N - 1));
-                }
-              : undefined,
+          onUpdate: function (this: gsap.core.Timeline) {
+            focusYear(this.progress() * (N - 1));
+          },
           scrollTrigger: {
             trigger: first,
             start: "center center",
@@ -387,13 +378,6 @@ export default function ScrollMapClient({
 
       // centre the route horizontally; start panned to the first station
       gsap.set(povg, { x: -CX, y: -(gsap.getProperty(dot, "y") as number) });
-
-      // This component is remounted (via `key`) when the version toggles, so its
-      // ScrollTriggers are created right after the previous instance's pin spacer
-      // is torn down in the same tick. Force one refresh so every trigger's
-      // start/end (the ride, the pins, the camera) is measured against the final
-      // DOM — without it the dot stays parked on 1946 in the remounted instance.
-      ScrollTrigger.refresh();
     },
     { scope: root, dependencies: [] }
   );
@@ -534,20 +518,11 @@ export default function ScrollMapClient({
 
             return (
               <article key={epoca.slug} className="epoca-block flex min-h-[78vh] flex-col justify-center border-t border-line py-12">
-                {version === 2 ? (
-                  /* Version 2 — image on the left, text on the right. */
-                  <div className="epoca-inner grid grid-cols-1 items-center gap-8 md:grid-cols-2 lg:gap-12">
-                    <div className="flex flex-wrap items-end gap-5">{photosBlock}</div>
-                    <div className="max-w-md">{textBlock}</div>
-                  </div>
-                ) : (
-                  /* Version 1 — image(s) on top (row out to the "Iniciar sesión"
-                     line), text below. */
-                  <div className="epoca-inner">
-                    <div className="flex w-full max-w-[714px] flex-wrap items-end gap-5">{photosBlock}</div>
-                    <div className="mt-6 max-w-2xl">{textBlock}</div>
-                  </div>
-                )}
+                {/* Image on the left, text on the right. */}
+                <div className="epoca-inner grid grid-cols-1 items-center gap-8 md:grid-cols-2 lg:gap-12">
+                  <div className="flex flex-wrap items-end gap-5">{photosBlock}</div>
+                  <div className="max-w-md">{textBlock}</div>
+                </div>
               </article>
             );
           })}

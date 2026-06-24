@@ -37,15 +37,7 @@ function Masthead() {
     inline nav with an active underline, burgundy Suscribirme on the right.
     `compact` is kept for call-site compatibility (no longer toggles a
     shrink-on-scroll masthead). */
-export default function Header({
-  compact = false,
-  aside,
-}: {
-  compact?: boolean;
-  /** Optional control rendered inside the nav cluster (e.g. the /80-años version
-   *  toggle). Lives in the centre cluster so it never shifts the right actions. */
-  aside?: React.ReactNode;
-}) {
+export default function Header({ compact = false }: { compact?: boolean }) {
   void compact;
   // The /80-años page is served under its accented URL (via a rewrite), and
   // usePathname() can hand back the percent-encoded form ("/80-a%C3%B1os"), so
@@ -82,7 +74,6 @@ export default function Header({
               </Link>
             );
           })}
-          {aside}
         </nav>
 
         {/* Actions */}
