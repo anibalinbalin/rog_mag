@@ -235,19 +235,6 @@ export default function ScrollMapClient({
       const pinType: "fixed" | "transform" = embedded ? "transform" : "fixed";
       ScrollTrigger.create({ trigger: section, start: "top top", end: "bottom bottom", pin: map, pinType });
 
-      // The "1946 — 2026" corner caption is a header for the rail at rest. Once
-      // you scroll and the year stations start riding, it collides with them —
-      // so fade it out over the first screen of scroll. Reversible: scrub fades
-      // it back in at the top.
-      const mapLabel = r.querySelector<HTMLElement>(".map-label");
-      if (mapLabel) {
-        gsap.to(mapLabel, {
-          opacity: 0,
-          ease: "none",
-          scrollTrigger: { trigger: section, start: "top top", end: () => "+=" + window.innerHeight * 0.6, scrub: true },
-        });
-      }
-
       // ── Zoom arc ─────────────────────────────────────────
       // Dive from WIDE to POV as you scroll the hero and ARRIVE on 1946 (the
       // founding year) — not somewhere between 1946 and 1971. Hold close through
@@ -435,12 +422,6 @@ export default function ScrollMapClient({
               </g>
             </g>
           </svg>
-
-          {/* corner label so the panel reads as a "journey" — fades out once the
-              year stations start riding (see the fade tween in useGSAP). */}
-          <div className="map-label pointer-events-none absolute left-6 top-6 font-serif text-sm uppercase tracking-[0.2em] text-burgundy">
-            1946 — 2026
-          </div>
         </div>
 
         {/* Right — the anniversary hero (or a slim section intro when embedded),
@@ -453,7 +434,7 @@ export default function ScrollMapClient({
         >
           <header className="mb-[20vh] text-center">
             {embedded || !hero ? (
-              <div className="pt-[6vh]">
+              <div className="pt-[6vh] text-left">
                 <p className="font-serif text-2xl font-semibold italic text-ink sm:text-3xl">
                   Seis épocas de historia en ocho décadas
                 </p>
