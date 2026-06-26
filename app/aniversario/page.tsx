@@ -62,14 +62,17 @@ export default function OchentaAnosPage() {
         {/* Section 1 — intro (white) with the giant ghost "80" behind the title */}
         <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-36 sm:pt-45">
           <div className="mx-auto max-w-3xl text-center">
-            {/* Title + years, with the decorative ghost "80" hugging them */}
+            {/* Title + years, with Belén's decorative "80" mark hugging them */}
             <div className="relative isolate">
-              <span
+              <Image
+                src="/80.svg"
+                alt=""
                 aria-hidden="true"
-                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-[56%] select-none font-serif text-[22rem] italic leading-none text-paper-gray/70 sm:text-[34rem]"
-              >
-                80
-              </span>
+                width={457}
+                height={275}
+                priority
+                className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-auto w-[18rem] -translate-x-1/2 -translate-y-1/2 select-none sm:w-[34rem]"
+              />
 
               <h1 className="font-serif text-4xl font-bold leading-[1.1] text-ink sm:text-5xl">
                 {renderTitle(pagina.title)}
