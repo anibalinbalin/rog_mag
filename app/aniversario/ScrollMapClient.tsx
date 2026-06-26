@@ -377,12 +377,12 @@ export default function ScrollMapClient({
     <div ref={root} className="bg-paper">
       <section id="scrollmap" className="relative mx-auto w-full max-w-[1280px]">
         {/* Left — pinned "map" panel with the 80-year route. Embedded inside a
-            page with a sticky h-24 navbar (z-50), the full-height panel would
+            page with a sticky h-28 navbar (z-50), the full-height panel would
             cover the navbar's left half — so inset it below the navbar there and
             sit under it (z-40). Standalone keeps the full-bleed h-screen panel. */}
         <div
           className={`map absolute left-0 w-1/5 overflow-hidden border-r border-line bg-paper-warm ${
-            embedded ? "top-24 z-40 h-[calc(100svh-6rem)]" : "top-0 z-50 h-screen"
+            embedded ? "top-28 z-40 h-[calc(100svh-7rem)]" : "top-0 z-50 h-screen"
           }`}
         >
           <svg className="h-full w-full" viewBox={`0 0 ${VB} ${VB}`} preserveAspectRatio="xMidYMid slice" fill="none">

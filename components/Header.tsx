@@ -52,7 +52,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper">
-      <div className="mx-auto flex h-24 max-w-[1280px] items-stretch justify-between gap-6">
+      <div className="mx-auto flex h-28 max-w-[1280px] items-stretch justify-between gap-6">
         {/* Masthead — fills the full navbar height, flush to the top-left */}
         <Masthead />
 
