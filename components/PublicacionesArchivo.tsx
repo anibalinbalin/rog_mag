@@ -210,7 +210,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   <button
                     type="button"
                     onClick={() => setYearIdx((i) => i - 1)}
-                    className="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-ink-soft transition-colors hover:text-ink"
+                    className="inline-flex items-center gap-2 rounded-full bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
                   >
                     <span aria-hidden="true">←</span> Año anterior
                   </button>
@@ -239,7 +239,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   <button
                     type="button"
                     onClick={() => setYearIdx((i) => i + 1)}
-                    className="inline-flex items-center gap-2 text-sm uppercase tracking-widest text-ink-soft transition-colors hover:text-ink"
+                    className="inline-flex items-center gap-2 rounded-full bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
                   >
                     Siguiente año <span aria-hidden="true">→</span>
                   </button>
