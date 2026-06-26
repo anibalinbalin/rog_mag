@@ -71,11 +71,11 @@ export default function RevistaPage() {
                 </div>
               </div>
 
-              {/* The cover asset (REVISTA 5-6.png) is already a rendered 3D
+              {/* The cover asset (REVISTA 5-6.webp) is already a rendered 3D
                   hardcover with its own spine, page edges and drop shadow, so it
                   renders as a plain image — NOT through BookCover3D (which would
                   double up the 3D effect). */}
-              <div className="justify-self-center lg:justify-self-end">
+              <div className="flex flex-col items-center gap-6 justify-self-center lg:justify-self-end">
                 {currentIssue.cover && (
                   <Image
                     src={currentIssue.cover}
@@ -86,6 +86,12 @@ export default function RevistaPage() {
                     className="h-auto w-64 sm:w-72 lg:w-[380px]"
                   />
                 )}
+                <a
+                  href="#"
+                  className="inline-flex items-center rounded-sm border border-action-dark px-7 py-3 text-sm uppercase tracking-widest text-action-dark transition-colors hover:bg-action-dark hover:text-paper"
+                >
+                  Fundación
+                </a>
               </div>
             </div>
           )}
@@ -99,27 +105,40 @@ export default function RevistaPage() {
 
               <div className="mt-10 border-t border-dashed border-line-dark">
                 {others.map((issue) => (
-                  <Link
+                  // Row is a plain div (not a Link) so the "Fundación" anchor
+                  // below the cover isn't nested inside another anchor (invalid
+                  // HTML). The cover and the text are each their own Link; the
+                  // group wrapper keeps the title hover in sync across both.
+                  <div
                     key={issue.slug}
-                    href={`/revistas/${issue.slug}`}
-                    className="group grid grid-cols-[130px_1fr] items-center gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
+                    className="group grid grid-cols-[130px_1fr] items-start gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
                   >
-                    {/* Cover assets are pre-rendered 3D books with their own
-                        shadow on a transparent background — object-contain (no
-                        cream box, no extra shadow) so the full book shows like
-                        the mockup. */}
-                    <div className="relative aspect-[3/4] w-full">
-                      {issue.cover && (
-                        <Image
-                          src={issue.cover}
-                          alt={`${issue.number} (${issue.year})`}
-                          fill
-                          sizes="190px"
-                          className="object-contain"
-                        />
-                      )}
+                    {/* Cover column: the cover (a pre-rendered 3D book with its
+                        own shadow on a transparent background — object-contain,
+                        no cream box, no extra shadow) stacked over the button. */}
+                    <div className="flex flex-col items-center gap-5">
+                      <Link
+                        href={`/revistas/${issue.slug}`}
+                        className="relative block aspect-[3/4] w-full"
+                      >
+                        {issue.cover && (
+                          <Image
+                            src={issue.cover}
+                            alt={`${issue.number} (${issue.year})`}
+                            fill
+                            sizes="190px"
+                            className="object-contain"
+                          />
+                        )}
+                      </Link>
+                      <a
+                        href="#"
+                        className="inline-flex w-full items-center justify-center rounded-sm border border-action-dark px-4 py-2.5 text-xs uppercase tracking-widest text-action-dark transition-colors hover:bg-action-dark hover:text-paper"
+                      >
+                        Fundación
+                      </a>
                     </div>
-                    <div>
+                    <Link href={`/revistas/${issue.slug}`} className="block">
                       <p className="text-xs uppercase tracking-widest text-ink-muted">
                         {issueDateLabel(issue)}
                       </p>
@@ -130,8 +149,8 @@ export default function RevistaPage() {
                         {issue.description ||
                           `Volumen ${issue.volume} · N.º ${issue.issue} · ${issue.articleCount} artículos`}
                       </p>
-                    </div>
-                  </Link>
+                    </Link>
+                  </div>
                 ))}
               </div>
             </div>
