@@ -84,9 +84,9 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
       className="relative isolate overflow-hidden bg-burgundy-dark"
     >
       {/* Slides stacked; only opacity animates (GPU-safe crossfade).
-          Fills the viewport below the sticky h-24 (6rem) header so the hero
+          Fills the viewport below the sticky h-28 (7rem) header so the hero
           owns the whole first screen. */}
-      <div className="relative min-h-[calc(100svh-6rem)]">
+      <div className="relative min-h-[calc(100svh-7rem)]">
         {slides.map((slide, i) => {
           const centered = isCentered(i);
           const isActive = i === active;
@@ -108,7 +108,7 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
               />
 
               <div
-                className={`relative mx-auto flex min-h-[calc(100svh-6rem)] max-w-[1280px] items-center px-4 py-20 ${
+                className={`relative mx-auto flex min-h-[calc(100svh-7rem)] max-w-[1280px] items-center px-4 py-20 ${
                   centered ? "justify-center text-center" : ""
                 }`}
               >
