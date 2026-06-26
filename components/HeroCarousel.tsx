@@ -120,8 +120,8 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                   <h2
                     className={`font-serif leading-[1.1] drop-shadow-sm ${
                       centered
-                        ? "text-5xl italic sm:text-6xl lg:text-7xl"
-                        : "text-4xl sm:text-5xl"
+                        ? "text-6xl italic sm:text-7xl lg:text-8xl"
+                        : "text-5xl sm:text-6xl"
                     }`}
                   >
                     {slide.heading}
@@ -130,8 +130,8 @@ export default function HeroCarousel({ slides }: { slides: HeroSlide[] }) {
                     <p
                       className={`font-serif leading-[1.15] drop-shadow-sm ${
                         centered
-                          ? "mt-4 text-3xl sm:text-4xl"
-                          : "mt-1 text-4xl sm:text-5xl"
+                          ? "mt-4 text-4xl sm:text-5xl"
+                          : "mt-1 text-5xl sm:text-6xl"
                       }`}
                     >
                       {slide.subheading}
