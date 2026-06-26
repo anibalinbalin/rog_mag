@@ -7,7 +7,7 @@ import { Stepper, useAutoPlay } from "pasito/react";
 import "pasito/styles.css";
 import type { HeroSlide } from "@/lib/paginas";
 
-const AUTO_ADVANCE_MS = 3000;
+const AUTO_ADVANCE_MS = 4500;
 
 const PLAY_ICON = (
   <svg className="size-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
