@@ -57,7 +57,7 @@ export default function Header({ compact = false }: { compact?: boolean }) {
         <Masthead />
 
         {/* Inline nav */}
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-8 pr-4 sm:pr-6 md:flex">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.match);
             return (
@@ -76,21 +76,6 @@ export default function Header({ compact = false }: { compact?: boolean }) {
           })}
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center gap-4 pr-4 sm:pr-6">
-          <button
-            type="button"
-            className="hidden text-sm text-ink-soft transition-colors hover:text-ink sm:block"
-          >
-            Iniciar sesión
-          </button>
-          <button
-            type="button"
-            className="rounded-sm bg-burgundy px-5 py-2.5 text-sm text-paper transition-opacity hover:opacity-90"
-          >
-            Suscribirme
-          </button>
-        </div>
       </div>
     </header>
   );
