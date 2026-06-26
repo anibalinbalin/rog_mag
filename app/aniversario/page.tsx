@@ -74,7 +74,7 @@ export default function OchentaAnosPage() {
               <h1 className="font-serif text-4xl font-bold leading-[1.1] text-ink sm:text-5xl">
                 {renderTitle(pagina.title)}
               </h1>
-              <p className="mt-5 font-serif text-2xl font-semibold italic text-ink sm:text-3xl">
+              <p className="mt-5 font-serif text-2xl font-bold text-ink sm:text-3xl">
                 {pagina.yearsLabel}
               </p>
             </div>
