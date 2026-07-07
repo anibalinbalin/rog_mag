@@ -100,6 +100,12 @@ const Issue: Collection = {
       description: 'Resumen de 1–2 líneas para la lista de Revistas Anteriores.',
     },
     {
+      type: 'string',
+      name: 'fcuLink',
+      label: 'Enlace FCU (Fundación)',
+      description: 'URL de la edición en la tienda de FCU. Alimenta el botón «Fundación».',
+    },
+    {
       type: 'boolean',
       name: 'current',
       label: 'Edición actual',

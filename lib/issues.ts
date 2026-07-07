@@ -17,6 +17,7 @@ export interface Issue {
   articleCount: number;
   current: boolean;
   description: string;
+  fcuLink: string;
   doctrina: string[];
   deInteres: string[];
   actualidadSociedades: string[];
@@ -42,6 +43,7 @@ function parseIssue(fileName: string): Issue {
     articleCount: data.articleCount ?? 0,
     current: data.current ?? false,
     description: data.description ?? "",
+    fcuLink: data.fcuLink ?? "",
     doctrina: data.doctrina ?? [],
     deInteres: data.deInteres ?? [],
     actualidadSociedades: data.actualidadSociedades ?? [],

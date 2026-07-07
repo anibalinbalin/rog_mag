@@ -59,7 +59,7 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Buscar publicación"
           aria-label="Buscar publicación"
-          className="w-full rounded-full border border-line bg-paper py-3.5 pl-14 pr-5 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-ink-muted"
+          className="w-full rounded-sm border border-line bg-paper py-3.5 pl-14 pr-5 text-sm text-ink outline-none placeholder:text-ink-faint focus:border-ink-muted"
           />
         </div>
       </div>
@@ -69,7 +69,7 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
         {filtered.map((post) => (
           <div
             key={post.slug}
-            className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 sm:grid-cols-[160px_1fr_auto] sm:items-center sm:gap-10"
+            className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr_auto] sm:items-center sm:gap-10"
           >
             {/* Thumbnail (post cover) */}
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream">

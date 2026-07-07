@@ -21,7 +21,7 @@ export default function AutoresPage() {
       <Header compact />
 
       <main>
-        <section className="mx-auto max-w-[1280px] px-4 pb-20 pt-12">
+        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-12 lg:pb-32">
           {/* Title row */}
           <h1 className="border-b border-dashed border-line-dark pb-6 font-serif text-4xl text-ink">
             Nuestros autores

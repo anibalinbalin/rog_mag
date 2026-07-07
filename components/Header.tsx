@@ -37,7 +37,15 @@ function Masthead() {
     inline nav with an active underline, burgundy Suscribirme on the right.
     `compact` is kept for call-site compatibility (no longer toggles a
     shrink-on-scroll masthead). */
-export default function Header({ compact = false }: { compact?: boolean }) {
+export default function Header({
+  compact = false,
+  borderless = false,
+}: {
+  compact?: boolean;
+  /** Drops the bottom hairline — for pages where a dark hero sits flush
+      under the header and the light border would read as a white seam. */
+  borderless?: boolean;
+}) {
   void compact;
   // The /80-años page is served under its accented URL (via a rewrite), and
   // usePathname() can hand back the percent-encoded form ("/80-a%C3%B1os"), so
@@ -51,13 +59,16 @@ export default function Header({ compact = false }: { compact?: boolean }) {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper">
-      <div className="mx-auto flex h-28 max-w-[1280px] items-stretch justify-between gap-6">
-        {/* Masthead — fills the full navbar height, flush to the top-left */}
+    <header
+      className={`sticky top-0 z-50 bg-paper ${borderless ? "" : "border-b border-line"}`}
+    >
+      <div className="mx-auto flex h-28 max-w-[1280px] items-stretch justify-between gap-6 px-4">
+        {/* Masthead — fills the full navbar height, left edge aligned to the
+            content grid (px-4, matching every content section's container) */}
         <Masthead />
 
         {/* Inline nav */}
-        <nav className="hidden items-center gap-8 pr-4 sm:pr-6 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => {
             const active = pathname.startsWith(item.match);
             return (

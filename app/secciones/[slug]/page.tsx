@@ -48,7 +48,7 @@ export default async function SectionPage({
           bio={section.tagline}
         />
 
-        <section className="mx-auto max-w-[1280px] px-4 pb-20 pt-6">
+        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-6 lg:pb-32">
           {posts.length > 0 ? (
             <PostGrid posts={posts} />
           ) : (
