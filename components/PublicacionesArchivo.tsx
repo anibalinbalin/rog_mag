@@ -81,10 +81,18 @@ function bookJitter(seed: number) {
     h ^= h >>> 16;
     return ((h >>> 0) % 100000) / 100000; // [0,1)
   };
+  const angle = 150 + Math.round(rnd(1) * 22); // 150–172° open
   return {
-    angle: 150 + Math.round(rnd(1) * 22), // 150–172° open
+    angle,
     tilt: +((rnd(2) * 2 - 1) * 1.3).toFixed(2), // −1.3…+1.3° resting tilt
     dur: 460 + Math.round(rnd(3) * 150), // 460–610ms
+    // How far (as a % of the book's own width) the open cover's free edge
+    // reaches to the left of the spine — |cos(angle)|, since the cover is
+    // hinged on the left and rotates flat toward the viewer. Anchors the
+    // ground/neighbor shadow (.archivo-ground) right at each book's actual
+    // tip instead of guessing an average, so it never overlaps (and gets
+    // hidden behind) the opaque open cover.
+    reach: Math.abs(Math.cos((angle * Math.PI) / 180)),
   };
 }
 
@@ -257,6 +265,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   "--open": `${book.angle}deg`,
                   "--tilt": `${book.tilt}deg`,
                   "--dur": `${book.dur}ms`,
+                  "--ground-right": `${(100 * (1 + book.reach)).toFixed(1)}%`,
                 } as CSSProperties;
                 const bookClass =
                   "archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20";
@@ -281,6 +290,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                       />
                     )}
                     <span className="archivo-cast" aria-hidden="true" />
+                    <span className="archivo-ground" aria-hidden="true" />
                     <span className="archivo-cover">
                       <Image
                         className="archivo-front"
@@ -491,6 +501,30 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
                       transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
         }
+        /* Ground + neighbor shadow: as the cover lifts open, a soft shadow
+           fades in over the page background and onto whichever magazine
+           sits in the neighboring cell — grounding the cover as something
+           physically lifted above the page. --ground-right anchors this
+           element's right edge to each book's own tip (the open cover's
+           free edge, computed per-book from --open in bookJitter), so it
+           starts exactly where the opaque cover ends instead of guessing
+           an average — a flat plane sized to overlap the cover itself would
+           just get hidden behind it (it swings to a higher, viewer-facing
+           depth). No 3D transform here on purpose: this element sits outside
+           .archivo-inner's own box (right can exceed 100%), and combining
+           that with translateZ inside a preserve-3d ancestor silently drops
+           the paint in Chromium — confirmed by testing, not assumed. Plain
+           2D scale is enough; --dur/easing keep it moving with the cover. */
+        .archivo-ground {
+          position: absolute; top: 4%; bottom: 4%;
+          right: var(--ground-right, 6%); width: 85%;
+          pointer-events: none; opacity: 0;
+          transform: scaleX(0.7);
+          transform-origin: right center;
+          background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.32), rgba(40,22,10,.22) 32%, rgba(40,22,10,.08) 62%, transparent 88%);
+          transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
+                      transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .archivo-cover {
           position: absolute; inset: 0;
           transform-origin: left center;
@@ -506,28 +540,12 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           backface-visibility: hidden;
           box-shadow: 0 8px 18px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
         }
-        /* The exposed inside-cover (back face) already carries the whole
-           opened cover's weight in this design — it swings to nearly face
-           the viewer and its outer edge lands past the neighboring book (see
-           .archivo-cover rotation above), so it's the one surface that can
-           cast a believable shadow onto the ground/neighbor: a soft shadow
-           offset toward the outer edge (away from the spine), which the
-           cover's own rotation carries out past its edge and onto whatever
-           sits there. A flat sibling shadow layer can't do this — it would
-           sit at a fixed depth and get hidden behind this rotated, opaque
-           panel instead of appearing to fall past it.
-           The offset is negative: this face is rotated 180deg relative to
-           its parent .archivo-cover (itself rotated ~-160deg on hover), and
-           that compound rotation mirrors the local x-axis — a positive
-           offset here would land the shadow back toward the spine instead
-           of out past the tip. Verified visually, not guessed. */
         .archivo-back {
           position: absolute; inset: 0;
           backface-visibility: hidden;
           transform: rotateY(180deg);
           background: #e9e6dd;
-          box-shadow: inset 0 0 44px rgba(60,40,20,.14), -22px 4px 32px -6px rgba(40,22,10,0);
-          transition: box-shadow var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: inset 0 0 44px rgba(60,40,20,.14);
         }
         .archivo-back::after {
           content: ""; position: absolute; inset: 0;
@@ -566,9 +584,11 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             transition: opacity var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1),
                         transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
           }
-          .archivo-book:hover .archivo-back {
-            box-shadow: inset 0 0 44px rgba(60,40,20,.14), -22px 4px 32px -6px rgba(40,22,10,.24);
-            transition: box-shadow var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+          .archivo-book:hover .archivo-ground {
+            opacity: 1;
+            transform: scaleX(1);
+            transition: opacity var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1),
+                        transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
           }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
@@ -578,10 +598,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           .archivo-cover { transition: none; }
           .archivo-book:hover .archivo-cover { transform: none; }
           .archivo-cast { display: none; }
-          .archivo-back {
-            box-shadow: inset 0 0 44px rgba(60,40,20,.14);
-            transition: none;
-          }
+          .archivo-ground { display: none; }
           /* No flip → the inside page never exposes, so the hint would float
              over a closed cover. Hide it; the book is still a button. */
           .archivo-hint { display: none; }

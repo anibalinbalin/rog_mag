@@ -80,8 +80,8 @@ export default function RevistaPage() {
                   <Image
                     src={currentIssue.cover}
                     alt={`${currentIssue.number} (${currentIssue.year})`}
-                    width={779}
-                    height={1080}
+                    width={770}
+                    height={1065}
                     priority
                     className="h-auto w-64 sm:w-72 lg:w-[380px]"
                   />
@@ -118,7 +118,7 @@ export default function RevistaPage() {
                           alt={`${issue.number} (${issue.year})`}
                           fill
                           sizes="190px"
-                          className="object-contain"
+                          className="object-contain object-left"
                         />
                       )}
                     </Link>

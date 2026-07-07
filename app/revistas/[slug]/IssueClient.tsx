@@ -88,7 +88,7 @@ export default function IssueClient(props: IssueClientProps) {
                     alt={`${issue.number} (${issue.year})`}
                     fill
                     sizes="(min-width: 1024px) 300px, 100vw"
-                    className="object-contain"
+                    className="object-contain object-left"
                   />
                 )}
               </div>
