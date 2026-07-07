@@ -85,14 +85,11 @@ export default function PostCard({
         {post.excerpt}
       </p>
 
-      {/* Author — labelled */}
+      {/* Author — same quiet burgundy chip as the issue contenidos */}
       <div className={`mt-5 ${isFeature ? "text-center" : ""}`}>
-        <p className="text-[10px] uppercase tracking-[0.18em] text-ink-faint">
-          Autor
-        </p>
-        <p className="mt-1 text-xs uppercase tracking-widest text-ink">
+        <span className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy">
           {post.author}
-        </p>
+        </span>
       </div>
     </Link>
   );

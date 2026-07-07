@@ -79,28 +79,28 @@ export default function ArticleClient(props: ArticleClientProps) {
                     href={`/autores/${author.slug}`}
                     className="group mt-2 block"
                   >
-                    <p
+                    <span
                       data-tina-field={tinaField(post, "author")}
-                      className="text-sm font-medium text-ink underline-offset-4 transition-colors group-hover:text-burgundy group-hover:underline"
+                      className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy transition-colors group-hover:bg-burgundy/15"
                     >
                       {post.author}
-                    </p>
-                    <p className="text-sm text-ink-muted">
+                    </span>
+                    <p className="mt-2 text-sm text-ink-muted">
                       {author.role} · {author.institution}
                     </p>
                   </Link>
                 ) : (
                   <div className="mt-2">
-                    <p
+                    <span
                       data-tina-field={tinaField(post, "author")}
-                      className="text-sm font-medium text-ink"
+                      className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy"
                     >
                       {post.author}
-                    </p>
+                    </span>
                     {post.authorRole && (
                       <p
                         data-tina-field={tinaField(post, "authorRole")}
-                        className="text-sm text-ink-muted"
+                        className="mt-2 text-sm text-ink-muted"
                       >
                         {post.authorRole}
                       </p>
