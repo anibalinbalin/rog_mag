@@ -40,12 +40,12 @@ export default function PageIdentity({
   linksField?: string;
 }) {
   return (
-    <div className="mx-auto max-w-2xl px-4 pb-6 pt-12 text-center">
+    <div className="mx-auto max-w-[1280px] px-4 pb-6 pt-12">
       {/* Identity image — uploaded photo, or cream placeholder circle */}
       {avatar && (
         <div
           data-tina-field={avatarField}
-          className="relative mx-auto mb-6 h-36 w-36 overflow-hidden rounded-full bg-paper-cream sm:h-44 sm:w-44"
+          className="relative mb-6 h-36 w-36 overflow-hidden rounded-full bg-paper-cream sm:h-44 sm:w-44"
         >
           {avatarSrc && (
             <Image
@@ -100,7 +100,7 @@ export default function PageIdentity({
       {bio && (
         <div
           data-tina-field={bioField}
-          className="mx-auto mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft"
+          className="mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft"
         >
           {bio}
         </div>
@@ -110,7 +110,7 @@ export default function PageIdentity({
       {links && links.length > 0 && (
         <div
           data-tina-field={linksField}
-          className="mt-6 flex items-center justify-center gap-5"
+          className="mt-6 flex items-center justify-start gap-5"
         >
           {links.map((link) => (
             <a

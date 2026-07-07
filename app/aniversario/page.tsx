@@ -74,10 +74,10 @@ export default function OchentaAnosPage() {
                 className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-auto w-[18rem] -translate-x-1/2 -translate-y-1/2 select-none sm:w-[34rem]"
               />
 
-              <h1 className="font-serif text-4xl font-bold leading-[1.1] text-ink sm:text-5xl">
+              <h1 className="font-serif text-4xl leading-[1.1] text-ink sm:text-5xl">
                 {renderTitle(pagina.title)}
               </h1>
-              <p className="mt-5 font-serif text-2xl font-bold text-ink sm:text-3xl">
+              <p className="mt-5 font-serif text-2xl text-ink sm:text-3xl">
                 {pagina.yearsLabel}
               </p>
             </div>

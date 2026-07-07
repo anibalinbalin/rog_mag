@@ -72,9 +72,15 @@ export default function BibliografiaSheet({
                   <Scroll.Content>
                     <div className="mx-auto max-w-4xl px-6 pb-20 pt-20 sm:px-10 sm:pt-24">
                       <div className="grid gap-8 sm:grid-cols-[18rem_1fr] sm:gap-12">
-                        {/* Portrait */}
-                        <div className="relative aspect-square w-full overflow-hidden rounded-sm bg-paper-cream sm:w-72">
-                          {photo && (
+                        {/* Portrait — dashed placeholder when no photo is set
+                            yet (same box, so the layout doesn't shift once a
+                            real portrait is added). */}
+                        <div
+                          className={`relative aspect-square w-full overflow-hidden rounded-sm bg-paper-cream sm:w-72 ${
+                            photo ? "" : "border border-dashed border-line"
+                          }`}
+                        >
+                          {photo ? (
                             <Image
                               src={photo}
                               alt={photoAlt}
@@ -82,6 +88,27 @@ export default function BibliografiaSheet({
                               sizes="288px"
                               className="object-cover"
                             />
+                          ) : (
+                            <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-ink-muted/70">
+                              <svg
+                                width="40"
+                                height="40"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth={1.5}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <rect x="3" y="3" width="18" height="18" rx="2" />
+                                <circle cx="9" cy="9" r="1.6" />
+                                <path d="M21 15l-5-5L5 21" />
+                              </svg>
+                              <span className="text-[0.7rem] uppercase tracking-[0.2em]">
+                                Imagen
+                              </span>
+                            </div>
                           )}
                         </div>
 

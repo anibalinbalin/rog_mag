@@ -33,7 +33,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Header />
+      <Header borderless />
 
       <main>
         {/* Hero carousel — slides fed by getPaginaInicio(), with a static

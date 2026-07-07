@@ -127,29 +127,45 @@ function PhotoFigure({ photo }: { photo: EpocaPhoto }) {
   );
 }
 
-/** Dashed fallback shown on épocas that have no portrait yet. */
-function PhotoPlaceholder() {
+/** Dashed fallback shown on épocas that have no portrait yet — or whose
+ *  photo entry is a known placeholder (real portrait pending). Mirrors
+ *  PhotoFigure's sizing/caption so swapping in a real photo later doesn't
+ *  shift the layout. */
+function PhotoPlaceholder({ photo }: { photo?: Pick<EpocaPhoto, "aspect" | "name"> }) {
+  const aspect = photo?.aspect ?? "4/3";
+  const [w, h] = aspect.split("/").map(Number);
+  const landscape = !(w && h) || w >= h;
   return (
-    <div className="relative flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream">
-      <div className="flex flex-col items-center gap-2 text-ink-muted/70">
-        <svg
-          width="40"
-          height="40"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <rect x="3" y="3" width="18" height="18" rx="2" />
-          <circle cx="9" cy="9" r="1.6" />
-          <path d="M21 15l-5-5L5 21" />
-        </svg>
-        <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
+    <figure className={landscape ? "w-full" : "min-w-0 flex-1 basis-0"}>
+      <div
+        className="relative flex items-center justify-center overflow-hidden rounded-sm border border-dashed border-line bg-paper-cream"
+        style={{ aspectRatio: aspect }}
+      >
+        <div className="flex flex-col items-center gap-2 text-ink-muted/70">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="3" y="3" width="18" height="18" rx="2" />
+            <circle cx="9" cy="9" r="1.6" />
+            <path d="M21 15l-5-5L5 21" />
+          </svg>
+          <span className="text-[0.7rem] uppercase tracking-[0.2em]">Imagen</span>
+        </div>
       </div>
-    </div>
+      {photo?.name && (
+        <figcaption className="mt-2 text-[0.7rem] uppercase tracking-[0.18em] text-ink-muted">
+          {photo.name}
+        </figcaption>
+      )}
+    </figure>
   );
 }
 
@@ -475,7 +491,13 @@ export default function ScrollMapClient({
             // this station on the map, so repeating it here was redundant.
             const photosBlock =
               epoca.photos.length > 0 ? (
-                epoca.photos.map((photo) => <PhotoFigure key={photo.src} photo={photo} />)
+                epoca.photos.map((photo, i) =>
+                  photo.src ? (
+                    <PhotoFigure key={photo.src} photo={photo} />
+                  ) : (
+                    <PhotoPlaceholder key={photo.name || i} photo={photo} />
+                  )
+                )
               ) : (
                 <PhotoPlaceholder />
               );

@@ -159,7 +159,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Buscar revista"
-            className="w-full rounded-full border border-line-dark bg-paper py-3 pl-11 pr-4 text-sm text-ink placeholder:text-ink-muted focus:border-action focus:outline-none"
+            className="w-full rounded-sm border border-line-dark bg-paper py-3 pl-11 pr-4 text-sm text-ink placeholder:text-ink-muted focus:border-action focus:outline-none"
           />
         </label>
       </div>
@@ -177,7 +177,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                 setYearIdx(0);
               }}
               aria-pressed={isActive}
-              className={`rounded-full border px-5 py-2 text-sm tabular-nums tracking-wide transition-colors ${
+              className={`rounded-sm border px-5 py-2 text-sm tabular-nums tracking-wide transition-colors ${
                 isActive
                   ? "border-burgundy bg-burgundy text-paper shadow-sm"
                   : "border-line-dark bg-paper text-ink-soft hover:border-burgundy hover:text-burgundy"
@@ -210,7 +210,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   <button
                     type="button"
                     onClick={() => setYearIdx((i) => i - 1)}
-                    className="inline-flex items-center gap-2 rounded-full bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+                    className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
                   >
                     <span aria-hidden="true">←</span> Año anterior
                   </button>
@@ -239,7 +239,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   <button
                     type="button"
                     onClick={() => setYearIdx((i) => i + 1)}
-                    className="inline-flex items-center gap-2 rounded-full bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+                    className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
                   >
                     Siguiente año <span aria-hidden="true">→</span>
                   </button>
@@ -280,7 +280,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                         sizes="160px"
                       />
                     )}
-                    <span className="archivo-gutter" aria-hidden="true" />
+                    <span className="archivo-cast" aria-hidden="true" />
                     <span className="archivo-cover">
                       <Image
                         className="archivo-front"
@@ -462,8 +462,9 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
 
         /* ── Magazine flip-open ──────────────────────────────
            rest  : closed cover (the inner sits at its faint --tilt).
-           hover : the cover swings open on the left spine by --open and the
-                   spine gutter shadow fades in, revealing the sumario inside.
+           hover : the cover swings open on the left spine by --open, casting a
+                   shadow that sweeps across the sumario toward the spine as the
+                   cover lifts, ending as the resting spine-gutter shade.
            Per-issue --open / --dur / --tilt make each one a little different. */
         .archivo-book { perspective: 1500px; }
         .archivo-inner {
@@ -476,11 +477,19 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           transform: translateZ(-2px);
           box-shadow: 0 8px 18px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.05);
         }
-        .archivo-gutter {
-          position: absolute; left: 0; top: 0; bottom: 0; width: 34%;
-          pointer-events: none; opacity: 0; transform: translateZ(-1px);
-          background: linear-gradient(90deg, rgba(40,22,10,.32), transparent);
-          transition: opacity var(--dur, 520ms) ease-out;
+        /* Cast shadow on the page plane: full-page at rest (invisible), it fades
+           in while scaling down to a spine gutter, so on hover it reads as the
+           opening cover's shadow retreating across the page. transform/opacity
+           only; shares --dur and the cover's split easings (plain close here,
+           overshoot on :hover below) so cover and shadow move as one unit. */
+        .archivo-cast {
+          position: absolute; inset: 0;
+          pointer-events: none; opacity: 0;
+          transform: translateZ(-1px);
+          transform-origin: left center;
+          background: linear-gradient(90deg, rgba(40,22,10,.36), rgba(40,22,10,.1) 62%, transparent);
+          transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
+                      transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
         }
         .archivo-cover {
           position: absolute; inset: 0;
@@ -497,12 +506,28 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           backface-visibility: hidden;
           box-shadow: 0 8px 18px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
         }
+        /* The exposed inside-cover (back face) already carries the whole
+           opened cover's weight in this design — it swings to nearly face
+           the viewer and its outer edge lands past the neighboring book (see
+           .archivo-cover rotation above), so it's the one surface that can
+           cast a believable shadow onto the ground/neighbor: a soft shadow
+           offset toward the outer edge (away from the spine), which the
+           cover's own rotation carries out past its edge and onto whatever
+           sits there. A flat sibling shadow layer can't do this — it would
+           sit at a fixed depth and get hidden behind this rotated, opaque
+           panel instead of appearing to fall past it.
+           The offset is negative: this face is rotated 180deg relative to
+           its parent .archivo-cover (itself rotated ~-160deg on hover), and
+           that compound rotation mirrors the local x-axis — a positive
+           offset here would land the shadow back toward the spine instead
+           of out past the tip. Verified visually, not guessed. */
         .archivo-back {
           position: absolute; inset: 0;
           backface-visibility: hidden;
           transform: rotateY(180deg);
           background: #e9e6dd;
-          box-shadow: inset 0 0 44px rgba(60,40,20,.14);
+          box-shadow: inset 0 0 44px rgba(60,40,20,.14), -22px 4px 32px -6px rgba(40,22,10,0);
+          transition: box-shadow var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
         }
         .archivo-back::after {
           content: ""; position: absolute; inset: 0;
@@ -535,7 +560,16 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             transform: rotateY(calc(-1 * var(--open, 160deg)));
             transition: transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
           }
-          .archivo-book:hover .archivo-gutter { opacity: 1; }
+          .archivo-book:hover .archivo-cast {
+            opacity: 1;
+            transform: translateZ(-1px) scaleX(0.34);
+            transition: opacity var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1),
+                        transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+          }
+          .archivo-book:hover .archivo-back {
+            box-shadow: inset 0 0 44px rgba(60,40,20,.14), -22px 4px 32px -6px rgba(40,22,10,.24);
+            transition: box-shadow var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+          }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
           }
@@ -543,7 +577,11 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         @media (prefers-reduced-motion: reduce) {
           .archivo-cover { transition: none; }
           .archivo-book:hover .archivo-cover { transform: none; }
-          .archivo-gutter { display: none; }
+          .archivo-cast { display: none; }
+          .archivo-back {
+            box-shadow: inset 0 0 44px rgba(60,40,20,.14);
+            transition: none;
+          }
           /* No flip → the inside page never exposes, so the hint would float
              over a closed cover. Hide it; the book is still a button. */
           .archivo-hint { display: none; }

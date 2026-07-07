@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /** every.to-style footer: ink band, brand block left, link columns right. */
@@ -8,7 +9,13 @@ export default function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1fr_auto] lg:gap-24">
           {/* Brand block */}
           <div className="max-w-md">
-            <p className="font-serif text-2xl tracking-wide">REVISTA DCE</p>
+            <Image
+              src="/logo-rdcydle-footer.svg"
+              alt="Revista de Derecho Comercial y de la Empresa"
+              width={244}
+              height={149}
+              className="h-24 w-auto"
+            />
             <p className="mt-8 text-xs text-paper/40">
               © 2026 Revista de Derecho Comercial y de la Empresa
             </p>

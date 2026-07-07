@@ -86,12 +86,6 @@ export default function RevistaPage() {
                     className="h-auto w-64 sm:w-72 lg:w-[380px]"
                   />
                 )}
-                <a
-                  href="#"
-                  className="inline-flex items-center rounded-sm border border-action-dark px-7 py-3 text-sm uppercase tracking-widest text-action-dark transition-colors hover:bg-action-dark hover:text-paper"
-                >
-                  Fundación
-                </a>
               </div>
             </div>
           )}
@@ -105,51 +99,52 @@ export default function RevistaPage() {
 
               <div className="mt-10 border-t border-dashed border-line-dark">
                 {others.map((issue) => (
-                  // Row is a plain div (not a Link) so the "Fundación" anchor
-                  // below the cover isn't nested inside another anchor (invalid
-                  // HTML). The cover and the text are each their own Link; the
+                  // The cover and the text are each their own Link; the
                   // group wrapper keeps the title hover in sync across both.
                   <div
                     key={issue.slug}
                     className="group grid grid-cols-[130px_1fr] items-start gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
                   >
-                    {/* Cover column: the cover (a pre-rendered 3D book with its
-                        own shadow on a transparent background — object-contain,
-                        no cream box, no extra shadow) stacked over the button. */}
-                    <div className="flex flex-col items-center gap-5">
+                    {/* Cover: a pre-rendered 3D book with its own shadow on a
+                        transparent background — object-contain, no cream box,
+                        no extra shadow. */}
+                    <Link
+                      href={`/revistas/${issue.slug}`}
+                      className="relative block aspect-[3/4] w-full"
+                    >
+                      {issue.cover && (
+                        <Image
+                          src={issue.cover}
+                          alt={`${issue.number} (${issue.year})`}
+                          fill
+                          sizes="190px"
+                          className="object-contain"
+                        />
+                      )}
+                    </Link>
+                    <div>
+                      <Link href={`/revistas/${issue.slug}`} className="block">
+                        <p className="text-xs uppercase tracking-widest text-ink-muted">
+                          {issueDateLabel(issue)}
+                        </p>
+                        <h3 className="mt-3 font-serif text-3xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+                          {issueListTitle(issue)}
+                        </h3>
+                        <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
+                          {issue.description ||
+                            `Volumen ${issue.volume} · N.º ${issue.issue} · ${issue.articleCount} artículos`}
+                        </p>
+                      </Link>
+                      {/* "Ver más" button below makes the row's clickability
+                          obvious for older readers; a sibling of the text
+                          Link, not nested inside it. */}
                       <Link
                         href={`/revistas/${issue.slug}`}
-                        className="relative block aspect-[3/4] w-full"
+                        className="mt-6 inline-flex items-center justify-center rounded-sm bg-action-dark px-5 py-2 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90"
                       >
-                        {issue.cover && (
-                          <Image
-                            src={issue.cover}
-                            alt={`${issue.number} (${issue.year})`}
-                            fill
-                            sizes="190px"
-                            className="object-contain"
-                          />
-                        )}
+                        Ver más
                       </Link>
-                      <a
-                        href="#"
-                        className="inline-flex w-full items-center justify-center rounded-sm border border-action-dark px-4 py-2.5 text-xs uppercase tracking-widest text-action-dark transition-colors hover:bg-action-dark hover:text-paper"
-                      >
-                        Fundación
-                      </a>
                     </div>
-                    <Link href={`/revistas/${issue.slug}`} className="block">
-                      <p className="text-xs uppercase tracking-widest text-ink-muted">
-                        {issueDateLabel(issue)}
-                      </p>
-                      <h3 className="mt-3 font-serif text-3xl font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
-                        {issueListTitle(issue)}
-                      </h3>
-                      <p className="mt-4 max-w-2xl text-base leading-relaxed text-ink-soft">
-                        {issue.description ||
-                          `Volumen ${issue.volume} · N.º ${issue.issue} · ${issue.articleCount} artículos`}
-                      </p>
-                    </Link>
                   </div>
                 ))}
               </div>
@@ -161,7 +156,7 @@ export default function RevistaPage() {
             archive on its own light-gray band, full width. */}
         {archivoYears.length > 0 && (
           <section className="bg-paper-warm">
-            <div className="mx-auto max-w-[1280px] px-4 py-20">
+            <div className="mx-auto max-w-[1280px] px-4 pb-24 pt-20 lg:pb-32">
               <PublicacionesArchivo years={archivoYears} />
             </div>
           </section>

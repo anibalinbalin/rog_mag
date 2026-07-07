@@ -24,7 +24,7 @@ export default function PublicacionesPage() {
       <Header compact />
 
       <main>
-        <section className="mx-auto max-w-[1280px] px-4 py-12 lg:py-16">
+        <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-12 lg:pb-32 lg:pt-16">
           {/* Title + search + searchable list */}
           <PublicacionesSearch posts={posts} />
         </section>
