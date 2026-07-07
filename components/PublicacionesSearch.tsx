@@ -95,8 +95,10 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-soft">
                 {post.excerpt}
               </p>
-              <p className="mt-4 text-xs uppercase tracking-widest text-ink-soft">
-                {post.author}
+              <p className="mt-4">
+                <span className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy">
+                  {post.author}
+                </span>
               </p>
             </div>
 
