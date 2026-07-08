@@ -117,3 +117,110 @@ body {
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+
+/* every.to card-to-cover morph (View Transitions API). Timing/easing ported
+   verbatim from _components/every.to/every-article-transition.css: 400ms
+   cubic-bezier(.4,0,.2,1) root crossfade + shared `post-cover` morph. The
+   clicked cover is named dynamically by CoverMorphTransition; the destination
+   cover carries `.post-cover-transition`. The reference's
+   `[data-post-card-image] > img { object-fit: cover }` rules are intentionally
+   omitted — these covers are portrait book renders on transparent backgrounds
+   (object-contain), and forcing object-fit:cover would crop them. */
+:root {
+  --every-vt-duration: 400ms;
+  --every-vt-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--every-vt-duration);
+  animation-timing-function: var(--every-vt-ease);
+}
+
+::view-transition-old(root) {
+  animation-name: every-vt-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: every-vt-fade-in;
+}
+
+@keyframes every-vt-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes every-vt-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-group(post-cover) {
+  animation-duration: var(--every-vt-duration);
+  animation-timing-function: var(--every-vt-ease);
+  overflow: hidden;
+}
+
+::view-transition-image-pair(post-cover) {
+  overflow: hidden;
+}
+
+::view-transition-old(post-cover),
+::view-transition-new(post-cover) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: normal;
+  animation-duration: var(--every-vt-duration);
+  animation-timing-function: var(--every-vt-ease);
+}
+
+::view-transition-old(post-cover) {
+  animation: var(--every-vt-duration) var(--every-vt-ease) forwards
+    every-post-cover-fade-out;
+}
+
+::view-transition-new(post-cover) {
+  animation: var(--every-vt-duration) var(--every-vt-ease) forwards
+    every-post-cover-fade-in;
+}
+
+@keyframes every-post-cover-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes every-post-cover-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.post-cover-transition {
+  view-transition-name: post-cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-group(post-cover),
+  ::view-transition-old(post-cover),
+  ::view-transition-new(post-cover) {
+    animation-duration: 1ms;
+  }
+}

@@ -80,7 +80,7 @@ export default function IssueClient(props: IssueClientProps) {
                   no extra shadow (mirrors app/revistas/page.tsx). */}
               <div
                 data-tina-field={tinaField(issue, "cover")}
-                className="relative aspect-[3/4] w-full"
+                className="post-cover-transition relative aspect-[3/4] w-full"
               >
                 {issue.cover && (
                   <Image
