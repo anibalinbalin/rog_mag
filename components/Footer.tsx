@@ -10,11 +10,11 @@ export default function Footer() {
           {/* Brand block */}
           <div className="max-w-md">
             <Image
-              src="/logo-rdcydle-footer.svg"
+              src="/logo-rdcydle-blanco.svg"
               alt="Revista de Derecho Comercial y de la Empresa"
-              width={244}
-              height={149}
-              className="h-24 w-auto"
+              width={300}
+              height={91}
+              className="h-auto w-46"
             />
             <p className="mt-8 text-xs text-paper/40">
               © 2026 Revista de Derecho Comercial y de la Empresa
