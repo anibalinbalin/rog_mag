@@ -68,10 +68,10 @@ export default function IssueContents({
       </h2>
 
       <div className="mt-5" data-tina-field={doctrinaField}>
-        <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
+        <p className="font-serif text-xl font-semibold text-ink">
           Doctrina
         </p>
-        <ul className="mt-3 space-y-3">
+        <ul className="mt-4 space-y-4">
           {doctrinaItems.map((item) => (
             <ContentItem key={item} item={item} />
           ))}
@@ -79,11 +79,11 @@ export default function IssueContents({
       </div>
 
       {deInteresItems.length > 0 && (
-        <div className="mt-8" data-tina-field={deInteresField}>
-          <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
+        <div className="mt-10" data-tina-field={deInteresField}>
+          <p className="font-serif text-xl font-semibold text-ink">
             De interés
           </p>
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-4 space-y-4">
             {deInteresItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}
@@ -92,11 +92,11 @@ export default function IssueContents({
       )}
 
       {actualidadSociedadesItems.length > 0 && (
-        <div className="mt-8" data-tina-field={actualidadSociedadesField}>
-          <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
+        <div className="mt-10" data-tina-field={actualidadSociedadesField}>
+          <p className="font-serif text-xl font-semibold text-ink">
             Actualidad Sociedades Comerciales
           </p>
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-4 space-y-4">
             {actualidadSociedadesItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}
@@ -105,11 +105,11 @@ export default function IssueContents({
       )}
 
       {concursosItems.length > 0 && (
-        <div className="mt-8" data-tina-field={concursosField}>
-          <p className="text-xs font-medium uppercase tracking-widest text-burgundy">
+        <div className="mt-10" data-tina-field={concursosField}>
+          <p className="font-serif text-xl font-semibold text-ink">
             Concursos
           </p>
-          <ul className="mt-3 space-y-3">
+          <ul className="mt-4 space-y-4">
             {concursosItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}
