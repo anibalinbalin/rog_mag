@@ -20,7 +20,7 @@ export default function PostCard({
         <p className="font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
           {post.title}
         </p>
-        <p className="mt-2 text-xs uppercase tracking-widest text-ink-muted">
+        <p className="mt-2 font-serif text-sm italic text-burgundy">
           {post.author}
         </p>
       </Link>
