@@ -135,6 +135,15 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
   const hasPrev = safeIdx > 0;
   const hasNext = safeIdx < decadeYears.length - 1;
 
+  // On a decade boundary (first/last year of the decade, or an empty decade
+  // with no scans at all), fall back to jumping straight into the
+  // neighboring decade in the DECADES list — same destination as clicking
+  // its pill, scans or not — instead of stranding the reader on a dead-end
+  // nav button. Only the very first/last decade overall has no neighbor.
+  const decadeIdx = DECADES.indexOf(decade);
+  const nextDecade = DECADES[decadeIdx + 1];
+  const prevDecade = DECADES[decadeIdx - 1];
+
   const q = query.trim().toLowerCase();
   const visibleMonths = active
     ? active.months.filter(
@@ -199,67 +208,100 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
 
       {/* Year archive for the active decade */}
       <div className="mt-14">
+        {active && (
+          <div className="text-center">
+            <h3 className="font-serif text-6xl font-bold tabular-nums leading-none text-ink sm:text-7xl">
+              {active.year}
+            </h3>
+            {active.director && (
+              <p className="mt-4 font-serif text-lg italic text-ink-muted sm:text-xl">
+                Director: {active.director}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Prev/next row: walks years within a decade, then hands off to the
+            neighboring decade at either end — even an empty one (matching
+            what clicking its pill shows) — so it's always possible to keep
+            clicking through, "Publicaciones desde 1946" to the present, and
+            back, without reaching for the pills above. */}
+        <div className="mt-8 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <div className="justify-self-start">
+            {hasPrev ? (
+              <button
+                type="button"
+                onClick={() => setYearIdx((i) => i - 1)}
+                className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+              >
+                <span aria-hidden="true">←</span> Año anterior
+              </button>
+            ) : (
+              prevDecade !== undefined && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDecade(prevDecade);
+                    setYearIdx((byDecade.get(prevDecade)?.length ?? 1) - 1);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+                >
+                  <span aria-hidden="true">←</span> Década anterior
+                </button>
+              )
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-2.5">
+            {active &&
+              decadeYears.map((y, i) => (
+                <button
+                  key={y.year}
+                  type="button"
+                  onClick={() => setYearIdx(i)}
+                  aria-label={`Ver ${y.year}`}
+                  aria-pressed={i === safeIdx}
+                  className={`h-2.5 w-2.5 rounded-full transition-colors ${
+                    i === safeIdx
+                      ? "bg-action"
+                      : "bg-line-dark hover:bg-ink-muted"
+                  }`}
+                />
+              ))}
+          </div>
+
+          <div className="justify-self-end">
+            {hasNext ? (
+              <button
+                type="button"
+                onClick={() => setYearIdx((i) => i + 1)}
+                className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+              >
+                Siguiente año <span aria-hidden="true">→</span>
+              </button>
+            ) : (
+              nextDecade !== undefined && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDecade(nextDecade);
+                    setYearIdx(0);
+                  }}
+                  className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+                >
+                  Siguiente década <span aria-hidden="true">→</span>
+                </button>
+              )
+            )}
+          </div>
+        </div>
+
         {active ? (
-          <>
-            <div className="text-center">
-              <h3 className="font-serif text-6xl font-bold tabular-nums leading-none text-ink sm:text-7xl">
-                {active.year}
-              </h3>
-              {active.director && (
-                <p className="mt-4 font-serif text-lg italic text-ink-muted sm:text-xl">
-                  Director: {active.director}
-                </p>
-              )}
-            </div>
-
-            <div className="mt-8 grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-              <div className="justify-self-start">
-                {hasPrev && (
-                  <button
-                    type="button"
-                    onClick={() => setYearIdx((i) => i - 1)}
-                    className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
-                  >
-                    <span aria-hidden="true">←</span> Año anterior
-                  </button>
-                )}
-              </div>
-
-              <div className="flex items-center justify-center gap-2.5">
-                {decadeYears.map((y, i) => (
-                  <button
-                    key={y.year}
-                    type="button"
-                    onClick={() => setYearIdx(i)}
-                    aria-label={`Ver ${y.year}`}
-                    aria-pressed={i === safeIdx}
-                    className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                      i === safeIdx
-                        ? "bg-action"
-                        : "bg-line-dark hover:bg-ink-muted"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              <div className="justify-self-end">
-                {hasNext && (
-                  <button
-                    type="button"
-                    onClick={() => setYearIdx((i) => i + 1)}
-                    className="inline-flex items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
-                  >
-                    Siguiente año <span aria-hidden="true">→</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            <div
-              key={active.year}
-              className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
-            >
-              {visibleMonths.map((m) => {
+          <div
+            key={active.year}
+            className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
+          >
+            {visibleMonths.map((m) => {
                 const book = bookJitter(active.year * 100 + Number(m.num));
                 const bookStyle = {
                   "--open": `${book.angle}deg`,
@@ -346,8 +388,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   No se encontraron revistas para “{query}”.
                 </p>
               )}
-            </div>
-          </>
+          </div>
         ) : (
           <p className="py-12 text-center text-sm text-ink-muted">
             Contenido pendiente para esta década.
@@ -428,7 +469,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                                     />
                                     {/* Always-visible "Ampliar" pill — older readers
                                         shouldn't have to discover a hover affordance. */}
-                                    <span className="pointer-events-none absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-paper/95 px-4 py-2 text-sm font-medium text-ink shadow-md ring-1 ring-black/5 transition-transform group-hover:scale-105">
+                                    <span className="pointer-events-none absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-sm bg-paper/95 px-4 py-2 text-sm font-medium text-ink shadow-md ring-1 ring-black/5 transition-transform group-hover:scale-105">
                                       <MagnifyPlusIcon />
                                       Ampliar
                                     </span>
