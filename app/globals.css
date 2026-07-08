@@ -59,7 +59,8 @@ body {
 
 /* Article body content rendered from markdown */
 .prose-article {
-  font-family: var(--font-crimson), Georgia, serif;
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
   font-size: 1.125rem;
   line-height: 1.8;
   color: var(--color-ink-soft);

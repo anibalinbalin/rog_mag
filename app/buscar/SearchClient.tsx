@@ -99,7 +99,7 @@ export default function SearchClient({ corpus }: { corpus: SearchDoc[] }) {
                           {doc.title}
                         </p>
                         {doc.excerpt && (
-                          <p className="mt-2 font-serif text-base leading-relaxed text-ink-muted">
+                          <p className="mt-2 text-base leading-relaxed text-ink-muted">
                             {doc.excerpt}
                           </p>
                         )}

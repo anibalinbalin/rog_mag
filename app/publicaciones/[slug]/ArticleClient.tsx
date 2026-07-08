@@ -184,7 +184,7 @@ export default function ArticleClient(props: ArticleClientProps) {
               </h1>
               <p
                 data-tina-field={tinaField(post, "excerpt")}
-                className="mt-5 font-serif text-xl leading-relaxed text-ink-muted"
+                className="mt-5 text-xl leading-relaxed text-ink-muted"
               >
                 {post.excerpt}
               </p>
@@ -193,7 +193,7 @@ export default function ArticleClient(props: ArticleClientProps) {
                 <p className="text-sm">
                   <span
                     data-tina-field={tinaField(post, "author")}
-                    className="font-medium text-ink"
+                    className="font-serif text-base italic text-burgundy"
                   >
                     {post.author}
                   </span>

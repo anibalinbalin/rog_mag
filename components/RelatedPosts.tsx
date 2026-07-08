@@ -30,7 +30,9 @@ export default function RelatedPosts({ posts }: { posts: Post[] }) {
               {post.title}
             </p>
             <p className="mt-2 text-sm">
-              <span className="font-medium text-ink">{post.author}</span>
+              <span className="font-serif text-base italic text-burgundy">
+                {post.author}
+              </span>
               <span className="text-ink-muted"> · {formatDate(post.date)}</span>
             </p>
           </Link>
