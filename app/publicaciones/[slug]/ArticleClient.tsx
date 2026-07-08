@@ -7,7 +7,6 @@ import { TinaMarkdown } from "tinacms/dist/rich-text";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RelatedPosts from "@/components/RelatedPosts";
-import SubscribeModule from "@/components/SubscribeModule";
 import SectionBadge from "@/components/SectionBadge";
 import { formatDate } from "@/lib/format";
 import type { PostQuery } from "@/tina/__generated__/types";
@@ -214,9 +213,8 @@ export default function ArticleClient(props: ArticleClientProps) {
                 <TinaMarkdown content={post.body} />
               </div>
 
-              {/* Post-body modules: access module → related reading */}
+              {/* Post-body modules: related reading */}
               <div className="mt-16 space-y-12">
-                <SubscribeModule />
                 <RelatedPosts posts={related} />
               </div>
             </div>
