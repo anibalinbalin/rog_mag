@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Crimson_Pro } from "next/font/google";
 import { Agentation } from "agentation";
+import ViewTransitionCommit from "@/components/ViewTransitionCommit";
 import "./globals.css";
 import "@silk-hq/components/unlayered-styles.css";
 
@@ -30,6 +31,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.variable} ${crimson.variable}`}>
+        <ViewTransitionCommit />
         {children}
         {/* Temporary build stamp — lets editors confirm their browser is on the
             latest deploy (cache-busting check). Remove once verified. Fixed,

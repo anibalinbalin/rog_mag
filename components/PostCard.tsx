@@ -85,9 +85,9 @@ export default function PostCard({
         {post.excerpt}
       </p>
 
-      {/* Author — same quiet burgundy chip as the issue contenidos */}
+      {/* Author — same italic serif burgundy byline as the issue contenidos */}
       <div className={`mt-5 ${isFeature ? "text-center" : ""}`}>
-        <span className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy">
+        <span className="font-serif text-base italic text-burgundy">
           {post.author}
         </span>
       </div>

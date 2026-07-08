@@ -3,6 +3,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DepthShell from "@/components/DepthShell";
+import CoverMorphTransition from "@/components/CoverMorphTransition";
 import IssueContentsAccordion from "@/components/IssueContentsAccordion";
 import PublicacionesArchivo from "@/components/PublicacionesArchivo";
 import { getCurrentIssue, getAllIssues, type Issue } from "@/lib/issues";
@@ -50,7 +51,13 @@ export default function RevistaPage() {
         <section className="mx-auto max-w-[1280px] px-4 py-12 lg:py-16">
           {/* Current issue — title + tan CTA + accordion, cover floated right */}
           {currentIssue && (
-            <div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start lg:gap-16">
+            // Wrapper drives the every.to cover morph: clicking "Ver más" or the
+            // cover navigates to the issue and the cover box morphs into the
+            // detail page's cover (data-post-card-image marks the element).
+            <CoverMorphTransition
+              href={`/revistas/${currentIssue.slug}`}
+              className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start lg:gap-16"
+            >
               <div>
                 <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
                   {currentIssue.number} ({currentIssue.year})
@@ -77,17 +84,23 @@ export default function RevistaPage() {
                   double up the 3D effect). */}
               <div className="flex flex-col items-center gap-6 justify-self-center lg:justify-self-end">
                 {currentIssue.cover && (
-                  <Image
-                    src={currentIssue.cover}
-                    alt={`${currentIssue.number} (${currentIssue.year})`}
-                    width={770}
-                    height={1065}
-                    priority
-                    className="h-auto w-64 sm:w-72 lg:w-[380px]"
-                  />
+                  <Link
+                    href={`/revistas/${currentIssue.slug}`}
+                    data-post-card-image
+                    className="block w-64 sm:w-72 lg:w-[380px]"
+                  >
+                    <Image
+                      src={currentIssue.cover}
+                      alt={`${currentIssue.number} (${currentIssue.year})`}
+                      width={770}
+                      height={1065}
+                      priority
+                      className="h-auto w-full"
+                    />
+                  </Link>
                 )}
               </div>
-            </div>
+            </CoverMorphTransition>
           )}
 
           {/* Revistas Anteriores — cover thumb + date + title + dek list */}
@@ -101,15 +114,20 @@ export default function RevistaPage() {
                 {others.map((issue) => (
                   // The cover and the text are each their own Link; the
                   // group wrapper keeps the title hover in sync across both.
-                  <div
+                  // CoverMorphTransition drives the every.to cover morph on any
+                  // of the row's links (cover, title, "Ver más").
+                  <CoverMorphTransition
                     key={issue.slug}
+                    href={`/revistas/${issue.slug}`}
                     className="group grid grid-cols-[130px_1fr] items-start gap-8 border-b border-dashed border-line-dark py-10 sm:grid-cols-[210px_1fr] sm:gap-12"
                   >
                     {/* Cover: a pre-rendered 3D book with its own shadow on a
                         transparent background — object-contain, no cream box,
-                        no extra shadow. */}
+                        no extra shadow. data-post-card-image marks the box that
+                        morphs into the detail page cover. */}
                     <Link
                       href={`/revistas/${issue.slug}`}
+                      data-post-card-image
                       className="relative block aspect-[3/4] w-full"
                     >
                       {issue.cover && (
@@ -145,7 +163,7 @@ export default function RevistaPage() {
                         Ver más
                       </Link>
                     </div>
-                  </div>
+                  </CoverMorphTransition>
                 ))}
               </div>
             </div>

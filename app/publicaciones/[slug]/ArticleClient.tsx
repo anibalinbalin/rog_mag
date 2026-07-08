@@ -81,7 +81,7 @@ export default function ArticleClient(props: ArticleClientProps) {
                   >
                     <span
                       data-tina-field={tinaField(post, "author")}
-                      className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy transition-colors group-hover:bg-burgundy/15"
+                      className="font-serif text-base italic text-burgundy transition-colors group-hover:text-burgundy-dark"
                     >
                       {post.author}
                     </span>
@@ -93,7 +93,7 @@ export default function ArticleClient(props: ArticleClientProps) {
                   <div className="mt-2">
                     <span
                       data-tina-field={tinaField(post, "author")}
-                      className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy"
+                      className="font-serif text-base italic text-burgundy"
                     >
                       {post.author}
                     </span>

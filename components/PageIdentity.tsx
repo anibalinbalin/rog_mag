@@ -65,14 +65,14 @@ export default function PageIdentity({
           <Link
             href={pillHref}
             data-tina-field={pillField}
-            className="mb-4 inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+            className="mb-4 inline-flex items-center rounded-sm bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
           >
             {pill}
           </Link>
         ) : (
           <p
             data-tina-field={pillField}
-            className="mb-4 inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy"
+            className="mb-4 inline-flex items-center rounded-sm bg-burgundy/10 px-3 py-1 text-xs uppercase tracking-widest text-burgundy"
           >
             {pill}
           </p>

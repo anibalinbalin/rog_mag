@@ -32,7 +32,7 @@ export default function IssueContentsAccordion({
                 aria-expanded={isOpen}
                 className="flex w-full items-center justify-between py-4 text-left"
               >
-                <span className="text-sm uppercase tracking-widest text-ink">
+                <span className="font-serif text-xl font-semibold text-ink">
                   {group.label}
                 </span>
                 <svg
@@ -59,13 +59,13 @@ export default function IssueContentsAccordion({
                     group.items.map((item) => (
                       <li
                         key={item}
-                        className="font-serif text-lg leading-snug text-ink-soft"
+                        className="text-base leading-relaxed text-ink-soft"
                       >
                         {item}
                       </li>
                     ))
                   ) : (
-                    <li className="font-serif text-lg italic leading-snug text-ink-muted">
+                    <li className="text-base italic leading-relaxed text-ink-muted">
                       Contenido pendiente
                     </li>
                   )}

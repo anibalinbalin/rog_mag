@@ -32,10 +32,23 @@ export interface ArchivoYear {
   months: ArchivoMonth[];
 }
 
-/** Strips an academic prefix ("Prof. ") so the byline reads like the mockup
-    ("Director: Sagunto Pérez Fontana"). */
+/** Época director fields are written as prose ("Director: X", "Dirección
+    compartida por X e Y") for reuse elsewhere (see ScrollMapClient), and may
+    span multiple lines when they also list editorial roles (see 1977's
+    content/epocas/1977.md). The archive only needs the resolved name(s) on a
+    single line, so take the first line and strip both the leading label
+    (the archive UI adds its own "Director: ") and an academic prefix
+    ("Prof. ") so the byline reads like the mockup
+    ("Director: Sagunto Pérez Fontana") instead of duplicating the label. */
 function cleanDirector(director: string): string {
-  return director.replace(/^\s*(prof\.?|dr\.?|esc\.?)\s+/i, "").trim();
+  const firstLine = director.split("\n")[0] ?? "";
+  return firstLine
+    .replace(
+      /^\s*(direcci[oó]n(?:\s+(compartida\s+por|conjunta\s+de))?|directora?)\s*:?\s*/i,
+      ""
+    )
+    .replace(/^\s*(prof\.?|dr\.?|esc\.?)\s+/i, "")
+    .trim();
 }
 
 /** The original "Sociedades Anónimas" issues, digitized by year. Years (and the
