@@ -1,16 +1,14 @@
 const AUTHOR_SEPARATOR = " — ";
 
 /** Splits "Título — Autor" into its parts. Falls back to a title-only
-    render when an item has no separator. Compound authors ("X y Y") are
-    split into individual names so each gets its own pill. */
+    render when an item has no separator. */
 function parseContentItem(item: string) {
   const sepIndex = item.indexOf(AUTHOR_SEPARATOR);
   if (sepIndex === -1) {
-    return { title: item, authors: [] as string[] };
+    return { title: item, authors: "" };
   }
   const title = item.slice(0, sepIndex);
-  const authorText = item.slice(sepIndex + AUTHOR_SEPARATOR.length);
-  const authors = authorText.split(" y ").map((a) => a.trim());
+  const authors = item.slice(sepIndex + AUTHOR_SEPARATOR.length).trim();
   return { title, authors };
 }
 
@@ -19,16 +17,9 @@ function ContentItem({ item }: { item: string }) {
   return (
     <li className="font-serif text-lg text-ink-soft">
       {title}
-      {authors.length > 0 && (
-        <span className="mt-1.5 flex flex-wrap gap-1.5">
-          {authors.map((author) => (
-            <span
-              key={author}
-              className="inline-flex items-center rounded-full bg-burgundy/10 px-3 py-1 font-sans text-xs text-burgundy"
-            >
-              {author}
-            </span>
-          ))}
+      {authors && (
+        <span className="mt-1.5 block font-serif text-base italic text-burgundy">
+          {authors}
         </span>
       )}
     </li>

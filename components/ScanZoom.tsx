@@ -156,7 +156,7 @@ export default function ScanZoom({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex h-12 items-center gap-1.5 rounded-full px-4 text-base text-ink-soft transition-colors hover:bg-paper-warm hover:text-ink"
+          className="inline-flex h-12 items-center gap-1.5 rounded-sm px-4 text-base text-ink-soft transition-colors hover:bg-paper-warm hover:text-ink"
         >
           <ChevronLeftIcon />
           Volver
@@ -209,7 +209,7 @@ export default function ScanZoom({
 
         {/* Hint appears only while zoomed; never blocks the page. */}
         <motion.p
-          className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/75 px-4 py-1.5 text-xs text-paper"
+          className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-sm bg-ink/75 px-4 py-1.5 text-xs text-paper"
           initial={false}
           animate={{ opacity: isZoomed ? 1 : 0 }}
           transition={{ duration: 0.25 }}
