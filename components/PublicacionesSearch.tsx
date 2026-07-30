@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { formatDate } from "@/lib/format";
@@ -16,7 +15,7 @@ export type PubItem = {
 };
 
 /** Belen's direction (2026-06): Publicaciones as a searchable list — pill
-    search field, dashed-rule rows, tan "Leer" CTA. Client-side text match. */
+    search field, dashed-rule rows. Client-side text match. */
 export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
   const [q, setQ] = useState("");
 
@@ -69,7 +68,7 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
         {filtered.map((post) => (
           <div
             key={post.slug}
-            className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr_auto] sm:items-center sm:gap-10"
+            className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:items-center sm:gap-10"
           >
             {/* Thumbnail (post cover) */}
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream">
@@ -101,14 +100,6 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
                 </span>
               </p>
             </div>
-
-            {/* CTA — own column on desktop, full-width row on mobile */}
-            <Link
-              href={`/publicaciones/${post.slug}`}
-              className="col-span-2 inline-flex items-center justify-center justify-self-start rounded-sm bg-action-dark px-7 py-2.5 text-xs uppercase tracking-widest text-paper transition-opacity hover:opacity-90 sm:col-span-1 sm:justify-self-end"
-            >
-              Leer
-            </Link>
           </div>
         ))}
 

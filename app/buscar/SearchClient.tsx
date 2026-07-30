@@ -16,7 +16,6 @@ function normalize(value: string): string {
 }
 
 const GROUPS: { type: SearchDoc["type"]; label: string }[] = [
-  { type: "post", label: "Artículos" },
   { type: "author", label: "Autores" },
   { type: "issue", label: "Ediciones" },
 ];

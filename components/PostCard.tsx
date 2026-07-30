@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import SectionBadge from "@/components/SectionBadge";
 import type { Post } from "@/lib/blog";
@@ -6,7 +5,8 @@ import { formatDate } from "@/lib/format";
 
 /** every.to collection-card anatomy: cover, metadata row, serif title,
     serif dek, uppercase author row. No card borders — dividers come from
-    the parent grid. */
+    the parent grid. Display-only since the article detail pages were
+    removed (2026-07-30) — cards no longer link anywhere. */
 export default function PostCard({
   post,
   size = "default",
@@ -16,24 +16,21 @@ export default function PostCard({
 }) {
   if (size === "compact") {
     return (
-      <Link href={`/publicaciones/${post.slug}`} className="group block py-4">
-        <p className="font-serif text-lg font-semibold leading-snug text-ink transition-colors group-hover:text-ink-soft">
+      <div className="block py-4">
+        <p className="font-serif text-lg font-semibold leading-snug text-ink">
           {post.title}
         </p>
         <p className="mt-2 font-serif text-sm italic text-burgundy">
           {post.author}
         </p>
-      </Link>
+      </div>
     );
   }
 
   const isFeature = size === "feature";
 
   return (
-    <Link
-      href={`/publicaciones/${post.slug}`}
-      className={`group block ${isFeature ? "text-center" : ""}`}
-    >
+    <div className={`block ${isFeature ? "text-center" : ""}`}>
       {/* Cover — uploaded image, or cream placeholder like the journal covers */}
       <div
         className={`relative w-full overflow-hidden bg-paper-cream ${
@@ -69,7 +66,7 @@ export default function PostCard({
 
       {/* Title */}
       <h3
-        className={`mt-3 font-serif font-semibold leading-tight text-ink transition-colors group-hover:text-ink-soft ${
+        className={`mt-3 font-serif font-semibold leading-tight text-ink ${
           isFeature ? "text-3xl sm:text-4xl" : "text-2xl"
         }`}
       >
@@ -91,6 +88,6 @@ export default function PostCard({
           {post.author}
         </span>
       </div>
-    </Link>
+    </div>
   );
 }

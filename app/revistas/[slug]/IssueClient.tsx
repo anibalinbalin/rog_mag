@@ -56,7 +56,7 @@ export default function IssueClient(props: IssueClientProps) {
               {issue.body && (
                 <div
                   data-tina-field={tinaField(issue, "body")}
-                  className="mt-5 font-serif text-lg leading-relaxed text-ink-muted"
+                  className="mt-5 text-lg leading-relaxed text-ink-muted"
                 >
                   <TinaMarkdown content={issue.body} />
                 </div>

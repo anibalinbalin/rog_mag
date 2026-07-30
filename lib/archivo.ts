@@ -20,8 +20,8 @@ const MONTH_LABELS: Record<string, string> = {
 };
 
 export interface ArchivoMonth {
-  num: string; // "06"
-  label: string; // "Junio"
+  num: string; // "06", or "05-06" for combined issues (up to "03-04-05-06")
+  label: string; // "Junio", or "Mayo-Junio" for combined issues
   cover: string; // "/archivo/1946/06-cover.jpg"
   sumario: string | null; // "/archivo/1946/06-sum.jpg" (may be absent)
 }
@@ -74,19 +74,34 @@ export function getArchivoYears(): ArchivoYear[] {
     .map((yearDir) => {
       const dir = path.join(archivoDirectory, yearDir);
       const files = fs.readdirSync(dir);
-      const months: ArchivoMonth[] = Object.keys(MONTH_LABELS)
-        .filter((mm) => files.includes(`${mm}-cover.jpg`))
-        // Numeric sort: JS would otherwise order integer-like keys ("10".."12")
-        // ahead of the leading-zero string keys ("01".."09").
-        .sort((a, b) => Number(a) - Number(b))
-        .map((mm) => ({
-          num: mm,
-          label: MONTH_LABELS[mm],
-          cover: `/archivo/${yearDir}/${mm}-cover.jpg`,
-          sumario: files.includes(`${mm}-sum.jpg`)
-            ? `/archivo/${yearDir}/${mm}-sum.jpg`
-            : null,
-        }));
+      // Issue keys are "MM" for monthly numbers and "MM-MM"(-MM…) for the
+      // combined ones the magazine published from time to time ("05-06",
+      // 1969's quarterly "03-04-05-06"). Combined issues are labeled as a
+      // first-to-last month range ("Mayo-Junio").
+      const months: ArchivoMonth[] = files
+        .map((f) => /^(\d{2}(?:-\d{2})*)-cover\.jpg$/.exec(f))
+        .filter((m): m is RegExpExecArray => m !== null)
+        .map((m) => m[1])
+        .filter((key) => key.split("-").every((mm) => mm in MONTH_LABELS))
+        // Numeric sort on the first month: JS would otherwise order
+        // integer-like keys ("10".."12") ahead of the leading-zero string
+        // keys ("01".."09").
+        .sort((a, b) => Number(a.slice(0, 2)) - Number(b.slice(0, 2)))
+        .map((key) => {
+          const parts = key.split("-");
+          const label =
+            parts.length === 1
+              ? MONTH_LABELS[key]
+              : `${MONTH_LABELS[parts[0]]}-${MONTH_LABELS[parts[parts.length - 1]]}`;
+          return {
+            num: key,
+            label,
+            cover: `/archivo/${yearDir}/${key}-cover.jpg`,
+            sumario: files.includes(`${key}-sum.jpg`)
+              ? `/archivo/${yearDir}/${key}-sum.jpg`
+              : null,
+          };
+        });
       return {
         year: Number(yearDir),
         director: directorForYear(Number(yearDir)),

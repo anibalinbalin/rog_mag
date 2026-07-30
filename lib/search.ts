@@ -1,4 +1,3 @@
-import { getAllPosts, formatDate } from "./blog";
 import { getAllAuthors } from "./authors";
 import { getAllIssues } from "./issues";
 
@@ -7,12 +6,12 @@ import { getAllIssues } from "./issues";
     client, which filters it locally — no search backend needed at this
     content volume. */
 export interface SearchDoc {
-  type: "post" | "author" | "issue";
+  type: "author" | "issue";
   title: string;
   href: string;
-  /** Secondary display line: author · date / role · institution / year. */
+  /** Secondary display line: role · institution / volume · year. */
   meta: string;
-  /** Short display text under the title (posts only). */
+  /** Short display text under the title (currently unused by both types). */
   excerpt: string;
   /** Pre-normalized searchable text (lowercase, accents stripped). */
   haystack: string;
@@ -26,35 +25,7 @@ export function normalizeText(value: string): string {
     .replace(/[̀-ͯ]/g, "");
 }
 
-/** Strip markdown syntax down to searchable plain text. */
-function stripMarkdown(md: string): string {
-  return md
-    .replace(/^#{1,6}\s+/gm, " ")
-    .replace(/[*_`>#]/g, " ")
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 export function getSearchCorpus(): SearchDoc[] {
-  const posts: SearchDoc[] = getAllPosts().map((post) => ({
-    type: "post",
-    title: post.title,
-    href: `/publicaciones/${post.slug}`,
-    meta: [post.author, formatDate(post.date)].filter(Boolean).join(" · "),
-    excerpt: post.excerpt,
-    haystack: normalizeText(
-      [
-        post.title,
-        post.excerpt,
-        post.category,
-        post.section,
-        post.author,
-        stripMarkdown(post.content),
-      ].join(" ")
-    ),
-  }));
-
   const authors: SearchDoc[] = getAllAuthors().map((author) => ({
     type: "author",
     title: author.name,
@@ -96,5 +67,5 @@ export function getSearchCorpus(): SearchDoc[] {
     ),
   }));
 
-  return [...posts, ...authors, ...issues];
+  return [...authors, ...issues];
 }

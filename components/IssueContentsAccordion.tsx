@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-type Group = { label: string; items: string[] };
+type Group = { label: string; sublabel?: string; items: string[] };
 
 /** Belen's direction (2026-06): the issue's "Contenido" as a collapsible
     accordion. Renders only groups that have items. */
@@ -53,6 +53,11 @@ export default function IssueContentsAccordion({
                 </svg>
               </button>
 
+              {isOpen && group.sublabel && (
+                <p className="pb-3 font-serif text-lg font-medium text-ink-muted">
+                  {group.sublabel}
+                </p>
+              )}
               {isOpen && (
                 <ul className="space-y-2 pb-5">
                   {group.items.length > 0 ? (

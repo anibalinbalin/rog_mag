@@ -45,6 +45,19 @@ const nextConfig: NextConfig = {
         destination: "/secciones/noticias",
         permanent: true,
       },
+      // Issues 3-4 and 5-6 were filed under 2026 before the printed covers
+      // settled the real dates (jul-dic 2024 and ene-jun 2025). Filename =
+      // slug = URL, so the renames need these to keep old links alive.
+      {
+        source: "/revistas/2026-no-3-4",
+        destination: "/revistas/2024-no-3-4",
+        permanent: true,
+      },
+      {
+        source: "/revistas/2026-no-5-6",
+        destination: "/revistas/2025-no-5-6",
+        permanent: true,
+      },
       // The anniversary page is canonical at /80-años (keep the ñ — "anos"
       // without it reads badly in Spanish). The route folder is ASCII
       // (app/aniversario) so `next dev` resolves it, and a rewrite (below)
