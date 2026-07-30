@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Crimson_Pro } from "next/font/google";
 import { Agentation } from "agentation";
+import DevDials from "@/components/DevDials";
 import ViewTransitionCommit from "@/components/ViewTransitionCommit";
 import "./globals.css";
 import "@silk-hq/components/unlayered-styles.css";
@@ -41,6 +42,8 @@ export default function RootLayout({
         </div>
         {/* Agentation visual-feedback toolbar — dev only, never ships to prod. */}
         {process.env.NODE_ENV === "development" && <Agentation />}
+        {/* DialKit control-panel surface — dev only, same rule as Agentation. */}
+        {process.env.NODE_ENV === "development" && <DevDials />}
       </body>
     </html>
   );

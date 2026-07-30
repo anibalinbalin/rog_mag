@@ -2,6 +2,7 @@
 
 import { useState, type CSSProperties } from "react";
 import Image from "next/image";
+import { useDialKit, useDialTimeline } from "dialkit";
 import { Scroll } from "@silk-hq/components";
 import { SheetWithDepth } from "@/components/SheetWithDepth";
 import ScanZoom from "@/components/ScanZoom";
@@ -72,7 +73,7 @@ function CloseIcon() {
     a slightly different angle, speed and a faint resting tilt — instead of every
     cover flipping identically. Keyed off the issue (year+month) so the server and
     client agree (no hydration flicker), and stable across renders. */
-function bookJitter(seed: number) {
+function bookJitter(seed: number, base: { angle: number; dur: number }) {
   const rnd = (salt: number) => {
     // avalanche hash (murmur3 finalizer) so consecutive issues scatter rather
     // than ramping in lockstep down a row.
@@ -81,11 +82,13 @@ function bookJitter(seed: number) {
     h ^= h >>> 16;
     return ((h >>> 0) % 100000) / 100000; // [0,1)
   };
-  const angle = 150 + Math.round(rnd(1) * 22); // 150–172° open
+  // Jitter is an OFFSET around the tuned base values (see the "Flip revistas"
+  // DialKit panel) — defaults reproduce the original 150–172° / 460–610ms.
+  const angle = base.angle - 11 + Math.round(rnd(1) * 22);
   return {
     angle,
     tilt: +((rnd(2) * 2 - 1) * 1.3).toFixed(2), // −1.3…+1.3° resting tilt
-    dur: 460 + Math.round(rnd(3) * 150), // 460–610ms
+    dur: base.dur - 75 + Math.round(rnd(3) * 150),
     // How far (as a % of the book's own width) the open cover's free edge
     // reaches to the left of the spine — |cos(angle)|, since the cover is
     // hinged on the left and rotates flat toward the viewer. Anchors the
@@ -111,6 +114,77 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
   const [decade, setDecade] = useState(firstWithData);
   const [yearIdx, setYearIdx] = useState(0);
   const [query, setQuery] = useState("");
+
+  // "Flip revistas" DialKit panel (dev only — the DialRoot surface is mounted
+  // behind NODE_ENV in the root layout; in prod this hook just returns these
+  // defaults, which reproduce the shipped flip exactly). openAngle/duration
+  // are the bases bookJitter scatters around; overshoot is the extra y1 of the
+  // hover-open easing (0.25 → cubic-bezier(0.34, 1.25, 0.5, 1)); stagger
+  // cascades the open choreography: cover leads, cast shadow follows at 1×,
+  // ground shadow at 2×, the "ampliar" hint at 3× (closing stays undelayed).
+  const flip = useDialKit("Flip revistas", {
+    openAngle: [161, 90, 180],
+    duration: [535, 200, 1200],
+    overshoot: [0.25, 0, 0.6],
+    stagger: [0, 0, 250],
+    perspective: [1500, 600, 3000],
+  });
+
+  // TODO(production): DialKit's clip.current values are the scrubbable
+  // authoring preview. The CSS flip (the style block below) IS the production
+  // implementation — once the choreography is tuned here, bake the clip `at`
+  // offsets/durations/eases back into the CSS vars + dial defaults, then
+  // remove useDialTimeline and the archivo-live path.
+  //
+  // "Flip open" timeline: the hover-open choreography as four named clips.
+  // Hovering a book (dev only) replays the timeline and that book renders
+  // from these sampled values (.archivo-live overrides the CSS transitions),
+  // so the dock can scrub every intermediate pose. Drag the clip bars to
+  // stagger the layers. Defaults reproduce the shipped flip: everything
+  // starts together at 0 with the 520ms overshoot ease.
+  const flipTl = useDialTimeline(
+    "Flip open",
+    {
+      cover: {
+        at: 0,
+        duration: 0.52,
+        from: { rot: 0 },
+        to: { rot: 161 },
+        transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
+      },
+      cast: {
+        at: 0,
+        duration: 0.52,
+        from: { opacity: 0, scaleX: 1 },
+        to: { opacity: 1, scaleX: 0.34 },
+        transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
+      },
+      ground: {
+        at: 0,
+        duration: 0.52,
+        from: { opacity: 0, scaleX: 0.7 },
+        to: { opacity: 1, scaleX: 1 },
+        transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
+      },
+      hint: {
+        at: 0,
+        duration: 0.52,
+        from: { opacity: 0, scale: 0.8 },
+        to: { opacity: 1, scale: 1 },
+        transition: { type: "easing", duration: 0.52, ease: [0, 0, 0.2, 1] },
+      },
+    },
+    {
+      id: "flip-revistas-open-v1",
+      persist: process.env.NODE_ENV === "development",
+      autoplay: false,
+    }
+  );
+
+  // The book currently driven by the timeline ("<year>-<num>", dev only —
+  // in prod nothing ever sets it, so the CSS transitions run untouched).
+  const [liveBook, setLiveBook] = useState<string | null>(null);
+  const isDev = process.env.NODE_ENV === "development";
   // The issue currently enlarged in the depth sheet (null = closed). Holds both
   // the cover (tapa) and the sumario so the sheet can show the full spread.
   const [viewing, setViewing] = useState<{
@@ -300,17 +374,55 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           <div
             key={active.year}
             className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
+            style={
+              {
+                "--persp": `${flip.perspective}px`,
+                "--ease-open": `cubic-bezier(0.34, ${(1 + flip.overshoot).toFixed(2)}, 0.5, 1)`,
+                "--stag": `${flip.stagger}ms`,
+              } as CSSProperties
+            }
           >
             {visibleMonths.map((m) => {
-                const book = bookJitter(active.year * 100 + Number(m.num));
+                // Seed on the first month of the key — combined issues
+                // ("01-02") would otherwise Number() to NaN and collapse
+                // every combined issue onto one identical jitter.
+                const book = bookJitter(
+                  active.year * 100 + Number(m.num.slice(0, 2)),
+                  { angle: flip.openAngle, dur: flip.duration }
+                );
                 const bookStyle = {
                   "--open": `${book.angle}deg`,
                   "--tilt": `${book.tilt}deg`,
                   "--dur": `${book.dur}ms`,
                   "--ground-right": `${(100 * (1 + book.reach)).toFixed(1)}%`,
                 } as CSSProperties;
-                const bookClass =
-                  "archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20";
+                const bookKey = `${active.year}-${m.num}`;
+                const isLive = liveBook === bookKey;
+                // While live (dev, hovered), this book renders straight from
+                // the "Flip open" timeline's sampled values via CSS vars.
+                const liveStyle = isLive
+                  ? ({
+                      "--live-rot": `${flipTl.cover.current.rot}deg`,
+                      "--live-cast-o": flipTl.cast.current.opacity,
+                      "--live-cast-sx": flipTl.cast.current.scaleX,
+                      "--live-ground-o": flipTl.ground.current.opacity,
+                      "--live-ground-sx": flipTl.ground.current.scaleX,
+                      "--live-hint-o": flipTl.hint.current.opacity,
+                      "--live-hint-s": flipTl.hint.current.scale,
+                    } as CSSProperties)
+                  : undefined;
+                const liveHandlers = isDev
+                  ? {
+                      onMouseEnter: () => {
+                        setLiveBook(bookKey);
+                        flipTl.replay();
+                      },
+                      onMouseLeave: () => setLiveBook(null),
+                    }
+                  : {};
+                const bookClass = `archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20${
+                  isLive ? " archivo-live" : ""
+                }`;
 
                 /* Magazine flip-open: the cover is hinged on the spine and swings
                    open on hover to reveal the sumario inside (two-faced — cover art
@@ -371,12 +483,17 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                         }
                         aria-label={`Ampliar el sumario de ${m.label} ${active.year}`}
                         className={`${bookClass} block cursor-pointer appearance-none border-0 bg-transparent p-0`}
-                        style={bookStyle}
+                        style={{ ...bookStyle, ...liveStyle }}
+                        {...liveHandlers}
                       >
                         {inner}
                       </button>
                     ) : (
-                      <div className={bookClass} style={bookStyle}>
+                      <div
+                        className={bookClass}
+                        style={{ ...bookStyle, ...liveStyle }}
+                        {...liveHandlers}
+                      >
                         {inner}
                       </div>
                     )}
@@ -517,7 +634,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                    shadow that sweeps across the sumario toward the spine as the
                    cover lifts, ending as the resting spine-gutter shade.
            Per-issue --open / --dur / --tilt make each one a little different. */
-        .archivo-book { perspective: 1500px; }
+        .archivo-book { perspective: var(--persp, 1500px); }
         .archivo-inner {
           position: absolute; inset: 0;
           transform: rotate(var(--tilt, 0deg));
@@ -617,24 +734,54 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
              resting angle and settles, like a real cover being flipped open. */
           .archivo-book:hover .archivo-cover {
             transform: rotateY(calc(-1 * var(--open, 160deg)));
-            transition: transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+            transition: transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1));
           }
+          /* Open-only stagger (--stag, from the dev dials): the cover leads,
+             the cast shadow follows at 1×, the ground shadow at 2×, the hint
+             at 3×. Delays live only in these :hover rules, so mouse-out
+             (the base rules above, delay 0) still closes as one unit. */
           .archivo-book:hover .archivo-cast {
             opacity: 1;
             transform: translateZ(-1px) scaleX(0.34);
-            transition: opacity var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1),
-                        transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+            transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms),
+                        transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms);
           }
           .archivo-book:hover .archivo-ground {
             opacity: 1;
             transform: scaleX(1);
-            transition: opacity var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1),
-                        transform var(--dur, 520ms) cubic-bezier(0.34, 1.25, 0.5, 1);
+            transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) calc(var(--stag, 0ms) * 2),
+                        transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) calc(var(--stag, 0ms) * 2);
           }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
+            transition-delay: calc(var(--stag, 0ms) * 3);
           }
         }
+        /* ── Timeline-driven authoring override (dev only) ──
+           While a book is "live" (hovered with the "Flip open" DialKit
+           timeline active) its layers render the sampled clip values
+           directly — transitions off, so scrubbing the dock is exactly
+           what you see. Production never adds .archivo-live. */
+        .archivo-live .archivo-cover {
+          transition: none !important;
+          transform: rotateY(calc(-1 * var(--live-rot, 0deg))) !important;
+        }
+        .archivo-live .archivo-cast {
+          transition: none !important;
+          opacity: var(--live-cast-o, 0) !important;
+          transform: translateZ(-1px) scaleX(var(--live-cast-sx, 1)) !important;
+        }
+        .archivo-live .archivo-ground {
+          transition: none !important;
+          opacity: var(--live-ground-o, 0) !important;
+          transform: scaleX(var(--live-ground-sx, 0.7)) !important;
+        }
+        .archivo-live .archivo-hint {
+          transition: none !important;
+          opacity: var(--live-hint-o, 0) !important;
+          transform: translateZ(1px) scale(var(--live-hint-s, 0.8)) !important;
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .archivo-cover { transition: none; }
           .archivo-book:hover .archivo-cover { transform: none; }

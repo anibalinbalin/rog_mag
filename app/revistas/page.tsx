@@ -36,7 +36,8 @@ export default function RevistaPage() {
         { label: "Doctrina", items: currentIssue.doctrina },
         { label: "De interés", items: currentIssue.deInteres },
         {
-          label: "Actualidad Sociedades Comerciales",
+          label: "Actualidad",
+          sublabel: "Sociedades comerciales",
           items: currentIssue.actualidadSociedades,
         },
         { label: "Concursos", items: currentIssue.concursos },

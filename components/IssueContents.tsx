@@ -15,7 +15,7 @@ function parseContentItem(item: string) {
 function ContentItem({ item }: { item: string }) {
   const { title, authors } = parseContentItem(item);
   return (
-    <li className="font-serif text-lg text-ink-soft">
+    <li className="text-lg text-ink-soft">
       {title}
       {authors && (
         <span className="mt-1.5 block font-serif text-base italic text-burgundy">
@@ -26,9 +26,9 @@ function ContentItem({ item }: { item: string }) {
   );
 }
 
-/** Issue table of contents — Doctrina + De interés + Actualidad Sociedades
-    Comerciales + Concursos lists. Shared by the revista landing (current
-    issue) and issue detail pages. The optional *Field props carry
+/** Issue table of contents — Doctrina + De interés + Actualidad (subsección
+    Sociedades comerciales) + Concursos lists. Shared by the revista landing
+    (current issue) and issue detail pages. The optional *Field props carry
     data-tina-field values so the issue detail page can make these lists
     contextually editable. */
 export default function IssueContents({
@@ -71,7 +71,7 @@ export default function IssueContents({
         <p className="font-serif text-xl font-semibold text-ink">
           Doctrina
         </p>
-        <ul className="mt-4 space-y-4">
+        <ul className="mt-4 space-y-3">
           {doctrinaItems.map((item) => (
             <ContentItem key={item} item={item} />
           ))}
@@ -83,7 +83,7 @@ export default function IssueContents({
           <p className="font-serif text-xl font-semibold text-ink">
             De interés
           </p>
-          <ul className="mt-4 space-y-4">
+          <ul className="mt-4 space-y-3">
             {deInteresItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}
@@ -94,9 +94,12 @@ export default function IssueContents({
       {actualidadSociedadesItems.length > 0 && (
         <div className="mt-10" data-tina-field={actualidadSociedadesField}>
           <p className="font-serif text-xl font-semibold text-ink">
-            Actualidad Sociedades Comerciales
+            Actualidad
           </p>
-          <ul className="mt-4 space-y-4">
+          <p className="mt-3 font-serif text-lg font-medium text-ink-muted">
+            Sociedades comerciales
+          </p>
+          <ul className="mt-4 space-y-3">
             {actualidadSociedadesItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}
@@ -109,7 +112,7 @@ export default function IssueContents({
           <p className="font-serif text-xl font-semibold text-ink">
             Concursos
           </p>
-          <ul className="mt-4 space-y-4">
+          <ul className="mt-4 space-y-3">
             {concursosItems.map((item) => (
               <ContentItem key={item} item={item} />
             ))}

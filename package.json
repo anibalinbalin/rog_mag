@@ -18,6 +18,7 @@
     "@tinacms/datalayer": "2.0.22",
     "agentation": "^3.0.2",
     "cloudinary": "^1.41.3",
+    "dialkit": "1.4.3",
     "gray-matter": "^4.0.3",
     "gsap": "^3.15.0",
     "mongodb-level": "0.0.4",

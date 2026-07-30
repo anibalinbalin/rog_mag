@@ -129,9 +129,10 @@ const Issue: Collection = {
     {
       type: 'string',
       name: 'actualidadSociedades',
-      label: 'Actualidad de Sociedades Comerciales',
+      label: 'Actualidad — Sociedades comerciales',
       list: true,
-      description: 'Títulos de esta sección.',
+      description:
+        'Títulos de la subsección Sociedades comerciales, dentro de la sección Actualidad.',
     },
     {
       type: 'string',
