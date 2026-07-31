@@ -4,8 +4,9 @@
 self-hosted TinaCMS setup. The site is **built and live**; Tina is **wired** (one env var pending,
 see below).
 
-- **Production:** https://rog-mag.vercel.app (every.to-style layout, sections/authors/issues)
-- **Admin:** https://rog-mag.vercel.app/admin (Clerk Google login, allowed emails only)
+- **Production:** https://revistaderechocomercial.edu.uy (every.to-style layout, sections/authors/issues;
+  DNS on Porkbun, www 308→apex; rog-mag.vercel.app still works as alias)
+- **Admin:** https://revistaderechocomercial.edu.uy/admin (Clerk Google login, allowed emails only)
 - **GitHub:** `anibalinbalin/rog_mag` — pushes to `main` auto-deploy on Vercel
 - **Vercel:** project `rog-mag`, team scope `anibals-projects-c9882c4c`
 - **Local dir:** `/mnt/data/sites-sync/2026/olivera_mag/` (app at repo root)
