@@ -433,17 +433,19 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                    Pure CSS; reduced motion keeps clean static covers. */
                 const inner = (
                   <span className="archivo-inner">
-                    {m.sumario && (
-                      <Image
-                        className="archivo-sum"
-                        src={m.sumario}
-                        alt=""
-                        aria-hidden="true"
-                        fill
-                        sizes="160px"
-                      />
-                    )}
-                    <span className="archivo-cast" aria-hidden="true" />
+                    <span className="archivo-page">
+                      {m.sumario && (
+                        <Image
+                          className="archivo-sum"
+                          src={m.sumario}
+                          alt=""
+                          aria-hidden="true"
+                          fill
+                          sizes="160px"
+                        />
+                      )}
+                      <span className="archivo-cast" aria-hidden="true" />
+                    </span>
                     <span className="archivo-ground" aria-hidden="true" />
                     <span className="archivo-cover">
                       <Image
@@ -640,20 +642,22 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           transform: rotate(var(--tilt, 0deg));
           transform-style: preserve-3d;
         }
+        .archivo-page {
+          position: absolute; inset: 0;
+          transform: translateZ(-2px);
+        }
         .archivo-sum {
           object-fit: cover;
-          transform: translateZ(-2px);
           box-shadow: 0 8px 18px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.05);
         }
         /* Cast shadow on the page plane: full-page at rest (invisible), it fades
            in while scaling down to a spine gutter, so on hover it reads as the
-           opening cover's shadow retreating across the page. transform/opacity
-           only; shares --dur and the cover's split easings (plain close here,
-           overshoot on :hover below) so cover and shadow move as one unit. */
+           opening cover's shadow retreating across the page. Composited flat
+           inside .archivo-page (same Z as the sumario) so its gradient never
+           intersects the rotating cover's 3D plane. */
         .archivo-cast {
           position: absolute; inset: 0;
           pointer-events: none; opacity: 0;
-          transform: translateZ(-1px);
           transform-origin: left center;
           background: linear-gradient(90deg, rgba(40,22,10,.36), rgba(40,22,10,.1) 62%, transparent);
           transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
@@ -742,7 +746,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
              (the base rules above, delay 0) still closes as one unit. */
           .archivo-book:hover .archivo-cast {
             opacity: 1;
-            transform: translateZ(-1px) scaleX(0.34);
+            transform: scaleX(0.34);
             transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms),
                         transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms);
           }
@@ -769,7 +773,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         .archivo-live .archivo-cast {
           transition: none !important;
           opacity: var(--live-cast-o, 0) !important;
-          transform: translateZ(-1px) scaleX(var(--live-cast-sx, 1)) !important;
+          transform: scaleX(var(--live-cast-sx, 1)) !important;
         }
         .archivo-live .archivo-ground {
           transition: none !important;
