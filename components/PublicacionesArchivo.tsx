@@ -664,7 +664,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           position: absolute; inset: 0;
           pointer-events: none; opacity: 0;
           transform-origin: left center;
-          background: linear-gradient(90deg, rgba(40,22,10,.36), rgba(40,22,10,.1) 62%, transparent);
+          background: linear-gradient(90deg, rgba(40,22,10,.20), rgba(40,22,10,.13) 22%, rgba(40,22,10,.06) 52%, rgba(40,22,10,.02) 76%, transparent);
           transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
                       transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -688,7 +688,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           pointer-events: none; opacity: 0;
           transform: scaleX(0.7);
           transform-origin: right center;
-          background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.32), rgba(40,22,10,.22) 32%, rgba(40,22,10,.08) 62%, transparent 88%);
+          background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.19), rgba(40,22,10,.13) 32%, rgba(40,22,10,.06) 54%, rgba(40,22,10,.02) 74%, transparent 90%);
           transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
                       transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -750,7 +750,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
              at 3×. Delays live only in these :hover rules, so mouse-out
              (the base rules above, delay 0) still closes as one unit. */
           .archivo-book:hover .archivo-cast {
-            opacity: 1;
+            opacity: 0.8;
             transform: scaleX(0.34);
             transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms),
                         transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms);
