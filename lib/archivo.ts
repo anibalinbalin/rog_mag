@@ -54,7 +54,7 @@ function cleanDirector(director: string): string {
 
 /** The original "Sociedades Anónimas" issues, digitized by year. Years (and the
     months inside them) are derived from the optimized scans in
-    /public/archivo/<year>/<MM>-{cover,sum}.webp — drop a new year's folder in and
+    /public/archivo/<year>/<MM>-{cover,sum}.jpg — drop a new year's folder in and
     it appears automatically. The director is matched from the época that spans
     the year (see content/epocas). */
 export function getArchivoYears(): ArchivoYear[] {
@@ -81,7 +81,7 @@ export function getArchivoYears(): ArchivoYear[] {
       // 1969's quarterly "03-04-05-06"). Combined issues are labeled as a
       // first-to-last month range ("Mayo-Junio").
       const months: ArchivoMonth[] = files
-        .map((f) => /^(\d{2}(?:-\d{2})*)-cover\.webp$/.exec(f))
+        .map((f) => /^(\d{2}(?:-\d{2})*)-cover\.jpg$/.exec(f))
         .filter((m): m is RegExpExecArray => m !== null)
         .map((m) => m[1])
         .filter((key) => key.split("-").every((mm) => mm in MONTH_LABELS))
@@ -96,16 +96,16 @@ export function getArchivoYears(): ArchivoYear[] {
               ? MONTH_LABELS[key]
               : `${MONTH_LABELS[parts[0]]}-${MONTH_LABELS[parts[parts.length - 1]]}`;
           const sumPages: string[] = [];
-          if (files.includes(`${key}-sum.webp`))
-            sumPages.push(`/archivo/${yearDir}/${key}-sum.webp`);
+          if (files.includes(`${key}-sum.jpg`))
+            sumPages.push(`/archivo/${yearDir}/${key}-sum.jpg`);
           for (let i = 2; i <= 9; i++) {
-            if (files.includes(`${key}-sum${i}.webp`))
-              sumPages.push(`/archivo/${yearDir}/${key}-sum${i}.webp`);
+            if (files.includes(`${key}-sum${i}.jpg`))
+              sumPages.push(`/archivo/${yearDir}/${key}-sum${i}.jpg`);
           }
           return {
             num: key,
             label,
-            cover: `/archivo/${yearDir}/${key}-cover.webp`,
+            cover: `/archivo/${yearDir}/${key}-cover.jpg`,
             sumario: sumPages[0] ?? null,
             sumarios: sumPages,
           };
