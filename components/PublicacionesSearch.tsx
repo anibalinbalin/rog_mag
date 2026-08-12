@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { formatDate } from "@/lib/format";
 
@@ -30,11 +31,24 @@ export default function PublicacionesSearch({ posts }: { posts: PubItem[] }) {
 
   return (
     <>
-      {/* Title + search on one row */}
+      {/* Title + pills + search */}
       <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-        <h1 className="font-serif text-4xl text-ink sm:text-5xl">
-          Publicaciones
-        </h1>
+        <div className="flex items-center gap-6">
+          <h1 className="font-serif text-4xl text-ink sm:text-5xl">
+            Publicaciones
+          </h1>
+          <nav className="flex gap-2">
+            <span className="rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy">
+              Artículos
+            </span>
+            <Link
+              href="/publicaciones/libros"
+              className="rounded-sm px-4 py-1.5 text-xs uppercase tracking-widest text-ink-soft transition-colors hover:bg-burgundy/10 hover:text-burgundy"
+            >
+              Libros
+            </Link>
+          </nav>
+        </div>
 
         <div className="relative w-full lg:max-w-xl">
           <svg
