@@ -189,12 +189,11 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
   // the cover (tapa) and the sumario so the sheet can show the full spread.
   const [viewing, setViewing] = useState<{
     cover: string;
-    sumario: string;
+    sumarios: string[];
     label: string;
     year: number;
   } | null>(null);
-  // Which page is open in the focused zoom viewer (null = showing the spread).
-  const [zoomPage, setZoomPage] = useState<"cover" | "sumario" | null>(null);
+  const [zoomPage, setZoomPage] = useState<number | null>(null);
 
   // Closing the sheet always drops back to the spread, so re-opening another
   // issue never lands mid-zoom on a stale page.
@@ -434,10 +433,10 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                 const inner = (
                   <span className="archivo-inner">
                     <span className="archivo-page">
-                      {m.sumario && (
+                      {m.sumarios[0] && (
                         <Image
                           className="archivo-sum"
-                          src={m.sumario}
+                          src={m.sumarios[0]}
                           alt=""
                           aria-hidden="true"
                           fill
@@ -457,9 +456,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                       />
                       <span className="archivo-back" aria-hidden="true" />
                     </span>
-                    {/* "ampliar" affordance — fades in over the exposed inside page
-                        once the cover is open (only when there's a sumario). */}
-                    {m.sumario && (
+                    {m.sumarios.length > 0 && (
                       <span className="archivo-hint" aria-hidden="true">
                         <MagnifyPlusIcon />
                       </span>
@@ -472,13 +469,13 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                     <p className="mb-4 text-sm uppercase tracking-widest text-ink-muted">
                       {m.label}
                     </p>
-                    {m.sumario ? (
+                    {m.sumarios.length > 0 ? (
                       <button
                         type="button"
                         onClick={() =>
                           setViewing({
                             cover: m.cover,
-                            sumario: m.sumario!,
+                            sumarios: m.sumarios,
                             label: m.label,
                             year: active.year,
                           })
@@ -558,23 +555,23 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                               Sociedades Anónimas · {viewing.label} {viewing.year}
                             </p>
                             <SheetWithDepth.Title className="mt-2 text-center font-serif text-2xl text-ink sm:text-3xl">
-                              Tapa y sumario
+                              {viewing.sumarios.length > 1 ? "Tapa y sumarios" : "Tapa y sumario"}
                             </SheetWithDepth.Title>
                             <p className="mt-3 text-center text-sm text-ink-muted">
                               Tocá una página para ampliarla y leerla cómodo.
                             </p>
-                            {/* Tapa + sumario side by side on wider screens (a
-                                real two-page spread), stacked on phones. Each page
-                                is a button that opens the focused zoom viewer. */}
-                            <div className="mx-auto mt-8 flex max-w-5xl flex-col items-start gap-8 sm:flex-row sm:justify-center sm:gap-10">
-                              {([
-                                { key: "cover", label: "Tapa", src: viewing.cover },
-                                { key: "sumario", label: "Sumario", src: viewing.sumario },
-                              ] as const).map((p) => (
-                                <figure key={p.key} className="w-full sm:w-1/2 sm:max-w-[420px]">
+                            <div className="mx-auto mt-8 flex max-w-5xl flex-col items-start gap-8 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-10">
+                              {[
+                                { label: "Tapa", src: viewing.cover },
+                                ...viewing.sumarios.map((src, i) => ({
+                                  label: viewing.sumarios.length > 1 ? `Sumario ${i + 1}` : "Sumario",
+                                  src,
+                                })),
+                              ].map((p, idx) => (
+                                <figure key={idx} className="w-full sm:w-1/2 sm:max-w-[420px]">
                                   <button
                                     type="button"
-                                    onClick={() => setZoomPage(p.key)}
+                                    onClick={() => setZoomPage(idx)}
                                     aria-label={`Ampliar ${p.label.toLowerCase()} — Sociedades Anónimas ${viewing.label} ${viewing.year}`}
                                     className="group relative block w-full cursor-zoom-in overflow-hidden rounded-sm bg-paper-cream shadow-lg transition-shadow hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-burgundy"
                                   >
@@ -586,8 +583,6 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                                       sizes="(min-width: 640px) 420px, 100vw"
                                       className="h-auto w-full"
                                     />
-                                    {/* Always-visible "Ampliar" pill — older readers
-                                        shouldn't have to discover a hover affordance. */}
                                     <span className="pointer-events-none absolute bottom-3 left-1/2 inline-flex -translate-x-1/2 items-center gap-1.5 rounded-sm bg-paper/95 px-4 py-2 text-sm font-medium text-ink shadow-md ring-1 ring-black/5 transition-transform group-hover:scale-105">
                                       <MagnifyPlusIcon />
                                       Ampliar
@@ -608,16 +603,26 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
 
                 {/* Focused, elderly-friendly zoom for the chosen page. Keyed so
                     switching tapa↔sumario remounts clean (fresh zoom + pan). */}
-                {viewing && zoomPage && (
-                  <ScanZoom
-                    key={zoomPage}
-                    src={zoomPage === "cover" ? viewing.cover : viewing.sumario}
-                    pageLabel={zoomPage === "cover" ? "Tapa" : "Sumario"}
-                    caption={`Sociedades Anónimas · ${viewing.label} ${viewing.year}`}
-                    onBack={() => setZoomPage(null)}
-                    onClose={closeSheet}
-                  />
-                )}
+                {viewing && zoomPage !== null && (() => {
+                  const allPages = [
+                    { label: "Tapa", src: viewing.cover },
+                    ...viewing.sumarios.map((src, i) => ({
+                      label: viewing.sumarios.length > 1 ? `Sumario ${i + 1}` : "Sumario",
+                      src,
+                    })),
+                  ];
+                  const page = allPages[zoomPage];
+                  return page ? (
+                    <ScanZoom
+                      key={zoomPage}
+                      src={page.src}
+                      pageLabel={page.label}
+                      caption={`Sociedades Anónimas · ${viewing.label} ${viewing.year}`}
+                      onBack={() => setZoomPage(null)}
+                      onClose={closeSheet}
+                    />
+                  ) : null;
+                })()}
               </div>
             </SheetWithDepth.Content>
           </SheetWithDepth.View>

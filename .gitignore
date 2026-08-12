@@ -35,3 +35,8 @@ next-env.d.ts
 
 # Cover art samples (preview only, not committed)
 /public/cover-samples/
+
+# Raw cover scans (Belen's exports, large originals)
+drive-download-*.zip
+*.zip
+/public/BELEN ASSETS*/

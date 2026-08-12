@@ -22,8 +22,9 @@ const MONTH_LABELS: Record<string, string> = {
 export interface ArchivoMonth {
   num: string; // "06", or "05-06" for combined issues (up to "03-04-05-06")
   label: string; // "Junio", or "Mayo-Junio" for combined issues
-  cover: string; // "/archivo/1946/06-cover.jpg"
-  sumario: string | null; // "/archivo/1946/06-sum.jpg" (may be absent)
+  cover: string;
+  sumario: string | null;
+  sumarios: string[];
 }
 
 export interface ArchivoYear {
@@ -53,7 +54,7 @@ function cleanDirector(director: string): string {
 
 /** The original "Sociedades Anónimas" issues, digitized by year. Years (and the
     months inside them) are derived from the optimized scans in
-    /public/archivo/<year>/<MM>-{cover,sum}.jpg — drop a new year's folder in and
+    /public/archivo/<year>/<MM>-{cover,sum}.webp — drop a new year's folder in and
     it appears automatically. The director is matched from the época that spans
     the year (see content/epocas). */
 export function getArchivoYears(): ArchivoYear[] {
@@ -61,10 +62,11 @@ export function getArchivoYears(): ArchivoYear[] {
   const epocas = getEpocas();
 
   const directorForYear = (year: number): string => {
-    const epoca = epocas.find(
-      (e) => year >= e.startYear && (e.endYear === 0 || year <= e.endYear)
-    );
-    return cleanDirector(epoca?.director ?? "");
+    let match = epocas[0];
+    for (const e of epocas) {
+      if (year >= e.startYear) match = e;
+    }
+    return cleanDirector(match?.director ?? "");
   };
 
   return fs
@@ -79,7 +81,7 @@ export function getArchivoYears(): ArchivoYear[] {
       // 1969's quarterly "03-04-05-06"). Combined issues are labeled as a
       // first-to-last month range ("Mayo-Junio").
       const months: ArchivoMonth[] = files
-        .map((f) => /^(\d{2}(?:-\d{2})*)-cover\.jpg$/.exec(f))
+        .map((f) => /^(\d{2}(?:-\d{2})*)-cover\.webp$/.exec(f))
         .filter((m): m is RegExpExecArray => m !== null)
         .map((m) => m[1])
         .filter((key) => key.split("-").every((mm) => mm in MONTH_LABELS))
@@ -93,13 +95,19 @@ export function getArchivoYears(): ArchivoYear[] {
             parts.length === 1
               ? MONTH_LABELS[key]
               : `${MONTH_LABELS[parts[0]]}-${MONTH_LABELS[parts[parts.length - 1]]}`;
+          const sumPages: string[] = [];
+          if (files.includes(`${key}-sum.webp`))
+            sumPages.push(`/archivo/${yearDir}/${key}-sum.webp`);
+          for (let i = 2; i <= 9; i++) {
+            if (files.includes(`${key}-sum${i}.webp`))
+              sumPages.push(`/archivo/${yearDir}/${key}-sum${i}.webp`);
+          }
           return {
             num: key,
             label,
-            cover: `/archivo/${yearDir}/${key}-cover.jpg`,
-            sumario: files.includes(`${key}-sum.jpg`)
-              ? `/archivo/${yearDir}/${key}-sum.jpg`
-              : null,
+            cover: `/archivo/${yearDir}/${key}-cover.webp`,
+            sumario: sumPages[0] ?? null,
+            sumarios: sumPages,
           };
         });
       return {
