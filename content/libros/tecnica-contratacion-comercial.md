@@ -3,7 +3,7 @@ title: "Técnica de la contratación comercial"
 author: "Daniel Hargain, Gabriel Mihali"
 year: 2024
 description: ""
-coverImage: ""
+coverImage: "/libros/tecnica-contratacion-comercial.jpg"
 purchaseUrl: "https://fcu.edu.uy/p/tecnica-de-la-contratacion-comercial"
 publisher: "FCU"
 ---
