@@ -153,25 +153,25 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
       },
       cast: {
-        at: 0,
-        duration: 0.52,
+        at: 0.09,
+        duration: 0.38,
         from: { opacity: 0, scaleX: 1 },
-        to: { opacity: 1, scaleX: 0.34 },
-        transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
+        to: { opacity: 0.8, scaleX: 0.34 },
+        transition: { type: "easing", duration: 0.38, ease: [0.45, 0.05, 0.25, 1] },
       },
       ground: {
-        at: 0,
-        duration: 0.52,
+        at: 0.06,
+        duration: 0.42,
         from: { opacity: 0, scaleX: 0.7 },
         to: { opacity: 1, scaleX: 1 },
-        transition: { type: "easing", duration: 0.52, ease: [0.34, 1.25, 0.5, 1] },
+        transition: { type: "easing", duration: 0.42, ease: [0.25, 0.46, 0.45, 0.94] },
       },
       hint: {
-        at: 0,
-        duration: 0.52,
+        at: 0.34,
+        duration: 0.18,
         from: { opacity: 0, scale: 0.8 },
         to: { opacity: 1, scale: 1 },
-        transition: { type: "easing", duration: 0.52, ease: [0, 0, 0.2, 1] },
+        transition: { type: "easing", duration: 0.18, ease: [0.34, 1.3, 0.64, 1] },
       },
     },
     {
@@ -372,12 +372,13 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         {active ? (
           <div
             key={active.year}
-            className="mt-14 grid grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
+            className="mx-auto mt-14 grid w-full max-w-[calc(var(--cols)*160px+(var(--cols)-1)*1.5rem)] grid-cols-2 gap-x-6 gap-y-12 motion-safe:[animation:archivoFadeIn_200ms_ease-out] sm:grid-cols-3 lg:grid-cols-6"
             style={
               {
                 "--persp": `${flip.perspective}px`,
                 "--ease-open": `cubic-bezier(0.34, ${(1 + flip.overshoot).toFixed(2)}, 0.5, 1)`,
                 "--stag": `${flip.stagger}ms`,
+                "--cols": Math.min(Math.max(visibleMonths.length, 1), 6),
               } as CSSProperties
             }
           >
@@ -665,8 +666,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           pointer-events: none; opacity: 0;
           transform-origin: left center;
           background: linear-gradient(90deg, rgba(40,22,10,.20), rgba(40,22,10,.13) 22%, rgba(40,22,10,.06) 52%, rgba(40,22,10,.02) 76%, transparent);
-          transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
-                      transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
+          transition: opacity calc(var(--dur, 520ms) * 0.55) cubic-bezier(0.4, 0, 0.2, 1),
+                      transform calc(var(--dur, 520ms) * 0.55) cubic-bezier(0.4, 0, 0.2, 1);
         }
         /* Ground + neighbor shadow: as the cover lifts open, a soft shadow
            fades in over the page background and onto whichever magazine
@@ -689,8 +690,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           transform: scaleX(0.7);
           transform-origin: right center;
           background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.19), rgba(40,22,10,.13) 32%, rgba(40,22,10,.06) 54%, rgba(40,22,10,.02) 74%, transparent 90%);
-          transition: opacity var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1),
-                      transform var(--dur, 520ms) cubic-bezier(0.4, 0, 0.2, 1);
+          transition: opacity calc(var(--dur, 520ms) * 0.68) cubic-bezier(0.4, 0, 0.2, 1),
+                      transform calc(var(--dur, 520ms) * 0.68) cubic-bezier(0.4, 0, 0.2, 1);
         }
         .archivo-cover {
           position: absolute; inset: 0;
@@ -729,8 +730,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           color: var(--color-ink-soft, #4a4036);
           box-shadow: 0 2px 8px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.04);
           opacity: 0; transform: translateZ(1px) scale(0.8);
-          transition: opacity var(--dur, 520ms) ease-out,
-                      transform var(--dur, 520ms) ease-out;
+          transition: opacity 120ms cubic-bezier(0.215, 0.61, 0.355, 1),
+                      transform 120ms cubic-bezier(0.215, 0.61, 0.355, 1);
           pointer-events: none;
         }
         .archivo-book:focus-visible {
@@ -752,18 +753,19 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           .archivo-book:hover .archivo-cast {
             opacity: 0.8;
             transform: scaleX(0.34);
-            transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms),
-                        transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) var(--stag, 0ms);
+            transition: opacity calc(var(--dur, 520ms) * 0.73) cubic-bezier(0.45, 0.05, 0.25, 1) 90ms,
+                        transform calc(var(--dur, 520ms) * 0.73) cubic-bezier(0.215, 0.61, 0.355, 1) 90ms;
           }
           .archivo-book:hover .archivo-ground {
             opacity: 1;
             transform: scaleX(1);
-            transition: opacity var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) calc(var(--stag, 0ms) * 2),
-                        transform var(--dur, 520ms) var(--ease-open, cubic-bezier(0.34, 1.25, 0.5, 1)) calc(var(--stag, 0ms) * 2);
+            transition: opacity calc(var(--dur, 520ms) * 0.8) cubic-bezier(0.25, 0.46, 0.45, 0.94) 60ms,
+                        transform calc(var(--dur, 520ms) * 0.8) cubic-bezier(0.25, 0.46, 0.45, 0.94) 60ms;
           }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
-            transition-delay: calc(var(--stag, 0ms) * 3);
+            transition: opacity 180ms cubic-bezier(0.215, 0.61, 0.355, 1) 340ms,
+                        transform 180ms cubic-bezier(0.34, 1.3, 0.64, 1) 340ms;
           }
         }
         /* ── Timeline-driven authoring override (dev only) ──
