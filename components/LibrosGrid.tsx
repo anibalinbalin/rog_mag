@@ -60,12 +60,11 @@ function LibroCard({ libro }: { libro: Libro }) {
             href={libro.purchaseUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex w-fit items-center gap-2 rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
+            className="mt-4 inline-flex w-fit rounded-sm bg-burgundy/10 px-4 py-1.5 text-xs uppercase tracking-widest text-burgundy transition-colors hover:bg-burgundy/15"
           >
-            Adquirir
-            <span className="text-[10px] normal-case tracking-normal">
-              {libro.publisher === "FCU" ? "en FCU" : "en La Ley"}
-            </span>
+            {libro.publisher === "FCU"
+              ? "Adquirir en FCU"
+              : "Adquirir en La Ley"}
           </a>
         )}
       </div>
