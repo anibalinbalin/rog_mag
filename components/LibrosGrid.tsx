@@ -11,7 +11,7 @@ function LibroCard({ libro }: { libro: Libro }) {
   return (
     <div className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:items-center sm:gap-10">
       {/* Cover */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream p-3">
+      <div className="relative aspect-[4/5] w-full">
         {libro.coverImage && (
           <Image
             src={libro.coverImage}
