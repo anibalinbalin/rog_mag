@@ -11,14 +11,14 @@ function LibroCard({ libro }: { libro: Libro }) {
   return (
     <div className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:items-center sm:gap-10">
       {/* Cover */}
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream">
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-paper-cream p-3">
         {libro.coverImage && (
           <Image
             src={libro.coverImage}
             alt={libro.title}
             fill
             sizes="160px"
-            className="object-cover"
+            className="object-contain [filter:drop-shadow(0_4px_8px_rgb(0_0_0_/_0.12))]"
           />
         )}
       </div>

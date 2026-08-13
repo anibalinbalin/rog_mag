@@ -3,7 +3,7 @@ title: "Manual de Derecho Comercial Uruguayo. Tomo XIV — Títulos valores"
 author: "Carlos E. López Rodríguez, Nuri E. Rodríguez Olivera"
 year: 2024
 description: ""
-coverImage: "/libros/manual-derecho-comercial-tomo14.jpg"
+coverImage: "/libros/manual-derecho-comercial-tomo14.webp"
 purchaseUrl: "https://fcu.edu.uy/p/manual-de-derecho-comercial-uruguayo-tomo-xiv"
 publisher: "FCU"
 ---
