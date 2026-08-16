@@ -10,6 +10,7 @@ export interface Libro {
   author: string;
   year: number;
   description: string;
+  note: string;
   coverImage: string;
   purchaseUrl: string;
   publisher: string;
@@ -27,6 +28,7 @@ function parseLibro(fileName: string): Libro {
     author: data.author ?? "",
     year: Number(data.year) || 0,
     description: data.description ?? "",
+    note: data.note ?? "",
     coverImage: data.coverImage ?? "",
     purchaseUrl: data.purchaseUrl ?? "",
     publisher: data.publisher ?? "",

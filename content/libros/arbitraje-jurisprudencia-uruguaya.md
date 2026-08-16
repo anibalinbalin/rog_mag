@@ -2,7 +2,9 @@
 title: "Arbitraje Comercial y de Inversión en la Jurisprudencia Uruguaya"
 author: "Mateo Miguel Verdías Mezzera"
 year: 2026
-description: "Manual teórico y práctico del arbitraje en Uruguay con una explicación clara de los conceptos fundamentales y un análisis sistemático de más de 100 sentencias relevantes para el ámbito arbitral. Prólogo de Mercedes Jiménez de Aréchaga."
+description: |-
+  Innovador manual teórico y práctico del arbitraje en Uruguay, conteniendo una explicación clara y profunda de los conceptos fundamentales de la materia y un análisis sistemático y pormenorizado de más de 100 sentencias relevantes para el ámbito arbitral.
+note: "Prólogo: Mercedes Jiménez de Aréchaga"
 coverImage: "/libros/arbitraje-jurisprudencia-uruguaya.webp"
 purchaseUrl: "https://laleyuruguay.com/products/arbitraje-comercial-y-de-inversion-en-la-jurisprudencia-uruguaya"
 publisher: "La Ley Uruguay"

@@ -34,7 +34,7 @@ function LibroCard({ libro }: { libro: Libro }) {
         {libro.description && (
           <div className="mt-3">
             <p
-              className={`max-w-2xl text-sm leading-relaxed text-ink-soft ${
+              className={`max-w-2xl whitespace-pre-line text-sm leading-relaxed text-ink-soft ${
                 !expanded && needsTruncation ? "line-clamp-3" : ""
               }`}
             >
@@ -49,6 +49,11 @@ function LibroCard({ libro }: { libro: Libro }) {
               </button>
             )}
           </div>
+        )}
+        {libro.note && (
+          <p className="mt-3 max-w-2xl text-sm italic leading-relaxed text-ink-muted">
+            {libro.note}
+          </p>
         )}
         <p className="mt-4">
           <span className="font-serif text-base italic text-burgundy">
