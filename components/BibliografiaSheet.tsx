@@ -71,12 +71,10 @@ export default function BibliografiaSheet({
                 <Scroll.View className="h-full" scrollGestureTrap={{ yEnd: true }}>
                   <Scroll.Content>
                     <div className="mx-auto max-w-4xl px-6 pb-20 pt-20 sm:px-10 sm:pt-24">
-                      <div className="grid gap-8 sm:grid-cols-[18rem_1fr] sm:gap-12">
-                        {/* Portrait — dashed placeholder when no photo is set
-                            yet (same box, so the layout doesn't shift once a
-                            real portrait is added). */}
+                      <div className="grid gap-8 sm:grid-cols-[22rem_1fr] sm:gap-12">
+                        {/* Portrait */}
                         <div
-                          className={`relative aspect-square w-full overflow-hidden rounded-sm bg-paper-cream sm:w-72 ${
+                          className={`relative aspect-[3/4] w-full overflow-hidden rounded-sm bg-paper-cream sm:w-[22rem] ${
                             photo ? "" : "border border-dashed border-line"
                           }`}
                         >
@@ -85,7 +83,7 @@ export default function BibliografiaSheet({
                               src={photo}
                               alt={photoAlt}
                               fill
-                              sizes="288px"
+                              sizes="352px"
                               className="object-cover"
                             />
                           ) : (
