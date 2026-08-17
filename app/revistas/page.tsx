@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DepthShell from "@/components/DepthShell";
 import CoverMorphTransition from "@/components/CoverMorphTransition";
+import PatinaCover from "@/components/PatinaCover";
 import IssueContentsAccordion from "@/components/IssueContentsAccordion";
 import PublicacionesArchivo from "@/components/PublicacionesArchivo";
 import { getCurrentIssue, getAllIssues, type Issue } from "@/lib/issues";
@@ -79,10 +80,10 @@ export default function RevistaPage() {
                 </div>
               </div>
 
-              {/* The cover asset (REVISTA 5-6.webp) is already a rendered 3D
-                  hardcover with its own spine, page edges and drop shadow, so it
-                  renders as a plain image — NOT through BookCover3D (which would
-                  double up the 3D effect). */}
+              {/* PATINA TEST (uncommitted): the static cover image is replaced
+                  by the /labs/patina WebGL material — fixed geometry, scroll
+                  moves only the virtual observer's specular response. Maps in
+                  public/patina-revista/. Revert to the <Image> below to go back. */}
               <div className="flex flex-col items-center gap-6 justify-self-center lg:justify-self-end">
                 {currentIssue.cover && (
                   <Link
@@ -90,12 +91,12 @@ export default function RevistaPage() {
                     data-post-card-image
                     className="block w-64 sm:w-72 lg:w-[380px]"
                   >
-                    <Image
-                      src={currentIssue.cover}
+                    <PatinaCover
+                      basePath="/patina-revista"
+                      textureWidth={770}
+                      textureHeight={1065}
+                      dialLabel="Patina revista"
                       alt={`${currentIssue.number} (${currentIssue.year})`}
-                      width={770}
-                      height={1065}
-                      priority
                       className="h-auto w-full"
                     />
                   </Link>

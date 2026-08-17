@@ -42,7 +42,7 @@ export default function RootLayout({
         </div>
         {/* Agentation visual-feedback toolbar — dev only, never ships to prod. */}
         {process.env.NODE_ENV === "development" && <Agentation />}
-        {/* DialKit control-panel surface — dev only, same rule as Agentation. */}
+        {/* DialKit authoring surfaces — dev only (patina light-path tuning). */}
         {process.env.NODE_ENV === "development" && <DevDials />}
       </body>
     </html>

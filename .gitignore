@@ -40,3 +40,4 @@ next-env.d.ts
 drive-download-*.zip
 *.zip
 /public/BELEN ASSETS*/
+.gstack/

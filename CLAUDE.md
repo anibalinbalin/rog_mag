@@ -139,3 +139,13 @@ If this session runs in a worktree (`.claude/worktrees/<name>/`):
 1. `bun install` first — node_modules is not copied. Gitignored env files arrive via `.worktreeinclude`.
 2. Dev server: pick a free port in 3005-3008 — all pre-mapped via `tailscale serve`, so the access URL is `https://claude-code-sec.tailf626.ts.net:<port>/` — never hand over localhost or the LAN IP.
 3. Finish with `/go` (commit → push → PR → merge, `anibal/` branch prefix). Never hand uncommitted files back to the main checkout — the hub tab only ever `git pull`s after merge.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
