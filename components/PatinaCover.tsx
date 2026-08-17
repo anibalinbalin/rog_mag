@@ -271,7 +271,9 @@ export default function PatinaCover({
   const path = useDialTimeline(
     "Luz portada",
     {
-      leg1: { at: 0, duration: 0.42, from: { x: 0, y: 72 }, to: { x: 18, y: 36 }, transition: { type: "spring", stiffness: 200, damping: 25, mass: 1 } },
+      // Baked 2026-08-17 from Anibal's clip-editor tuning (was persisted only
+      // in browser DialKit storage): sweep straight down the left edge.
+      leg1: { at: 0, duration: 0.25, from: { x: -100, y: 81 }, to: { x: -100, y: -100 }, transition: { type: "spring", visualDuration: 0.42, bounce: 0.2 } },
       // Legs 2-4 disabled 2026-08-17 (Anibal) — sweep is leg1 only for now.
       // Restore by uncommenting and adding them back to the `legs` array below.
       // leg2: { at: 0.42, duration: 0.08, from: { x: 18, y: 36 }, to: { x: 0, y: 0 }, transition: lin(0.08) },
