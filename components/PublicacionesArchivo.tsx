@@ -605,8 +605,12 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           transform: scaleX(0.7);
           transform-origin: right center;
           background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.19), rgba(40,22,10,.13) 32%, rgba(40,22,10,.06) 54%, rgba(40,22,10,.02) 74%, transparent 90%);
-          transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                      transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+          /* CLOSE: the cover lifts off the ground zone in the first instant of
+             the close swing, so its shadow there must die immediately — 150ms,
+             well inside the cover's 450ms — or a detached blob lingers on the
+             empty paper after the cover has already landed shut. */
+          transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
+                      transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
         }
         .archivo-cover {
           position: absolute; inset: 0;
@@ -662,22 +666,29 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
             transform: rotateY(calc(-1 * var(--open, 160deg)));
             transition: transform var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
           }
-          /* Shadows grow in lockstep with the cover — same duration and easing,
-             no delays. The shadow starts from a barely-visible seed (0.04/0.03)
-             and grows to full intensity using the same curve as the rotation,
-             so it feels CAUSED by the cover lifting rather than a separate
-             delayed effect popping in mid-air. */
+          /* The cast shadow (under the cover, retreating to the spine gutter)
+             moves in lockstep with the rotation — it is always hidden behind
+             the cover, so sharing the cover's curve keeps it feeling caused by
+             the lift. */
           .archivo-book:hover .archivo-cast {
             opacity: 0.8;
             transform: scaleX(0.34);
             transition: opacity var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1)),
                         transform var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
           }
+          /* The ground shadow must NOT run in lockstep: it sits at the open
+             cover's FINAL tip position, but the tip only sweeps into that zone
+             in the last third of the rotation (and the overshoot curve front-
+             loads the motion). Lockstep painted a near-full shadow on empty
+             paper while the cover still stood at the spine — the shadow landed
+             before the cover did. Staged instead: hold for 0.3×dur, then bloom
+             over 0.45×dur with a plain ease-out, completing just as the cover
+             presses flat. */
           .archivo-book:hover .archivo-ground {
             opacity: 1;
             transform: scaleX(1);
-            transition: opacity var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1)),
-                        transform var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
+            transition: opacity calc(var(--dur, 700ms) * 0.45) cubic-bezier(0.215, 0.61, 0.355, 1) calc(var(--dur, 700ms) * 0.3),
+                        transform calc(var(--dur, 700ms) * 0.45) cubic-bezier(0.215, 0.61, 0.355, 1) calc(var(--dur, 700ms) * 0.3);
           }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
