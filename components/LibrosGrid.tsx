@@ -9,7 +9,7 @@ function LibroCard({ libro }: { libro: Libro }) {
   const needsTruncation = libro.description.length > 200;
 
   return (
-    <div className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:items-center sm:gap-10">
+    <div className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:gap-10">
       {/* Cover */}
       <div className="relative aspect-[4/5] w-full">
         {libro.coverImage && (

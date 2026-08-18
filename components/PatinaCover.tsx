@@ -244,6 +244,21 @@ export default function PatinaCover({
     // (scene units) keeps the sheen alive while the scroll is parked.
     wobble: [0.04, 0, 0.08],
     wobbleSpeed: [0.25, 0.05, 1],
+    // Contact shadow — a pill strip at the contact line (shadowY, % of
+    // canvas) whose layered box-shadows do the diffusion. Box-shadows keep a
+    // straight edge straight (radial ellipses starve the book's corners, which
+    // is what made it float). W = strip width as canvas fraction; strength
+    // scales all three layers' opacity, size their blur/offset in px.
+    // Geometry derived from height.png: silhouette cols 9-688/770 × planeFill
+    // 0.97 → width 0.855, center 45.4% of canvas (shadowX −4.6); flat bottom
+    // row 995/1065 → contact line 92.1% of canvas. Verified against rendered
+    // pixels (book x 11-333, bottom 91.8% on a 380px canvas).
+    shadowY: [92.1, 85, 96],
+    shadowX: [-4.6, -8, 8],
+    shadowW: [0.855, 0.3, 1.1],
+    shadowH: [1.2, 0.4, 3],
+    shadowStrength: [1, 0, 2],
+    shadowSize: [1, 0.3, 2.5],
   });
   const dialsRef = useRef(dials);
   dialsRef.current = dials;
@@ -554,16 +569,37 @@ export default function PatinaCover({
         }}
       />
       {/* Contact shadow grounds the book on the page — without it the masked
-          render reads as a floating cutout. Position derives from the plane:
-          book bottom = 0.5 + (0.935 − 0.5) × planeFill(0.97) ≈ 92% of canvas
-          (texture cut row 996/1065 = 0.935 of the plane). */}
+          render reads as a floating cutout. Two layers, both centered on the
+          contact line (book bottom ≈ 92% of canvas: 0.5 + (0.935 − 0.5) ×
+          planeFill(0.97); texture cut row 996/1065 = 0.935 of the plane).
+          One blurred ellipse reads as a detached gray puck — the dark occlusion
+          core hugging the contact line is what welds the book to the page, and
+          the penumbra spreads below it. Gradient stops approximate an eased
+          falloff so neither layer shows a visible rim. */}
+      {/* The strip paints ABOVE the canvas (z-10): the shader's output is
+          non-premultiplied (frag = col, mask), so outside the silhouette the
+          wall light composites additively over the page — anything BEHIND the
+          canvas gets brightened toward white. A shadow is absence of light, so
+          it must darken on top of that light layer. The strip's own background
+          is the occlusion core tucked under the book's bottom edge; the three
+          box-shadows are the classic layered-shadow stack (tight → mid → wide,
+          halving opacity as blur grows) and inherit the pill's straight-edged
+          silhouette. filter blur softens core and stack together. */}
       <div
         aria-hidden
-        className="absolute left-1/2 top-[91.5%] h-[3.5%] w-[86%] -translate-x-1/2 rounded-full"
+        className="absolute z-10 -translate-x-1/2 -translate-y-[45%] rounded-full"
         style={{
-          background:
-            "radial-gradient(ellipse closest-side, rgba(46, 18, 28, 0.38), rgba(46, 18, 28, 0) 78%)",
-          filter: "blur(5px)",
+          top: `${dials.shadowY.toFixed(2)}%`,
+          left: `calc(50% + ${dials.shadowX.toFixed(2)}%)`,
+          height: `${dials.shadowH.toFixed(2)}%`,
+          width: `${(dials.shadowW * 100).toFixed(1)}%`,
+          background: `rgba(46, 18, 28, ${(0.42 * dials.shadowStrength).toFixed(3)})`,
+          boxShadow: [
+            `0 ${(3 * dials.shadowSize).toFixed(1)}px ${(5 * dials.shadowSize).toFixed(1)}px rgba(46, 18, 28, ${(0.34 * dials.shadowStrength).toFixed(3)})`,
+            `0 ${(10 * dials.shadowSize).toFixed(1)}px ${(18 * dials.shadowSize).toFixed(1)}px rgba(46, 18, 28, ${(0.22 * dials.shadowStrength).toFixed(3)})`,
+            `0 ${(24 * dials.shadowSize).toFixed(1)}px ${(42 * dials.shadowSize).toFixed(1)}px rgba(46, 18, 28, ${(0.12 * dials.shadowStrength).toFixed(3)})`,
+          ].join(", "),
+          filter: "blur(3px)",
         }}
       />
       {process.env.NODE_ENV === "development" && (
