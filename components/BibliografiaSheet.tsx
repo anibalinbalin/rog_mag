@@ -71,8 +71,8 @@ export default function BibliografiaSheet({
                 <Scroll.View className="h-full" scrollGestureTrap={{ yEnd: true }}>
                   <Scroll.Content>
                     <div className="mx-auto max-w-4xl px-6 pb-20 pt-20 sm:px-10 sm:pt-24">
+                      {/* Header: portrait + name side by side */}
                       <div className="grid gap-8 sm:grid-cols-[22rem_1fr] sm:gap-12">
-                        {/* Portrait */}
                         <div
                           className={`relative aspect-[3/4] w-full overflow-hidden rounded-sm bg-paper-cream sm:w-[22rem] ${
                             photo ? "" : "border border-dashed border-line"
@@ -110,8 +110,7 @@ export default function BibliografiaSheet({
                           )}
                         </div>
 
-                        {/* Biography */}
-                        <div>
+                        <div className="flex flex-col justify-end">
                           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-muted">
                             {eyebrow}
                           </p>
@@ -124,15 +123,17 @@ export default function BibliografiaSheet({
                               </>
                             ) : null}
                           </SheetWithDepth.Title>
-                          <div className="mt-6 space-y-4 text-base leading-relaxed text-ink-soft">
-                            {body.map((paragraph, i) => (
-                              <p
-                                key={i}
-                                dangerouslySetInnerHTML={{ __html: paragraph }}
-                              />
-                            ))}
-                          </div>
                         </div>
+                      </div>
+
+                      {/* Body: full width below */}
+                      <div className="mt-10 space-y-4 text-base leading-relaxed text-ink-soft">
+                        {body.map((paragraph, i) => (
+                          <p
+                            key={i}
+                            dangerouslySetInnerHTML={{ __html: paragraph }}
+                          />
+                        ))}
                       </div>
                     </div>
                   </Scroll.Content>
