@@ -2,6 +2,7 @@ import Image from "next/image";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BibliografiaDepthShell from "@/components/BibliografiaDepthShell";
+import PatinaShelf from "@/components/PatinaShelf";
 import BibliografiaSheet from "@/components/BibliografiaSheet";
 import ScrollMapClient from "./ScrollMapClient";
 import { getEpocas } from "@/lib/epocas";
@@ -108,15 +109,10 @@ export default function OchentaAnosPage() {
         {pagina.librosImage && pagina.librosBody.length > 0 && (
           <section className="border-y border-line">
             <div className="grid items-stretch lg:grid-cols-2">
-              <div className="relative aspect-[1343/622] lg:aspect-auto lg:min-h-[460px]">
-                <Image
-                  src={pagina.librosImage}
-                  alt={pagina.librosAlt}
-                  fill
-                  sizes="(min-width: 1024px) 50vw, 100vw"
-                  className="object-cover"
-                />
-              </div>
+              <PatinaShelf
+                alt={pagina.librosAlt}
+                className="relative aspect-[2048/949] lg:aspect-auto lg:min-h-[460px]"
+              />
               <div className="flex items-center px-4 py-12 lg:py-16">
                 <div className="mx-auto max-w-xl space-y-5 lg:ml-12 lg:mr-auto">
                   {pagina.librosBody.map((paragraph, i) => (
