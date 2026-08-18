@@ -124,14 +124,12 @@ export default function BibliografiaSheet({
                               </>
                             ) : null}
                           </SheetWithDepth.Title>
-                          <div className="mt-6 space-y-4">
+                          <div className="mt-6 space-y-4 text-base leading-relaxed text-ink-soft">
                             {body.map((paragraph, i) => (
                               <p
                                 key={i}
-                                className="text-base leading-relaxed text-ink-soft"
-                              >
-                                {paragraph}
-                              </p>
+                                dangerouslySetInnerHTML={{ __html: paragraph }}
+                              />
                             ))}
                           </div>
                         </div>
