@@ -129,7 +129,7 @@ export default function BibliografiaSheet({
                           )}
                         </div>
 
-                        <div className="flex flex-col justify-end">
+                        <div className="flex flex-col justify-start">
                           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ink-muted">
                             {eyebrow}
                           </p>
