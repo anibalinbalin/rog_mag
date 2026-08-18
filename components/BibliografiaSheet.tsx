@@ -19,9 +19,28 @@ export type BibliografiaSheetProps = {
 const DEFAULT_BUTTON =
   "inline-flex items-center rounded-sm bg-action px-7 py-3 text-sm uppercase tracking-widest text-paper transition-opacity hover:opacity-90";
 
-/** "Bibliografía Fontana" CTA on /80-años. Opens a Silk "sheet with depth":
-    the page recedes behind a bottom sheet holding Pérez Fontana's portrait and
-    biography. Dismiss via the X, the backdrop, swipe-down, or Esc. */
+function NumberedList({ html }: { html: string }) {
+  const items = html.split("<br>").map((raw) => {
+    const match = raw.match(/^(\d+)\.\s*/);
+    if (!match) return null;
+    return { n: match[1], text: raw.slice(match[0].length) };
+  });
+  if (items.some((it) => !it)) return <p dangerouslySetInnerHTML={{ __html: html }} />;
+  return (
+    <ol className="space-y-3">
+      {(items as { n: string; text: string }[]).map((item) => (
+        <li key={item.n} className="flex gap-3">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-soft/30 text-xs font-semibold text-ink-soft">
+            {item.n}
+          </span>
+          <span className="pt-0.5" dangerouslySetInnerHTML={{ __html: item.text }} />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+
 export default function BibliografiaSheet({
   label,
   eyebrow,
@@ -128,12 +147,16 @@ export default function BibliografiaSheet({
 
                       {/* Body: full width below */}
                       <div className="mt-10 space-y-4 text-base leading-relaxed text-ink-soft">
-                        {body.map((paragraph, i) => (
-                          <p
-                            key={i}
-                            dangerouslySetInnerHTML={{ __html: paragraph }}
-                          />
-                        ))}
+                        {body.map((paragraph, i) =>
+                          /^1\.\s/.test(paragraph) && paragraph.includes("<br>") ? (
+                            <NumberedList key={i} html={paragraph} />
+                          ) : (
+                            <p
+                              key={i}
+                              dangerouslySetInnerHTML={{ __html: paragraph }}
+                            />
+                          )
+                        )}
                       </div>
                     </div>
                   </Scroll.Content>
