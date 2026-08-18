@@ -1,17 +1,37 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Libro } from "@/lib/libros";
 
 function LibroCard({ libro }: { libro: Libro }) {
   const [expanded, setExpanded] = useState(false);
-  const needsTruncation = libro.description.length > 200;
+  const [clamped, setClamped] = useState(false);
+  const descRef = useRef<HTMLParagraphElement>(null);
+
+  // Only offer "Leer más" when line-clamp-3 actually hides text. Measured on
+  // the real element (and re-measured on resize) because it depends on the
+  // column width, not the character count.
+  useEffect(() => {
+    const el = descRef.current;
+    if (!el || expanded) return;
+    const measure = () => setClamped(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [expanded]);
+
+  const needsTruncation = clamped || expanded;
 
   return (
     <div className="grid grid-cols-[120px_1fr] items-start gap-6 border-b border-dashed border-line-dark py-8 last:border-b-0 sm:grid-cols-[160px_1fr] sm:gap-10">
       {/* Cover */}
-      <div className="relative aspect-[4/5] w-full">
+      <div
+        className={`relative aspect-[4/5] w-full transition-transform duration-300 ease-[cubic-bezier(0.77,0,0.175,1)] motion-reduce:transition-none ${
+          expanded ? "translate-y-8" : ""
+        }`}
+      >
         {libro.coverImage && (
           <Image
             src={libro.coverImage}
@@ -34,8 +54,9 @@ function LibroCard({ libro }: { libro: Libro }) {
         {libro.description && (
           <div className="mt-3">
             <p
+              ref={descRef}
               className={`max-w-2xl whitespace-pre-line text-sm leading-relaxed text-ink-soft ${
-                !expanded && needsTruncation ? "line-clamp-3" : ""
+                !expanded ? "line-clamp-3" : ""
               }`}
             >
               {libro.description}
