@@ -30,7 +30,7 @@ function NumberedList({ html }: { html: string }) {
     <ol className="space-y-3">
       {(items as { n: string; text: string }[]).map((item) => (
         <li key={item.n} className="flex gap-3">
-          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-ink-soft/30 text-xs font-semibold text-ink-soft">
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-ink-soft/70 text-xs font-semibold text-paper">
             {item.n}
           </span>
           <span className="pt-0.5" dangerouslySetInnerHTML={{ __html: item.text }} />
