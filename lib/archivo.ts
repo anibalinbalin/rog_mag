@@ -19,6 +19,24 @@ const MONTH_LABELS: Record<string, string> = {
   "12": "Diciembre",
 };
 
+/** Short forms, used only when joining a combined issue into a range
+    ("Set-Oct"). A range of two full month names wraps onto a second line in
+    the archive grid and pushes that magazine below the row's baseline. */
+const MONTH_SHORT: Record<string, string> = {
+  "01": "Ene",
+  "02": "Feb",
+  "03": "Mar",
+  "04": "Abr",
+  "05": "May",
+  "06": "Jun",
+  "07": "Jul",
+  "08": "Ago",
+  "09": "Set",
+  "10": "Oct",
+  "11": "Nov",
+  "12": "Dic",
+};
+
 export interface ArchivoMonth {
   num: string; // "06", or "05-06" for combined issues (up to "03-04-05-06")
   label: string; // "Junio", or "Mayo-Junio" for combined issues
@@ -94,7 +112,7 @@ export function getArchivoYears(): ArchivoYear[] {
           const label =
             parts.length === 1
               ? MONTH_LABELS[key]
-              : `${MONTH_LABELS[parts[0]]}-${MONTH_LABELS[parts[parts.length - 1]]}`;
+              : `${MONTH_SHORT[parts[0]]}-${MONTH_SHORT[parts[parts.length - 1]]}`;
           const sumPages: string[] = [];
           if (files.includes(`${key}-sum.jpg`))
             sumPages.push(`/archivo/${yearDir}/${key}-sum.jpg`);

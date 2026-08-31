@@ -72,7 +72,22 @@ function CloseIcon() {
     a slightly different angle, speed and a faint resting tilt — instead of every
     cover flipping identically. Keyed off the issue (year+month) so the server and
     client agree (no hydration flicker), and stable across renders. */
-function bookJitter(seed: number, base: { angle: number; dur: number }) {
+/** Years whose covers are dark blue or near-black cloth. Their straight edges
+    read against the pale ground, so the resting tilt that gives the cream
+    covers their hand-shelved look reads as sloppy alignment instead — these
+    get a fraction of it. Derived from mean cover luminance (<150) excluding
+    the warm orange/red covers (2001, 2004). */
+const DARK_COVER_YEARS = (y: number) =>
+  (y >= 1949 && y <= 1959) || (y >= 1977 && y <= 1992) || y === 1996 || y === 1997 || y === 1999 || y === 2000;
+
+/** How much of the resting tilt a dark-cover year keeps. */
+const DARK_TILT_SCALE = 0.25;
+
+function bookJitter(
+  seed: number,
+  base: { angle: number; dur: number },
+  tiltScale = 1
+) {
   const rnd = (salt: number) => {
     // avalanche hash (murmur3 finalizer) so consecutive issues scatter rather
     // than ramping in lockstep down a row.
@@ -84,7 +99,7 @@ function bookJitter(seed: number, base: { angle: number; dur: number }) {
   const angle = base.angle - 11 + Math.round(rnd(1) * 22);
   return {
     angle,
-    tilt: +((rnd(2) * 2 - 1) * 1.3).toFixed(2), // −1.3…+1.3° resting tilt
+    tilt: +((rnd(2) * 2 - 1) * 1.3 * tiltScale).toFixed(2), // ±1.3° resting tilt
     dur: base.dur - 75 + Math.round(rnd(3) * 150),
     // How far (as a % of the book's own width) the open cover's free edge
     // reaches to the left of the spine — |cos(angle)|, since the cover is
@@ -331,7 +346,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                 // every combined issue onto one identical jitter.
                 const book = bookJitter(
                   active.year * 100 + Number(m.num.slice(0, 2)),
-                  { angle: flip.openAngle, dur: flip.duration }
+                  { angle: flip.openAngle, dur: flip.duration },
+                  DARK_COVER_YEARS(active.year) ? DARK_TILT_SCALE : 1
                 );
                 const bookStyle = {
                   "--open": `${book.angle}deg`,
