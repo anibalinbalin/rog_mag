@@ -6,9 +6,11 @@ import type { Post } from "@/lib/blog";
 export default function PostGrid({
   posts,
   columns = 4,
+  hideSectionBadge = false,
 }: {
   posts: Post[];
   columns?: 3 | 4;
+  hideSectionBadge?: boolean;
 }) {
   const colsClass =
     columns === 3
@@ -19,7 +21,11 @@ export default function PostGrid({
     <div className="border-t border-dashed border-line-dark pt-10">
       <div className={`grid gap-10 ${colsClass}`}>
         {posts.map((post) => (
-          <PostCard key={post.slug} post={post} />
+          <PostCard
+            key={post.slug}
+            post={post}
+            hideSectionBadge={hideSectionBadge}
+          />
         ))}
       </div>
     </div>

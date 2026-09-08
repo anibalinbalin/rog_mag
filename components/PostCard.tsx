@@ -12,9 +12,11 @@ import { formatDate } from "@/lib/format";
 export default function PostCard({
   post,
   size = "default",
+  hideSectionBadge = false,
 }: {
   post: Post;
   size?: "default" | "feature" | "compact";
+  hideSectionBadge?: boolean;
 }) {
   const Wrapper = post.sourceUrl ? "a" : "div";
   const linkProps = post.sourceUrl
@@ -37,7 +39,10 @@ export default function PostCard({
   const isFeature = size === "feature";
 
   return (
-    <Wrapper {...linkProps} className={`block ${isFeature ? "text-center" : ""}`}>
+    <Wrapper
+      {...linkProps}
+      className={`flex h-full flex-col ${isFeature ? "text-center" : ""}`}
+    >
       {/* Cover — uploaded image, or cream placeholder like the journal covers */}
       <div
         className={`relative w-full overflow-hidden bg-paper-cream ${
@@ -59,13 +64,15 @@ export default function PostCard({
         )}
       </div>
 
-      {/* Metadata row — accent-bar section + date (Belen's pick) */}
+      {/* Metadata row — accent-bar section + date (Belen's pick). The
+          section badge is dropped when the grid is already scoped to one
+          section (e.g. the Noticias page itself) — redundant there. */}
       <div
         className={`mt-5 flex items-center gap-3 ${
           isFeature ? "justify-center" : ""
         }`}
       >
-        <SectionBadge section={post.section} />
+        {!hideSectionBadge && <SectionBadge section={post.section} />}
         <span className="text-[11px] uppercase tracking-widest text-ink-muted">
           {formatDate(post.date)}
         </span>
@@ -89,8 +96,10 @@ export default function PostCard({
         {post.excerpt}
       </p>
 
-      {/* Author — same italic serif burgundy byline as the issue contenidos */}
-      <div className={`mt-5 ${isFeature ? "text-center" : ""}`}>
+      {/* Author — same italic serif burgundy byline as the issue contenidos.
+          mt-auto pins it to the card bottom so bylines align across a row
+          of cards regardless of how many lines the excerpt wraps to. */}
+      <div className={isFeature ? "mt-5 text-center" : "mt-auto pt-5"}>
         <span className="font-serif text-base italic text-burgundy">
           {post.author}
         </span>
