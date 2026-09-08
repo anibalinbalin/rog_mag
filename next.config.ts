@@ -45,6 +45,13 @@ const nextConfig: NextConfig = {
         destination: "/secciones/noticias",
         permanent: true,
       },
+      // Publicaciones is now books-only — /publicaciones/libros folded into
+      // the root /publicaciones (the old Artículos/Libros tabs are gone).
+      {
+        source: "/publicaciones/libros",
+        destination: "/publicaciones",
+        permanent: true,
+      },
       // Issues 3-4 and 5-6 were filed under 2026 before the printed covers
       // settled the real dates (jul-dic 2024 and ene-jun 2025). Filename =
       // slug = URL, so the renames need these to keep old links alive.
