@@ -6,6 +6,7 @@ excerpt: "El Instituto Iberoamericano de Derecho Concursal realizará su XXII Co
 author: "Revista de Derecho Comercial y de la Empresa"
 authorRole: "Redacción"
 date: "2026-09-08"
+coverImage: "/covers/noticias-congreso-concursal.webp"
 sourceUrl: "https://www.institutoiberoamericanoderechoconcursal.org/eventos/eventos-proximos/264-xxii-congreso-iberoamericano-de-derecho-concursal-2026"
 ---
 

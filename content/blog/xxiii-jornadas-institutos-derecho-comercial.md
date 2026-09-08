@@ -6,6 +6,7 @@ excerpt: "La Facultad de Derecho de la Universidad Nacional de Córdoba convoca 
 author: "Revista de Derecho Comercial y de la Empresa"
 authorRole: "Redacción"
 date: "2026-09-08"
+coverImage: "/covers/noticias-jornadas-institutos.webp"
 sourceUrl: "https://derecho.unc.edu.ar/xxiii-jornadas-de-institutos-de-derecho-comercial-inscripcion-abierta/"
 ---
 
