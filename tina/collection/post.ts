@@ -1,7 +1,7 @@
 import type { Collection } from 'tinacms';
 
 // Maps the flat frontmatter that lib/blog.ts reads via gray-matter
-// (title/category/section/excerpt/author/authorRole/date) + the markdown body.
+// (title/category/section/excerpt/author/authorRole/date/sourceUrl) + the markdown body.
 // Field `name`s MUST stay flat and match those keys, and the FILENAME must equal
 // the URL slug (lib/blog.ts getPostBySlug reads `${slug}.md`).
 const Post: Collection = {
@@ -91,6 +91,13 @@ const Post: Collection = {
       required: true,
       description: 'Ordena los artículos: el más reciente aparece primero.',
       ui: { dateFormat: 'YYYY-MM-DD' },
+    },
+    {
+      type: 'string',
+      name: 'sourceUrl',
+      label: 'Enlace externo (opcional)',
+      description:
+        'Para noticias que remiten a un sitio externo (congreso, convocatoria, etc.). Si se completa, la tarjeta enlaza a esta URL en vez de a la página del artículo.',
     },
     {
       type: 'rich-text',

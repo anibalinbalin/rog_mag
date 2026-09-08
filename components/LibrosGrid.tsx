@@ -51,6 +51,11 @@ function LibroCard({ libro }: { libro: Libro }) {
         <h3 className="mt-2 font-serif text-2xl font-semibold leading-snug text-ink">
           {libro.title}
         </h3>
+        <p className="mt-1">
+          <span className="font-serif text-lg font-medium italic text-burgundy">
+            {libro.author}
+          </span>
+        </p>
         {libro.description && (
           <div className="mt-3">
             <p
@@ -76,11 +81,6 @@ function LibroCard({ libro }: { libro: Libro }) {
             {libro.note}
           </p>
         )}
-        <p className="mt-4">
-          <span className="font-serif text-base italic text-burgundy">
-            {libro.author}
-          </span>
-        </p>
         {libro.purchaseUrl && (
           <a
             href={libro.purchaseUrl}

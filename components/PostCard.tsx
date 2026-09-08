@@ -6,7 +6,9 @@ import { formatDate } from "@/lib/format";
 /** every.to collection-card anatomy: cover, metadata row, serif title,
     serif dek, uppercase author row. No card borders — dividers come from
     the parent grid. Display-only since the article detail pages were
-    removed (2026-07-30) — cards no longer link anywhere. */
+    removed (2026-07-30) — cards don't link anywhere UNLESS the post sets
+    sourceUrl (external announcements, e.g. Noticias), in which case the
+    whole card links out to that URL in a new tab. */
 export default function PostCard({
   post,
   size = "default",
@@ -14,23 +16,28 @@ export default function PostCard({
   post: Post;
   size?: "default" | "feature" | "compact";
 }) {
+  const Wrapper = post.sourceUrl ? "a" : "div";
+  const linkProps = post.sourceUrl
+    ? { href: post.sourceUrl, target: "_blank", rel: "noopener noreferrer" }
+    : {};
+
   if (size === "compact") {
     return (
-      <div className="block py-4">
+      <Wrapper {...linkProps} className="block py-4">
         <p className="font-serif text-lg font-semibold leading-snug text-ink">
           {post.title}
         </p>
         <p className="mt-2 font-serif text-sm italic text-burgundy">
           {post.author}
         </p>
-      </div>
+      </Wrapper>
     );
   }
 
   const isFeature = size === "feature";
 
   return (
-    <div className={`block ${isFeature ? "text-center" : ""}`}>
+    <Wrapper {...linkProps} className={`block ${isFeature ? "text-center" : ""}`}>
       {/* Cover — uploaded image, or cream placeholder like the journal covers */}
       <div
         className={`relative w-full overflow-hidden bg-paper-cream ${
@@ -88,6 +95,6 @@ export default function PostCard({
           {post.author}
         </span>
       </div>
-    </div>
+    </Wrapper>
   );
 }
