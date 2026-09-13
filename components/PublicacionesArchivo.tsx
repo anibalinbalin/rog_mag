@@ -76,9 +76,10 @@ function CloseIcon() {
     read against the pale ground, so the resting tilt that gives the cream
     covers their hand-shelved look reads as sloppy alignment instead — these
     get a fraction of it. Derived from mean cover luminance (<150) excluding
-    the warm orange/red covers (2001, 2004). */
+    the warm orange/red covers (2001, 2004). The 2016+ Quinta Época issues are
+    photographed red covers with crisp paper edges and read the same way. */
 const DARK_COVER_YEARS = (y: number) =>
-  (y >= 1949 && y <= 1959) || (y >= 1977 && y <= 1992) || y === 1996 || y === 1997 || y === 1999 || y === 2000;
+  (y >= 1949 && y <= 1959) || (y >= 1977 && y <= 1992) || y === 1996 || y === 1997 || y === 1999 || y === 2000 || y >= 2016;
 
 /** How much of the resting tilt a dark-cover year keeps. */
 const DARK_TILT_SCALE = 0.25;
