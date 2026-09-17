@@ -25,7 +25,7 @@ export const sections: Section[] = [
     slug: "noticias",
     name: "Noticias",
     tagline:
-      "Novedades legislativas, congresos y actualidad del mundo jurídico.",
+      "Noticias, novedades y actividades que consideramos de interés para nuestros lectores, vinculadas al Derecho Comercial y a la actualidad jurídica.",
   },
 ];
 
