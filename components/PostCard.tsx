@@ -9,6 +9,8 @@ import { formatDate } from "@/lib/format";
     removed (2026-07-30) — cards don't link anywhere UNLESS the post sets
     sourceUrl (external announcements, e.g. Noticias), in which case the
     whole card links out to that URL in a new tab. */
+const PUBLICATION_NAME = "Revista de Derecho Comercial y de la Empresa";
+
 export default function PostCard({
   post,
   size = "default",
@@ -29,9 +31,11 @@ export default function PostCard({
         <p className="font-serif text-lg font-semibold leading-snug text-ink">
           {post.title}
         </p>
-        <p className="mt-2 font-serif text-sm italic text-burgundy">
-          {post.author}
-        </p>
+        {post.author !== PUBLICATION_NAME && (
+          <p className="mt-2 font-serif text-sm italic text-burgundy">
+            {post.author}
+          </p>
+        )}
       </Wrapper>
     );
   }
@@ -99,11 +103,13 @@ export default function PostCard({
       {/* Author — same italic serif burgundy byline as the issue contenidos.
           mt-auto pins it to the card bottom so bylines align across a row
           of cards regardless of how many lines the excerpt wraps to. */}
-      <div className={isFeature ? "mt-5 text-center" : "mt-auto pt-5"}>
-        <span className="font-serif text-base italic text-burgundy">
-          {post.author}
-        </span>
-      </div>
+      {post.author !== PUBLICATION_NAME && (
+        <div className={isFeature ? "mt-5 text-center" : "mt-auto pt-5"}>
+          <span className="font-serif text-base italic text-burgundy">
+            {post.author}
+          </span>
+        </div>
+      )}
     </Wrapper>
   );
 }
