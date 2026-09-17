@@ -21,6 +21,7 @@ export default function PageIdentity({
   subtitleField,
   bio,
   bioField,
+  bioClassName,
   links,
   linksField,
 }: {
@@ -36,6 +37,7 @@ export default function PageIdentity({
   subtitleField?: string;
   bio?: ReactNode;
   bioField?: string;
+  bioClassName?: string;
   links?: { label: string; href: string }[];
   linksField?: string;
 }) {
@@ -100,7 +102,10 @@ export default function PageIdentity({
       {bio && (
         <div
           data-tina-field={bioField}
-          className="mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft"
+          className={
+            bioClassName ??
+            "mt-5 max-w-xl font-serif text-lg leading-relaxed text-ink-soft"
+          }
         >
           {bio}
         </div>

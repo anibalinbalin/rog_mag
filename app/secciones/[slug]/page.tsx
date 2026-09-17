@@ -42,7 +42,15 @@ export default async function SectionPage({
       <Header compact />
 
       <main>
-        <PageIdentity title={section.name} bio={section.tagline} />
+        <PageIdentity
+          title={section.name}
+          bio={section.tagline}
+          bioClassName={
+            section.slug === "noticias"
+              ? "mt-5 max-w-2xl text-base leading-relaxed text-ink-soft"
+              : undefined
+          }
+        />
 
         <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-6 lg:pb-32">
           {posts.length > 0 ? (
