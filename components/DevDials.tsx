@@ -10,7 +10,7 @@ import "dialkit/styles.css";
 export default function DevDials() {
   return (
     <>
-      <DialRoot position="top-left" defaultOpen />
+      <DialRoot position="top-left" />
       <DialTimeline />
     </>
   );

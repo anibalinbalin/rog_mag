@@ -62,8 +62,11 @@ export default function RevistaPage() {
             >
               <div>
                 <h1 className="font-serif text-4xl leading-tight text-ink sm:text-5xl">
-                  {currentIssue.number} ({currentIssue.year})
+                  Última Edición
                 </h1>
+                <p className="mt-3 font-serif text-3xl font-semibold leading-snug text-ink">
+                  {currentIssue.number} ({currentIssue.year})
+                </p>
 
                 <Link
                   href={`/revistas/${currentIssue.slug}`}

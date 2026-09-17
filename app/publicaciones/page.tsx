@@ -22,6 +22,11 @@ export default function PublicacionesPage() {
           <h1 className="font-serif text-4xl text-ink sm:text-5xl">
             Publicaciones
           </h1>
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-ink-soft">
+            Selección de publicaciones de interés vinculadas al Derecho
+            Comercial y a otras áreas relacionadas, de autores y editoriales
+            nacionales e internacionales.
+          </p>
 
           {librosByYear.length > 0 ? (
             <LibrosGrid librosByYear={librosByYear} />
