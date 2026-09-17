@@ -55,6 +55,18 @@ const Epoca: Collection = {
     },
     {
       type: 'string',
+      name: 'etapa',
+      label: 'Etapa',
+      description: 'Ej: "1.ª ETAPA". Dejar vacío en los hitos que no abren una nueva etapa.',
+    },
+    {
+      type: 'string',
+      name: 'heading',
+      label: 'Título del hito',
+      description: 'Ej: Fundación de la revista.',
+    },
+    {
+      type: 'string',
       name: 'director',
       label: 'Director',
       description: 'Ej: Prof. Sagunto Pérez Fontana.',

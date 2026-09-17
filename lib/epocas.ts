@@ -18,6 +18,8 @@ export interface Epoca {
   title: string;
   startYear: number;
   endYear: number;
+  etapa: string;
+  heading: string;
   director: string;
   detail: string;
   photos: EpocaPhoto[];
@@ -44,6 +46,8 @@ function parseEpoca(fileName: string): Epoca {
     title: data.title ?? "",
     startYear: data.startYear ?? 0,
     endYear: data.endYear ?? 0,
+    etapa: data.etapa ?? "",
+    heading: data.heading ?? "",
     director: data.director ?? "",
     detail: data.detail ?? "",
     photos,

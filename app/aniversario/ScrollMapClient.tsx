@@ -452,7 +452,7 @@ export default function ScrollMapClient({
             {embedded || !hero ? (
               <div className="pt-[6vh] text-left">
                 <p className="font-serif text-2xl font-semibold italic text-ink sm:text-3xl">
-                  Seis épocas de historia en ocho décadas
+                  Seis etapas de historia en ocho décadas
                 </p>
                 <p className="mt-5 text-xs uppercase tracking-[0.25em] text-burgundy">1946 — 2026</p>
               </div>
@@ -503,6 +503,16 @@ export default function ScrollMapClient({
               );
             const textBlock = (
               <>
+                {epoca.etapa.trim() !== "" && (
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-burgundy">
+                    {epoca.etapa}
+                  </p>
+                )}
+                {epoca.heading.trim() !== "" && (
+                  <p className="mt-2 font-serif text-xl font-semibold text-ink">
+                    {epoca.heading}
+                  </p>
+                )}
                 {epoca.director.trim() !== "" && (
                   <p className="text-sm italic leading-relaxed text-ink-muted">
                     {epoca.director.split("\n").map((line, i) => (
