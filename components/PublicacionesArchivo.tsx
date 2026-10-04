@@ -355,6 +355,7 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                   "--tilt": `${book.tilt}deg`,
                   "--dur": `${book.dur}ms`,
                   "--ground-right": `${(100 * (1 + book.reach)).toFixed(1)}%`,
+                  "--reach": book.reach.toFixed(3),
                 } as CSSProperties;
                 const bookClass = "archivo-book group relative mx-auto aspect-[729/1000] w-[82%] max-w-[160px] hover:z-20";
 
@@ -574,11 +575,26 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
                    shadow that sweeps across the sumario toward the spine as the
                    cover lifts, ending as the resting spine-gutter shade.
            Per-issue --open / --dur / --tilt make each one a little different. */
+        /* --a is the cover's live opening angle — the ONE animated value.
+           Registered so it interpolates; the cover's rotation and both shadows
+           are pure functions of it, so they stay frame-locked to the cover on
+           open, close, overshoot and mid-flip reversals. (Separate shadow
+           transitions with guessed delays always drifted out of sync.) */
+        @property --a {
+          syntax: "<angle>";
+          inherits: true;
+          initial-value: 0deg;
+        }
         .archivo-book { perspective: var(--persp, 1500px); }
         .archivo-inner {
           position: absolute; inset: 0;
           transform: rotate(var(--tilt, 0deg));
           transform-style: preserve-3d;
+          --a: 0deg;
+          /* CLOSE (mouse-out): faster than open (450ms vs --dur ~700ms), plain
+             ease-out, NO overshoot — asymmetric so grid-skimming doesn't feel
+             sticky. The bouncy open easing lives in the :hover rule below. */
+          transition: --a 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         .archivo-page {
           position: absolute; inset: 0;
@@ -586,7 +602,9 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
         }
         .archivo-sum {
           object-fit: contain;
-          box-shadow: 0 8px 18px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.05);
+          /* Sits directly under the closed cover, so its shadow STACKS with
+             the cover's — kept lighter than the cover's own. */
+          box-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 2px rgba(40,22,10,.06), 0 5px 12px rgba(40,22,10,.06);
         }
         /* Cast shadow on the page plane: full-page at rest (invisible), it fades
            in while scaling down to a spine gutter, so on hover it reads as the
@@ -598,8 +616,9 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           pointer-events: none; opacity: 0.04;
           transform-origin: left center;
           background: linear-gradient(90deg, rgba(40,22,10,.20), rgba(40,22,10,.13) 22%, rgba(40,22,10,.06) 52%, rgba(40,22,10,.02) 76%, transparent);
-          transition: opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
-                      transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+          /* progress (1 - cos a) / 2: 0 closed → ~0.97 open. */
+          opacity: calc(0.04 + 0.76 * (1 - cos(var(--a))) / 2);
+          transform: scaleX(calc(1 - 0.66 * (1 - cos(var(--a))) / 2));
         }
         /* Ground + neighbor shadow: as the cover lifts open, a soft shadow
            fades in over the page background and onto whichever magazine
@@ -616,39 +635,65 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
            the paint in Chromium — confirmed by testing, not assumed. Plain
            2D scale is enough; --dur/easing keep it moving with the cover. */
         .archivo-ground {
-          position: absolute; top: 4%; bottom: 4%;
-          right: var(--ground-right, 6%); width: 85%;
-          pointer-events: none; opacity: 0.03;
-          transform: scaleX(0.7);
+          /* Light comes from above (same as the closed covers' 0 8px drop
+             shadow), so the cast falls a little LOWER than the cover and its
+             free edge. right is tucked 8% under the open cover so the darkest
+             part starts hidden beneath the tip — no seam between the shadow
+             and the cover. */
+          --gw: 0.72;
+          position: absolute; top: 9%; bottom: -6%;
+          right: calc(var(--ground-right, 106%) - 8%);
+          width: calc(var(--gw) * 100%);
+          pointer-events: none;
+          /* --r = how far the cover's free edge currently reaches past the
+             spine onto the ground (0 until the cover passes 90°, --reach when
+             fully open). The shadow's right edge rides that tip (translateX
+             back from its fully-open anchor) and darkens quadratically as the
+             cover lowers onto the page — so it can never land before the
+             cover, nor linger after it closes. Divided by --gw because
+             translate % is of this element's own width. */
+          --r: max(0, -1 * cos(var(--a)));
+          --g: min(1, var(--r) * var(--r) / (var(--reach, 0.95) * var(--reach, 0.95)));
+          opacity: var(--g);
+          transform: translateX(calc((var(--reach, 0.95) - var(--r)) / var(--gw) * 100%))
+                     scaleX(calc(0.75 + 0.25 * var(--g)));
           transform-origin: right center;
-          background: radial-gradient(ellipse 130% 100% at right center, rgba(40,22,10,.19), rgba(40,22,10,.13) 32%, rgba(40,22,10,.06) 54%, rgba(40,22,10,.02) 74%, transparent 90%);
-          /* CLOSE: the cover lifts off the ground zone in the first instant of
-             the close swing, so its shadow there must die immediately — 150ms,
-             well inside the cover's 450ms — or a detached blob lingers on the
-             empty paper after the cover has already landed shut. */
-          transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1),
-                      transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
+          /* Two layers, like a real cast: a tight umbra hugging the tip and a
+             wide, faint penumbra trailing off. Edges feathered on every side —
+             the mask kills the old hard top/bottom box edges, and the blur
+             tightens as the cover lowers (a higher tip throws a softer
+             shadow). */
+          background:
+            linear-gradient(270deg, rgba(40,22,10,.24), rgba(40,22,10,.10) 16%, transparent 38%),
+            linear-gradient(270deg, rgba(40,22,10,.12), rgba(40,22,10,.07) 35%, rgba(40,22,10,.025) 65%, transparent 92%);
+          -webkit-mask-image: linear-gradient(180deg, transparent, #000 22%, #000 72%, transparent);
+          mask-image: linear-gradient(180deg, transparent, #000 22%, #000 72%, transparent);
+          filter: blur(calc(14px - 8px * var(--g)));
         }
         .archivo-cover {
           position: absolute; inset: 0;
           transform-origin: left center;
           transform-style: preserve-3d;
-          /* CLOSE (mouse-out): faster than open (450ms vs --dur ~700ms), plain
-             ease-out, NO overshoot — asymmetric so grid-skimming doesn't feel
-             sticky. The bouncy open easing lives in the :hover rule below. */
-          transition: transform 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+          transform: rotateY(calc(-1 * var(--a)));
         }
         .archivo-front {
           object-fit: contain;
           backface-visibility: hidden;
-          box-shadow: 0 8px 18px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
+          /* Layered, warm, short: a thin magazine barely lifts off the page.
+             (Was a single 0 8px 18px .18 — doubled by the sumario's shadow
+             underneath it read as a heavy grey slab.) */
+          box-shadow: 0 0 0 1px rgba(0,0,0,.05), 0 1px 2px rgba(40,22,10,.08), 0 5px 12px rgba(40,22,10,.08);
         }
         .archivo-back {
           position: absolute; inset: 0;
           backface-visibility: hidden;
           transform: rotateY(180deg);
           background: #e9e6dd;
-          box-shadow: inset 0 0 44px rgba(60,40,20,.14);
+          /* Inset = paper tone; the outer layers are the lifted cover's own
+             soft drop onto the sumario/page below it (light from above). */
+          box-shadow: inset 0 0 44px rgba(60,40,20,.14),
+                      0 1px 2px rgba(40,22,10,.06),
+                      0 5px 12px rgba(40,22,10,.06);
         }
         .archivo-back::after {
           content: ""; position: absolute; inset: 0;
@@ -679,33 +724,11 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
              resting angle and settles, like a real cover being flipped open.
              Slower than close (700ms vs 450ms) — asymmetric: slow where the
              user is watching, fast on the way out so skimming feels light. */
-          .archivo-book:hover .archivo-cover {
-            transform: rotateY(calc(-1 * var(--open, 160deg)));
-            transition: transform var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
-          }
-          /* The cast shadow (under the cover, retreating to the spine gutter)
-             moves in lockstep with the rotation — it is always hidden behind
-             the cover, so sharing the cover's curve keeps it feeling caused by
-             the lift. */
-          .archivo-book:hover .archivo-cast {
-            opacity: 0.8;
-            transform: scaleX(0.34);
-            transition: opacity var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1)),
-                        transform var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
-          }
-          /* The ground shadow must NOT run in lockstep: it sits at the open
-             cover's FINAL tip position, but the tip only sweeps into that zone
-             in the last third of the rotation (and the overshoot curve front-
-             loads the motion). Lockstep painted a near-full shadow on empty
-             paper while the cover still stood at the spine — the shadow landed
-             before the cover did. Staged instead: hold for 0.3×dur, then bloom
-             over 0.45×dur with a plain ease-out, completing just as the cover
-             presses flat. */
-          .archivo-book:hover .archivo-ground {
-            opacity: 1;
-            transform: scaleX(1);
-            transition: opacity calc(var(--dur, 700ms) * 0.45) cubic-bezier(0.215, 0.61, 0.355, 1) calc(var(--dur, 700ms) * 0.3),
-                        transform calc(var(--dur, 700ms) * 0.45) cubic-bezier(0.215, 0.61, 0.355, 1) calc(var(--dur, 700ms) * 0.3);
+          /* OPEN (hover): overshoot easing so the cover snaps a touch past its
+             resting angle and settles; slower than close (~700ms vs 450ms). */
+          .archivo-book:hover .archivo-inner {
+            --a: var(--open, 160deg);
+            transition: --a var(--dur, 700ms) var(--ease-open, cubic-bezier(0.34, 1.2, 0.5, 1));
           }
           .archivo-book:hover .archivo-hint {
             opacity: 1; transform: translateZ(1px) scale(1);
@@ -714,8 +737,8 @@ export default function PublicacionesArchivo({ years }: { years: ArchivoYear[] }
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .archivo-cover { transition: none; }
-          .archivo-book:hover .archivo-cover { transform: none; }
+          .archivo-inner { transition: none; }
+          .archivo-book:hover .archivo-inner { --a: 0deg; }
           .archivo-cast { display: none; }
           .archivo-ground { display: none; }
           /* No flip → the inside page never exposes, so the hint would float
