@@ -1,14 +1,19 @@
 # olivera_mag — Olivera magazine site
 
 **Revista de Derecho Comercial y de la Empresa** — the 3rd of three sister sites using the same
-self-hosted TinaCMS setup. The site is **built and live**; Tina is **wired** (one env var pending,
-see below).
+self-hosted TinaCMS setup. Built and live; self-hosted on web-prod since the Vercel team pause
+(2026-11-04).
 
 - **Production:** https://revistaderechocomercial.edu.uy (every.to-style layout, sections/authors/issues;
-  DNS on Porkbun, www 308→apex; rog-mag.vercel.app still works as alias)
+  registrar NIC.uy (Belén's account, each NS change emails her a code); DNS on Cloudflare since
+  2026-11-16, served by Cloudflare Tunnel `revista`)
 - **Admin:** https://revistaderechocomercial.edu.uy/admin (Clerk Google login, allowed emails only)
-- **GitHub:** `anibalinbalin/rog_mag` — pushes to `main` auto-deploy on Vercel
-- **Vercel:** project `rog-mag`, team scope `anibals-projects-c9882c4c`
+- **GitHub:** `anibalinbalin/rog_mag` — pushing does NOT deploy
+- **Hosting:** CT 112 web-prod, unit `web@revista`, port 3005. Deploy: `webprod-deploy revista
+  /mnt/data/sites-sync/2026/olivera_mag origin/main` (runs `/home/web/revista/build.cmd`: full Tina
+  reindex, since git archive ships no `.git`). Env: `/home/web/revista/.env.production.local`.
+  Details: `2026/proxmox/.wiki/guests/web-prod.md`. Vercel project `rog-mag` is dead (team paused);
+  never `vercel deploy`.
 - **Local dir:** `/mnt/data/sites-sync/2026/olivera_mag/` (app at repo root)
 - **Local dev:** `bun run dev` (Tina + Next on port 3003) or `bun run dev:next` (Next only).
   Tailscale URL: https://claude-code-sec.tailf626.ts.net:3003/
@@ -39,14 +44,16 @@ see below).
   `--datalayer-port` flag — it's a TCP client connecting to the CLI's datalayer server. A mismatch
   (client default 9000, server on 9001) hangs builds forever. This hung a Vercel build for 46 min;
   it "worked" locally only because elemental's dev server happened to be listening on 9000.
-- **Vercel env (Production):** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
-  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN` (= `gh auth token`), `GITHUB_OWNER/REPO/BRANCH`,
+- **Production env (web-prod `.env.production.local`):** `TINA_PUBLIC_CLERK_PUBLIC_KEY`, `CLERK_SECRET`,
+  `TINA_PUBLIC_ALLOWED_EMAILS`, `GITHUB_PERSONAL_ACCESS_TOKEN`, `GITHUB_OWNER/REPO/BRANCH`,
   `MONGODB_URI`, `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
-  Stored as plain encrypted (NOT write-only "Sensitive") so `vercel env pull --environment=production` works.
+  `TINA_PUBLIC_*` are baked at build time: changing them needs a redeploy, the rest a
+  `systemctl restart web@revista`. Don't use `gh auth token` as the GitHub token: it dies when gh
+  re-authenticates (that broke Tina saves by 2026-11-16).
 
 ### ✅ MONGODB_URI — DONE (2026-06-02)
 
-Atlas db user `olivera_mag` minted; `MONGODB_URI` set in Vercel Production AND in local `.env`
+Atlas db user `olivera_mag` minted; `MONGODB_URI` set on web-prod AND in local `.env`
 (password is recoverable from `.env` — don't delete it). Content indexed into the `olivera_mag`
 database (collection `tinacms-main`) on the shared `tina-cms` cluster. Production editing is live.
 
@@ -77,11 +84,12 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 ## Secrets — where to find them on this box
 
 - **Clerk secret (sk_test):** `/mnt/data/sites-sync/2026/migrate_claude_code/clerk.env`
-- **GitHub token:** `gh auth token` (repo scope, account anibalinbalin)
-- **Mongo:** the Atlas user password is ONLY in local `.env` (and Vercel) — don't delete it
-- **Cloudinary:** API key/secret/cloud-name in local `.env` (and Vercel); also recoverable from
+- **GitHub token:** local `.env` and web-prod env (account anibalinbalin)
+- **Mongo:** the Atlas user password is ONLY in local `.env` (and web-prod env) — don't delete it
+- **Cloudinary:** API key/secret/cloud-name in local `.env` (and web-prod env); also recoverable from
   console.cloudinary.com (Anibal's account)
-- Local `.env` (gitignored) mirrors the Vercel production env for local prod-mode testing
+- Local `.env` (gitignored) mirrors the production env for local prod-mode testing.
+  Backup of all prod env: `~/.config/selfhost/` on CT110
 
 ## Gotchas (hard-won)
 
@@ -111,7 +119,7 @@ database (collection `tinacms-main`) on the shared `tina-cms` cluster. Productio
 - **The dev-mode /admin only works in a browser ON the dev box** — its stub loads assets from
   `http://localhost:4002/...` (hardcoded by the Tina CLI), which is unreachable from Anibal's
   MacBook over Tailscale ("Failed loading TinaCMS assets"). For remote testing of the editor,
-  ALWAYS use the production admin (rog-mag.vercel.app/admin). The local :3003 site pages are fine.
+  ALWAYS use the production admin (revistaderechocomercial.edu.uy/admin). The local :3003 site pages are fine.
 - **Admin collection search is production-only** — `tina/config.tsx` wires a custom `searchClient`
   (queries our GraphQL backend, text-matches in the browser, no index). In dev mode Tina ignores it
   and queries a hardcoded `localhost:4001` (our CLI runs on 4002), so dev-mode admin search never

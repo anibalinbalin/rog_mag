@@ -39,6 +39,19 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Self-hosted (web-prod) there's no Vercel edge doing these two:
+      // www → apex, and /admin → Tina's static index.html.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.revistaderechocomercial.edu.uy" }],
+        destination: "https://revistaderechocomercial.edu.uy/:path*",
+        permanent: true,
+      },
+      {
+        source: "/admin",
+        destination: "/admin/index.html",
+        permanent: false,
+      },
       // Noticias is an editorial section — its permanent home is /secciones/noticias.
       {
         source: "/noticias",
